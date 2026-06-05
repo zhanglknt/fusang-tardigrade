@@ -905,7 +905,7 @@ def divide_and_conquer(sequences, taxon_names,
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(
-        description="Fusang v2: Scalable Phylogenetic Inference"
+        description="Fusang: Tardigrade Edition -- Scalable Phylogenetic Inference"
     )
     parser.add_argument("--input", "-i", required=True,
                         help="Input FASTA file")
@@ -963,7 +963,7 @@ def main():
     args = parse_args()
     start_time = time.time()
     print("=" * 60)
-    print("  Fusang v2 - Scalable Phylogenetic Inference")
+    print("  Fusang: Tardigrade Edition -- Scalable Phylogenetic Inference")
     print("  Requested mode: %s" % args.mode)
     print("  Input: %s" % args.input)
     print("  Output: %s" % args.output)

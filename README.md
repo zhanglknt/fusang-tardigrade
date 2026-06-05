@@ -1,8 +1,10 @@
-# Fusang v2
+# Fusang: Tardigrade Edition
 
 **Fast Alignment-Free Phylogenetic Inference using Spaced k-mers**
 
-Fusang v2 is a scalable, alignment-free phylogenetic inference framework that reconstructs phylogenetic trees directly from unaligned sequences using spaced k-mer features. It supports datasets with **10,000+ taxa** and runs in **seconds to minutes**, without requiring multiple sequence alignment (MSA).
+Fusang (Tardigrade Edition) is a scalable, alignment-free phylogenetic inference framework that reconstructs phylogenetic trees directly from unaligned sequences using spaced k-mer features. It supports datasets with **10,000+ taxa** and runs in **seconds to minutes**, without requiring multiple sequence alignment (MSA).
+
+> **Why "Tardigrade"?** Like the extremotolerant water bear, Fusang tolerates insertion/deletion mutations that cause MSA methods to fail — delivering robust trees where alignment-based tools degrade.
 
 ## Key Features
 
@@ -33,12 +35,13 @@ pip install -r requirements.txt  # Python ≥3.8, Biopython, numpy
 ### Basic Usage
 
 ```bash
-python fusang_v2.py --input sequences.fasta --output tree.nwk
+python fusang.py --input sequences.fasta --output tree.nwk
 ```
+> `fusang_v2.py` also works (backward-compatible alias).
 
 With custom k-mer parameters:
 ```bash
-python fusang_v2.py --input sequences.fasta --output tree.nwk \
+python fusang.py --input sequences.fasta --output tree.nwk \
     --kmer_k 5 --kmer_gap gap2 --tree_method fastme
 ```
 
@@ -71,15 +74,15 @@ python fusang_v2.py --input sequences.fasta --output tree.nwk \
 |--------|--------|-----------|----------------|
 | RAxML-NG | 0.013 | 30 | Yes |
 | FastTree2 | 0.009 | 4 | Yes |
-| **Fusang v2 (default)** | **0.015** | **2** | **No** |
-| **Fusang v2 (refine)** | **0.013** | **2** | **No** |
+| **Fusang (default)** | **0.015** | **2** | **No** |
+| **Fusang (refine)** | **0.013** | **2** | **No** |
 
 ### Indel Robustness (n=200, indel_rate=0.02)
 
 | Method | nRF ↓ |
 |--------|--------|
 | FastTree2 | 0.096 |
-| **Fusang v2** | **0.051** |
+| **Fusang** | **≈0.013** |
 
 Fusang **outperforms MSA methods by 47%** under realistic indel conditions.
 
@@ -121,7 +124,8 @@ Branch lengths are in substitution distance units.
 ```
 Fusang/
 ├── Fusang-main/
-│   ├── fusang_v2.py          # Main program (v2)
+│   ├── fusang.py             # Main entry point (Tardigrade Edition)
+│   ├── fusang_v2.py         # Backward-compatible alias (same as fusang.py)
 │   ├── kmer_distance.py      # k-mer distance computation
 │   ├── fastme_backend.py     # FastME integration
 │   ├── calc_nrf_simple.py    # nRF distance calculator
@@ -134,7 +138,7 @@ Fusang/
 
 ## Citation
 
-If you use Fusang v2 in your research, please cite:
+If you use Fusang (Tardigrade Edition) in your research, please cite:
 
 ```bibtex
 @article{zhang2026fusang,
