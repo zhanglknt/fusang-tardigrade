@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use Fusang v2 in your research, please cite as below."
+authors:
+  - family-names: "Zhang"
+    given-names: "Li"
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # REPLACE with real ORCID
+  - family-names: "Fusang Contributors"
+    given-names: ""
+title: "Fusang v2: Fast Alignment-Free Phylogenetic Inference using Spaced k-mers"
+version: "2.0.0"
+date-released: 2026-06-05
+url: "https://github.com/yourusername/Fusang"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Zhang"
+      given-names: "Li"
+  title: "Fast alignment-free phylogenetic inference using spaced k-mers"
+  journal: "In preparation"
+  year: 2026

@@ -1,0 +1,6 @@
+# Fusang v2 requirements
+# Python ≥3.8 required
+
+numpy>=1.20.0
+numba>=0.55.0
+biopython>=1.79
