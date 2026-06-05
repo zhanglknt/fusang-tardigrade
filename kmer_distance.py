@@ -1,6 +1,6 @@
 """
 k-mer 距离模块
-用于 Fusang v2 分级建树架构
+用于 Fusang 分级建树架构
 
 功能：
 1. 对每条序列计算 k-mer 频率向量（Numba JIT 加速）

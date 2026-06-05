@@ -1,4 +1,4 @@
-# Fusang v2 requirements
+# Fusang requirements
 # Python ≥3.8 required
 
 numpy>=1.20.0

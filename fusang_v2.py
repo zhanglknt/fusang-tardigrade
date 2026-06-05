@@ -1,5 +1,5 @@
 """
-Fusang v2 - Scalable Phylogenetic Inference via Divide-and-Conquer
+Fusang - Scalable Phylogenetic Inference via Divide-and-Conquer
 Supports 10000+ taxa and arbitrary-length MSA.
 
 Architecture (DCM-inspired):
@@ -1051,7 +1051,7 @@ def main():
     elapsed = time.time() - start_time
     print("")
     print("=" * 60)
-    print("  Fusang v2 done! Time: %.2fs" % elapsed)
+    print("  Fusang done! Time: %.2fs" % elapsed)
     print("   Output: %s" % args.output)
     print("=" * 60)
     return 0

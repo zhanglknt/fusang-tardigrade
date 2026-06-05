@@ -1,5 +1,5 @@
 """
-fastme_backend.py — FastME (Balanced Minimum Evolution) backend for Fusang v2.
+fastme_backend.py — FastME (Balanced Minimum Evolution) backend for Fusang.
 
 Replaces O(n³) NJ with O(n² log n) FastME.
 Self-contained: no dependency on fusang_v2 (avoid numba import chain).
