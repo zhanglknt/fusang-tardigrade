@@ -1,0 +1,65 @@
+# Fusang: Tardigrade Edition - Git Ignore
+# Papers, figures, and large benchmark data are NOT synced to GitHub
+
+# === Papers, manuscripts, figures ===
+*.pdf
+*.docx
+*.pptx
+*.tex
+*.bib
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.tiff
+*_figure*/
+*figure*/
+*Figure*/
+*paper*/
+*manuscript*/
+*draft*/
+*report*.*/
+
+# === Benchmark data (large, generated) ===
+*benchmark_data*/
+*_data*/
+*results*/
+*.csv
+*.tsv
+!*_benchmark.csv
+!*_results.csv
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Logs ===
+*.log
+logs/
+
+# === Binaries (keep run scripts) ===
+*.exe
+*.bat
+!run_*.bat
