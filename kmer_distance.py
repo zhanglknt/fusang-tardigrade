@@ -10,6 +10,7 @@ k-mer 距离模块
 """
 
 import numpy as np
+from scipy.spatial.distance import pdist, squareform
 from typing import List, Dict, Tuple, Optional
 from functools import lru_cache
 import multiprocessing as mp
@@ -308,15 +309,19 @@ def compute_kmer_distance_matrix(sequences: List[str],
 
         np.fill_diagonal(dist_matrix, 0.0)
 
+    elif metric == 'euclidean':
+        # 向量化 Euclidean 距离：使用 scipy.spatial.distance.pdist (O(n² * vec_size) -> O(n²) optimized C)
+        condensed = pdist(freq_vectors, metric='euclidean')
+        dist_matrix = squareform(condensed).astype(np.float32)
+
+    elif metric == 'jaccard':
+        # 向量化 Jaccard 距离：先二值化，再用 pdist
+        binary_vectors = (freq_vectors > 0).astype(np.float32)
+        condensed = pdist(binary_vectors, metric='jaccard')
+        dist_matrix = squareform(condensed).astype(np.float32)
+
     else:
-        dist_matrix = np.zeros((n, n), dtype=np.float32)
-        for i in range(n):
-            for j in range(i + 1, n):
-                d = kmer_distance(freq_vectors[i], freq_vectors[j], metric)
-                dist_matrix[i][j] = d
-                dist_matrix[j][i] = d
-            if i % max(1, n // 10) == 0:
-                print(f"[kmer_distance]   距离矩阵计算进度: {i+1}/{n}")
+        raise ValueError(f"Unsupported metric: {metric}")
 
     print(f"[kmer_distance] 距离矩阵计算完成。形状: {dist_matrix.shape}")
     return dist_matrix

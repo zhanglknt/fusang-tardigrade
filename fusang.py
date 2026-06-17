@@ -2,7 +2,7 @@
 """
 Fusang: Tardigrade Edition -- entry point.
 
-Thin wrapper: imports and runs fusang_v2.main().
+Thin wrapper: imports and runs fusang-tardigrade.main().
 Both `python fusang.py` and `python fusang_v2.py` work.
 """
 from fusang_v2 import main

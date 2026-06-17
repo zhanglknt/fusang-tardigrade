@@ -1,0 +1,10 @@
+include requirements.txt
+include README.md
+include LICENSE
+recursive-include templates *
+recursive-include static *
+recursive-include fusang_mhl *
+include fusang_v2.py
+include fusang_v4_dahp_v1.py
+include fusang_mhl_main.py
+include fusang_webapp.py

@@ -2,7 +2,7 @@
 fastme_backend.py — FastME (Balanced Minimum Evolution) backend for Fusang.
 
 Replaces O(n³) NJ with O(n² log n) FastME.
-Self-contained: no dependency on fusang_v2 (avoid numba import chain).
+Self-contained: no dependency on fusang-tardigrade (avoid numba import chain).
 """
 
 from __future__ import annotations
@@ -18,13 +18,13 @@ from typing import List, Optional, Sequence, Tuple
 import numpy as np
 
 
-# ── Lightweight TreeNode (avoid importing fusang_v2 → numba) ──────────
+# ── Lightweight TreeNode (avoid importing fusang-tardigrade → numba) ──────────
 
 class _TreeNode:
-    """Lightweight Newick tree node, compatible with fusang_v2.TreeNode."""
+    """Lightweight Newick tree node, compatible with fusang-tardigrade.TreeNode."""
     def __init__(self, name: Optional[str] = None, dist: float = 0.0):
         self.name = name
-        self.dist = dist          # fusang_v2.TreeNode uses .dist
+        self.dist = dist          # fusang-tardigrade.TreeNode uses .dist
         self.children: List["_TreeNode"] = []
         self.up: Optional["_TreeNode"] = None
 
@@ -304,7 +304,7 @@ def build_tree_fastme(distance_matrix: np.ndarray,
                       verbose: int = 0) -> _TreeNode:
     """
     Build a phylogenetic tree using FastME.
-    Returns _TreeNode (compatible with fusang_v2.TreeNode).
+    Returns _TreeNode (compatible with fusang-tardigrade.TreeNode).
     """
     n = len(taxon_names)
     if n < 4:
@@ -439,8 +439,8 @@ def build_tree_fastme(distance_matrix: np.ndarray,
 
 if __name__ == "__main__":
     # ALL output goes to a file to avoid Windows console encoding crash
-    out_file = "C:/Users/admin/AppData/Local/Temp/fastme_test_output.txt"
-    log_file = "C:/Users/admin/AppData/Local/Temp/fastme_test_debug.txt"
+    out_file = os.path.join(tempfile.gettempdir(), "fastme_test_output.txt")
+    log_file = os.path.join(tempfile.gettempdir(), "fastme_test_debug.txt")
 
     def out(msg: str):
         with open(out_file, "a", encoding="utf-8", errors="replace") as f:

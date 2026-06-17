@@ -206,9 +206,14 @@ def calc_nrf(tree1_path, tree2_path):
     
     # Verify same leaf set
     if leaves1 != leaves2:
-        print(f"WARNING: Leaf sets differ! |tree1|={len(leaves1)}, |tree2|={len(leaves2)}")
-        print(f"  Only in tree1: {sorted(list(leaves1 - leaves2))[:5]}{'...' if len(leaves1 - leaves2) > 5 else ''}")
-        print(f"  Only in tree2: {sorted(list(leaves2 - leaves1))[:5]}{'...' if len(leaves2 - leaves1) > 5 else ''}")
+        try:
+            print(f"WARNING: Leaf sets differ! |tree1|={len(leaves1)}, |tree2|={len(leaves2)}")
+            only1_list = [str(x) for x in sorted(list(leaves1 - leaves2))[:5]]
+            only2_list = [str(x) for x in sorted(list(leaves2 - leaves1))[:5]]
+            print(f"  Only in tree1: {only1_list}{'...' if len(leaves1 - leaves2) > 5 else ''}")
+            print(f"  Only in tree2: {only2_list}{'...' if len(leaves2 - leaves1) > 5 else ''}")
+        except UnicodeEncodeError:
+            print(f"WARNING: Leaf sets differ! |tree1|={len(leaves1)}, |tree2|={len(leaves2)}")
     
     shared = bp1 & bp2
     only1 = bp1 - bp2

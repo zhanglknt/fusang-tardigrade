@@ -1,20 +1,39 @@
 cff-version: 1.2.0
-message: "If you use Fusang (Tardigrade Edition) in your research, please cite as below."
+message: "If you use Fusang: Tardigrade Edition in your research, please cite the following paper."
+title: "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
 authors:
-  - family-names: "Zhang"
-    given-names: "Li"
-    orcid: "https://orcid.org/0000-0000-0000-0000" # REPLACE with real ORCID
-  - family-names: "Fusang Contributors"
-    given-names: ""
-title: "Fusang: Tardigrade Edition -- Fast Alignment-Free Phylogenetic Inference using Spaced k-mers"
-version: "tardigrade-1.0"
-date-released: 2026-06-05
-url: "https://github.com/yourusername/Fusang"
+  - family-names: Zhang
+    given-names: Li
+    affiliation: "Chinese Academy of Medical Sciences & Peking Union Medical College; Chinese Institute for Brain Research (CIBR), Beijing"
+    orcid: ""
+  - family-names: Wang
+    given-names: Xiaowo
+    affiliation: "Tsinghua University"
+  - family-names: Li
+    given-names: Yixue
+    affiliation: "Chinese Academy of Sciences"
+repository-code: "https://github.com/fusang-dev/fusang-tardigrade"
+url: "https://github.com/fusang-dev/fusang-tardigrade"
+abstract: "Fusang is an alignment-free phylogenetic inference framework leveraging spaced k-mer features for indel-robust tree construction."
+keywords:
+  - phylogenetics
+  - alignment-free
+  - spaced-kmer
+  - indel-robust
+  - fastme
+license: MIT
+version: "2.0.0"
+date-released: "2026-06-06"
 preferred-citation:
   type: article
+  title: "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
   authors:
-    - family-names: "Zhang"
-      given-names: "Li"
-  title: "Fast alignment-free phylogenetic inference using spaced k-mers"
-  journal: "In preparation"
+    - family-names: Zhang
+      given-names: Li
+    - family-names: Wang
+      given-names: Xiaowo
+    - family-names: Li
+      given-names: Yixue
+  journal: Nucleic Acids Research
   year: 2026
+  status: under-review

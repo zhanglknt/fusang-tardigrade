@@ -1,5 +1,5 @@
 """
-Fusang - Scalable Phylogenetic Inference via Divide-and-Conquer
+Fusang: Tardigrade Edition -- Scalable Phylogenetic Inference via Divide-and-Conquer
 Supports 10000+ taxa and arbitrary-length MSA.
 
 Architecture (DCM-inspired):
@@ -88,6 +88,67 @@ class TreeNode:
         if self.up:
             self.up.children.remove(self)
             self.up = None
+
+    @classmethod
+    def from_newick(cls, newick_str):
+        """Parse a Newick string into a TreeNode tree.
+
+        Supports standard Newick format with branch lengths and names.
+        Ported from incremental_update.py parse_newick().
+
+        Args:
+            newick_str: Newick string (with or without trailing semicolon)
+
+        Returns:
+            TreeNode root of the parsed tree
+        """
+        newick_str = newick_str.strip().rstrip(';')
+
+        def _parse_node(s, pos):
+            node = cls()
+            if pos < len(s) and s[pos] == '(':
+                pos += 1
+                children = []
+                while pos < len(s) and s[pos] != ')':
+                    child, pos = _parse_node(s, pos)
+                    child.up = node
+                    children.append(child)
+                    if pos < len(s) and s[pos] == ',':
+                        pos += 1
+                if pos < len(s) and s[pos] == ')':
+                    pos += 1
+                node.children = children
+                # After closing ')', read optional internal node name
+                # (BioPython NJ names internal nodes like "Inner2:0.075")
+                name_chars = []
+                while pos < len(s) and s[pos] not in ',):;:':
+                    name_chars.append(s[pos])
+                    pos += 1
+                if name_chars:
+                    node.name = ''.join(name_chars).strip()
+            else:
+                name_chars = []
+                while pos < len(s) and s[pos] not in ',):;':
+                    name_chars.append(s[pos])
+                    pos += 1
+                node.name = ''.join(name_chars).strip()
+            # Parse branch length after ':'
+            if pos < len(s) and s[pos] == ':':
+                pos += 1
+                num_chars = []
+                while pos < len(s) and s[pos] in '0123456789.eE-+':
+                    num_chars.append(s[pos])
+                    pos += 1
+                if num_chars:
+                    node.dist = float(''.join(num_chars))
+            return node, pos
+
+        root, _ = _parse_node(newick_str, 0)
+        return root
+
+    def to_newick(self, format=1):
+        """Output Newick string with trailing semicolon. Alias for write()."""
+        return self.write(format=format)
 
     def __repr__(self):
         return "TreeNode(name=%s, dist=%.4f, n_children=%d)" % (
@@ -304,10 +365,106 @@ def _greedy_clustering(distance_matrix, max_group_size=40):
     return groups
 
 
+def tree_balanced_split(Z, n_taxa, max_group_size, min_ratio=0.1):
+    """
+    Given a scipy linkage matrix Z (n_taxa-1 rows),
+    recursively cut the tree to produce clusters all <= max_group_size,
+    while avoiding pathological splits (cluster < min_ratio * n_taxa).
+
+    Returns: list of lists of indices (0-based leaf indices).
+    """
+    import bisect
+    # Z[:,2] = height at each merge. Monotonically increasing.
+    # We want to find cut heights that give balanced partitions.
+    #
+    # Strategy: top-down recursive split using the linkage tree.
+    # Each internal node = a merge. We traverse from root,
+    # split at the deepest node where both children >= min_size.
+
+    min_size = max(2, int(n_taxa * min_ratio))
+
+    # Build children lookup from Z
+    # Z[i] merges clusters (Z[i,0], Z[i,1]) -> new cluster n_taxa+i
+    # Leaves: 0..n_taxa-1
+    n_merge = Z.shape[0]
+    children = {}
+    for i in range(n_merge):
+        left = int(Z[i, 0])
+        right = int(Z[i, 1])
+        new_id = n_taxa + i
+        children[new_id] = (left, right)
+
+    def _get_leaves(node_id):
+        if node_id < n_taxa:
+            return [node_id]
+        l, r = children[node_id]
+        return _get_leaves(l) + _get_leaves(r)
+
+    def _split_node(node_id):
+        """Yield leaf-groups by recursively splitting node_id."""
+        leaves = _get_leaves(node_id)
+        if len(leaves) <= max_group_size:
+            yield leaves
+            return
+        # Find the best split point in this subtree:
+        # the merge just above where the subtree root is.
+        # node_id is a merge node (n_taxa + i).
+        # Its children are left, right.
+        if node_id < n_taxa:
+            yield leaves  # shouldnt happen
+            return
+        l_child, r_child = children[node_id]
+        l_leaves = _get_leaves(l_child)
+        r_leaves = _get_leaves(r_child)
+        # If one child is too small, don't split here; need to go deeper
+        # or accept imbalance. Instead: force split and accept,
+        # but only if both children >= min_size.
+        if len(l_leaves) < min_size or len(r_leaves) < min_size:
+            # Can't split at this node. But group is > max_group_size,
+            # so we must split somewhere. Force split at this node anyway
+            # and let the small child be handled by overlap/merging.
+            # Actually: just yield both children recursively.
+            # If a child is too small, it will be merged later.
+            pass
+        # Recurse into both children
+        yield from _split_node(l_child)
+        yield from _split_node(r_child)
+
+    # Start from root = last merge
+    root_id = n_taxa + n_merge - 1
+    raw_groups = list(_split_node(root_id))
+
+    # Post-process: merge tiny groups (< min_size) into nearest neighbor group
+    if len(raw_groups) <= 1:
+        return [list(range(n_taxa))]  # fallback: one group
+
+    merged = []
+    tiny_groups = []
+    for g in raw_groups:
+        if len(g) < min_size:
+            tiny_groups.append(g)
+        else:
+            merged.append(g)
+
+    for tg in tiny_groups:
+        if not merged:
+            merged.append(tg)
+            continue
+        # Find the merged group whose centroid is closest to tg's centroid
+        # Simplest: just append to the largest group
+        largest = max(merged, key=len)
+        largest.extend(tg)
+
+    return merged
+
+
 def kmer_clustering(distance_matrix, taxon_names, max_group_size=40, overlap=0.15):
     """
     Cluster taxa using k-mer distance matrix.
     Returns list of groups, each group is a list of integer indices.
+
+    Uses UPGMA hierarchical clustering with balanced tree-cutting
+    to avoid pathological splits (e.g., [9999, 1] on coalescent data).
     """
     n = len(taxon_names)
     if n <= max_group_size:
@@ -317,33 +474,24 @@ def kmer_clustering(distance_matrix, taxon_names, max_group_size=40, overlap=0.1
         from scipy.spatial.distance import squareform
         condensed = squareform(distance_matrix)
         Z = linkage(condensed, method="average")
-        n_clusters = max(2, int(np.ceil(n / max_group_size)))
-        labels = fcluster(Z, t=n_clusters, criterion="maxclust")
-        groups_dict = {}
-        for i, label in enumerate(labels):
-            if label not in groups_dict:
-                groups_dict[label] = []
-            groups_dict[label].append(i)
-        raw_groups = list(groups_dict.values())
-        # Post-process: if any group exceeds max_group_size significantly,
-        # split it into chunks. This handles uniform data where clustering
-        # can't find natural subgroups.
+        # Use balanced tree splitting instead of fixed n_clusters
+        groups = tree_balanced_split(Z, n, max_group_size, min_ratio=0.1)
+        # Further split any group that still exceeds max_group_size * 2
         balanced = []
-        oversize_fixed = 0
-        for g in raw_groups:
-            if len(g) > max_group_size * 2:
-                # Sequential split: divide into roughly equal chunks
-                chunk_size = min(max_group_size, len(g))
+        for g in groups:
+            if len(g) > max_group_size:
+                # Force split into max_group_size chunks
                 while g:
-                    chunk = g[:chunk_size]
-                    g = g[chunk_size:]
-                    balanced.append(chunk)
-                oversize_fixed += 1
+                    balanced.append(g[:max_group_size])
+                    g = g[max_group_size:]
             else:
                 balanced.append(g)
-        if oversize_fixed:
-            print("  [clustering] split %d oversized groups, balanced: %d groups" %
-                  (oversize_fixed, len(balanced)))
+        # Sanity check
+        total = sum(len(g) for g in balanced)
+        assert total == n, f"Clustering lost taxa: expected {n}, got {total}"
+        ns = [len(g) for g in balanced]
+        print(f"  [clustering] UPGMA tree-cut: {len(balanced)} groups, "
+              f"sizes: min={min(ns)}, max={max(ns)}, mean={total/len(balanced):.0f}")
         return balanced
     except ImportError:
         print("[WARN] scipy not installed, using greedy clustering.")
@@ -749,10 +897,12 @@ def divide_and_conquer(sequences, taxon_names,
                             max_group_size=200, overlap=0.15,
                             mode="default", distance_method="kmer",
                             k=4, n_threads=4, _depth=0, gap_pattern=None,
-                            tree_method="nj"):
+                            tree_method="nj", epa_method="nj_centroid",
+                            use_minhash=False, minhash_k=5, minhash_sketches=128):
     n = len(sequences)
     indent = "  " * _depth
-    print("%s[DCM] depth=%d, n=%d, mode=%s" % (indent, _depth, n, mode))
+    sketches = None  # MinHash sketches (computed in Step 2 if use_minhash)
+    print("%s[DCM] depth=%d, n=%d, mode=%s, epa=%s" % (indent, _depth, n, mode, epa_method))
     # Base case: build tree directly
     if n <= max_group_size:
         print("%s[DCM] n=%d <= %d, building tree directly" % (indent, n, max_group_size))
@@ -803,26 +953,70 @@ def divide_and_conquer(sequences, taxon_names,
     # Step 2: clustering
     t1 = time.time()
     print("%s[DCM] Step 2: clustering (max_group=%d)..." % (indent, max_group_size))
-    groups = kmer_clustering(dist_mat, taxon_names,
-                              max_group_size=max_group_size,
-                              overlap=overlap)
+    
+    if use_minhash:
+        # MinHash LSH clustering: O(nL) instead of O(n²)
+        try:
+            from minhash_lsh import seq_to_minhash, minhash_coarse_cluster
+            import numpy as np
+            mk = k if k else minhash_k
+            ns = minhash_sketches
+            print("%s[DCM]   computing MinHash sketches (k=%d, sketches=%d)..." % (indent, mk, ns))
+            sketches = [seq_to_minhash(s, k=mk, num_hashes=ns) for s in sequences]
+            groups = minhash_coarse_cluster(sketches, target_group_size=max_group_size, band_width=None)
+        except ImportError:
+            print("%s[DCM]   WARNING: minhash_lsh not available, falling back to kmer_clustering" % indent)
+            groups = kmer_clustering(dist_mat, taxon_names, max_group_size=max_group_size, overlap=overlap)
+    else:
+        groups = kmer_clustering(dist_mat, taxon_names,
+                          max_group_size=max_group_size,
+                          overlap=overlap)
+    
     group_sizes = [len(g) for g in groups]
     print("%s[DCM]   got %d groups, sizes: %s" % (indent, len(groups), group_sizes))
     t2 = time.time()
     print("%s[DCM]   Step 2 done: %.1fs" % (indent, t2 - t1))
-    # Step 3: select centroid representatives using distance matrix
+    
+    # Step 3: select centroid representatives
     t2 = time.time()
     print("%s[DCM] Step 3: selecting centroid representatives..." % indent)
     rep_indices = []       # global indices into `sequences`
     rep_sequences = []
     rep_names = []
-    for g_idx, group in enumerate(groups):
+    
+    if use_minhash and sketches is not None:
+        # Use MinHash distance for centroid selection
+        from minhash_lsh import minhash_distance
+        for g_idx, group in enumerate(groups):
+            best_idx = 0
+            best_avg_dist = float('inf')
+            for i_idx, i in enumerate(group):
+                avg_dist = 0.0
+                count = 0
+                for j_idx, j in enumerate(group):
+                    if i == j:
+                        continue
+                    d = minhash_distance(sketches[i], sketches[j])
+                    avg_dist += d
+                    count += 1
+                if count > 0:
+                    avg_dist /= count
+                if avg_dist < best_avg_dist:
+                    best_avg_dist = avg_dist
+                    best_idx = i_idx
+            global_idx = group[best_idx]
+            rep_indices.append(global_idx)
+            rep_sequences.append(sequences[global_idx])
+            rep_names.append("REP_%d_%s" % (g_idx, taxon_names[global_idx]))
+    else:
         # Use pre-computed distance matrix to find centroid
-        centroid_local_idx = get_centroid_from_distmat(dist_mat, group)
-        global_idx = group[centroid_local_idx]
-        rep_indices.append(global_idx)
-        rep_sequences.append(sequences[global_idx])
-        rep_names.append("REP_%d_%s" % (g_idx, taxon_names[global_idx]))
+        for g_idx, group in enumerate(groups):
+            centroid_local_idx = get_centroid_from_distmat(dist_mat, group)
+            global_idx = group[centroid_local_idx]
+            rep_indices.append(global_idx)
+            rep_sequences.append(sequences[global_idx])
+            rep_names.append("REP_%d_%s" % (g_idx, taxon_names[global_idx]))
+    
     print("%s[DCM]   reps: %s" % (indent, rep_names))
     t3 = time.time()
     print("%s[DCM]   Step 3 done: %.1fs" % (indent, t3 - t2))
@@ -835,7 +1029,9 @@ def divide_and_conquer(sequences, taxon_names,
         overlap=overlap, mode=mode,
         distance_method=distance_method,
         k=k, n_threads=n_threads, gap_pattern=gap_pattern,
-        _depth=_depth + 1, tree_method=tree_method
+        _depth=_depth + 1, tree_method=tree_method,
+        epa_method=epa_method,
+        use_minhash=use_minhash, minhash_k=minhash_k, minhash_sketches=minhash_sketches
     )
     n_leaves_bb = len(backbone_tree.get_leaves())
     t4 = time.time()
@@ -853,7 +1049,9 @@ def divide_and_conquer(sequences, taxon_names,
             overlap=overlap, mode=mode,
             distance_method=distance_method,
             k=k, n_threads=n_threads, gap_pattern=gap_pattern,
-            _depth=_depth + 1, tree_method=tree_method
+            _depth=_depth + 1, tree_method=tree_method,
+            epa_method=epa_method,
+            use_minhash=use_minhash, minhash_k=minhash_k, minhash_sketches=minhash_sketches
         )
         subtrees.append((g_idx, group, subtree))
         n_leaves_st = len(subtree.get_leaves())
@@ -929,15 +1127,32 @@ def parse_args():
                         default=None,
                         help="Gapped k-mer pattern (auto-selected based on n_taxa if not set: n<=100→gap1, n>100→gap2)")
     parser.add_argument("--max_group", type=int, default=200,
-                        help="Max taxa per group (default 200, balances speed vs recursion)")
+                        help="Max taxa per group (default 200; auto-scaled for n>500 unless --no-auto-group)")
+    parser.add_argument("--no-auto-group", dest="auto_group", action="store_false",
+                        default=True,
+                        help="Disable automatic max_group_size selection")
     parser.add_argument("--overlap", type=float, default=0.15,
                         help="Group overlap ratio (default 0.15)")
     parser.add_argument("--threads", "-t", type=int, default=4,
                         help="Number of threads (default 4)")
     parser.add_argument("--tree_method", type=str,
                         choices=["nj", "fastme"],
-                        default="fastme",
-                        help="Tree building method: fastme (FastME BIONJ+bNNI, default; 28x faster and more accurate than NJ), nj (Neighbour-Joining)")
+                        default="nj",
+                        help="Tree building method: nj (Neighbour-Joining, recommended for k-mer distances), fastme (FastME BIONJ+bNNI, may degrade k-mer distance accuracy)")
+    parser.add_argument("--auto_group_method", type=str,
+                        choices=["simple", "nj_centroid", "epa_improved"],
+                        default=None,
+                        help="DCM strategy: simple (no DCM, direct NJ for n<500), nj_centroid (current DCM with NJ), epa_improved (DCM+NNI refinement after EPA grafting)")
+    parser.add_argument("--simple", dest="force_simple", action="store_true", default=None,
+                        help="Force simplified pipeline (k-mer→dist→tree, no DCM/EPA). Auto-enabled for n≤500.")
+    parser.add_argument("--no-simple", dest="force_simple", action="store_false", default=None,
+                        help="Force DCM pipeline even for n≤500 (for benchmarking only)")
+    parser.add_argument("--use_minhash", dest="use_minhash", action="store_true", default=False,
+                        help="Use MinHash LSH for coarse clustering (scales to 50K+ taxa, requires minhash_lsh.py)")
+    parser.add_argument("--minhash_k", type=int, default=5,
+                        help="k-mer size for MinHash (default 5)")
+    parser.add_argument("--minhash_sketches", type=int, default=128,
+                        help="MinHash signature size (default 128)")
     return parser.parse_args()
 
 
@@ -982,10 +1197,22 @@ def main():
         sys.exit(1)
     # Resolve auto mode based on n
     build_mode, nni_mode = _resolve_auto_mode(args.mode, n)
+    # Override nni_mode if epa_method requires refinement
+    epa_method = args.auto_group_method if args.auto_group_method else "nj_centroid"
+    if epa_method == "epa_improved":
+        nni_mode = "refine"  # Force NNI for epa_improved
     if args.mode == "auto":
-        print("[MAIN]   auto mode resolved: n=%d → build=%s, nni=%s" % (n, build_mode, nni_mode))
+        print("[MAIN]   auto mode resolved: n=%d → build=%s, nni=%s, epa=%s" % (n, build_mode, nni_mode, epa_method))
     # Auto-select kmer parameters based on n_taxa (if not explicitly set)
-    # Benchmarks: n<=100 → k=4,gap1 (nRF=0.021); n>100 → k=5,gap2 (nRF=0.005, 63% better)
+    # Evidence base (all seed=42 unless noted):
+    #   Clean n=200:  k=5,gap2  nRF=0.0051 (best ever, kmer_study/k_value_n200)
+    #   Clean n=500:  k=5,gap2  nRF=0.0221  (kmer_study/gap_scaling_n500)
+    #   Clean n=1000: k=5,gap2  nRF=0.0461  (kmer_study/gap_scaling_n1000)
+    #   Indel n=200:  k=5,gap3  nRF=0.0431 (best), k=5,gap2 nRF=0.0482 (+12%)
+    #   Indel multi:   k=5,gap2   mean=0.0804 vs FT2=0.0842, p=0.049 (130 seeds)
+    # Conclusion: k=5,gap2 is near-universal optimum across all scales.
+    #   Indel data at n<=200: gap3 can help (~+5-10% relative).
+    #   Small n<=100 clean: k=4,gap1 is adequate (nRF~0.02).
     if args.kmer_k is None or args.kmer_gap is None:
         if n <= 100:
             auto_k, auto_gap = 4, "gap1"
@@ -998,6 +1225,66 @@ def main():
         if args.kmer_gap is None:
             args.kmer_gap = auto_gap
         print("[MAIN]   auto-selected k=%d, gap=%s (n=%d taxa)" % (args.kmer_k, args.kmer_gap, n))
+    # Auto-select max_group_size based on n_taxa (if auto_group enabled)
+    # Diagnosis (2026-06-06): Critical design constraint discovered:
+    #   The DCM backbone tree MUST have at most 2 taxa when possible.
+    #   With 3+ backbone taxa, NJ/FastME topology is inherently unstable
+    #   on k-mer distances → ~60% disaster rate at n=500 (nRF > 0.44).
+    #   At n=500, mg=200 → 3 groups → 60% disaster; mg=250 → 2 groups → 0%.
+    #   At n=1000, mg=200 → 5+ groups → 60% disaster; mg=500 → 2 groups → 0%.
+    # Rule: max_group ≥ ceil(n/2) to guarantee ≤ 2 backbone taxa
+    #   n≤250:  default 200 (≤2 groups, already safe, simplified pipeline used)
+    #   n≤500:  250 (2 groups, verified safe, simplified pipeline used)
+    #   n≤1000: 500 (2 groups, verified safe, simplified pipeline used)
+    #   n≤2000: 1000 (2 groups, simplified pipeline used)
+    #   n≤5000: ≥2500 (2 groups, DCM triggered above SIMPLE_THRESHOLD=2000)
+    #   n>5000: ≥5000 (2 groups)
+    if args.auto_group:
+        if n <= 250:
+            auto_mg = 200
+        elif n <= 500:
+            auto_mg = 250
+        elif n <= 1000:
+            auto_mg = 500
+        elif n <= 2000:
+            auto_mg = 1000
+        elif n <= 5000:
+            auto_mg = (n + 1) // 2   # ensure ≤2 backbone taxa
+        else:
+            auto_mg = (n + 1) // 2   # ensure ≤2 backbone taxa
+        if auto_mg != args.max_group:
+            args.max_group = auto_mg
+            print("[MAIN]   auto-selected max_group=%d (n=%d taxa, %d backbone taxa)"
+                  % (auto_mg, n, max(1, -(-n // auto_mg))))
+    # Simplified pipeline auto-switch for n <= 500:
+    #   DCM adds no accuracy benefit at small-to-medium scales.
+    #   Empirical (seeds 401-405, n=1000): DCM nRF=0.084, simplified nRF=0.092.
+    #   -> Keep DCM for n>500; use simplified for n<=500.
+    SIMPLE_THRESHOLD = 500  # Reverted - 2000 caused regression (nRF 0.0878 → 0.1073)
+    use_simple = args.force_simple
+    # Override based on auto_group_method
+    if epa_method == "simple":
+        use_simple = True
+        print("[MAIN]   auto_group_method=simple: forcing simplified pipeline (no DCM)")
+    elif epa_method in ("nj_centroid", "epa_improved"):
+        # DCM helps at large n; for n <= SIMPLE_THRESHOLD, simplified is better
+        if n > SIMPLE_THRESHOLD:
+            use_simple = False
+            print("[MAIN]   auto_group_method=%s: using DCM pipeline (n=%d > %d)"
+                  % (epa_method, n, SIMPLE_THRESHOLD))
+        # else: leave use_simple as None so the next block can decide
+    if use_simple is None:
+        # Auto mode: use simplified pipeline for n <= SIMPLE_THRESHOLD
+        use_simple = (n <= SIMPLE_THRESHOLD and args.mode != "dl_refine")
+        if use_simple:
+            print("[MAIN]   auto: n=%d ≤ %d, using simplified pipeline" % (n, SIMPLE_THRESHOLD))
+        else:
+            print("[MAIN]   auto: n=%d > %d, using DCM pipeline" % (n, SIMPLE_THRESHOLD))
+    if use_simple:
+        if args.max_group < n:
+            args.max_group = n
+        print("[MAIN]   simplified pipeline: n=%d ≤ %d → direct tree (no DCM/EPA, %s)"
+              % (n, SIMPLE_THRESHOLD, args.tree_method))
     # Step 2: divide-and-conquer tree building
     print("\n[MAIN] Step 2: building tree (build_mode=%s)..." % build_mode)
     gap_pattern = None
@@ -1014,8 +1301,12 @@ def main():
         n_threads=args.threads,
         _depth=0,
         tree_method=args.tree_method,
+        epa_method=args.auto_group_method if args.auto_group_method else "nj_centroid",
+        use_minhash=args.use_minhash,
+        minhash_k=args.minhash_k,
+        minhash_sketches=args.minhash_sketches,
     )
-    # Step 3: NNI refinement (refine / dl_refine mode)
+    # Step 3: NNI refinement (refine / dl_refine / epa_improved mode)
     # Skip NNI when tree was built by FastME (already BME-optimal)
     dl_model = None
     skip_nni = (args.tree_method == "fastme")
@@ -1038,6 +1329,10 @@ def main():
     elif nni_mode == "refine":
         print("\n[MAIN] Step 3: BME NNI refinement...")
         tree = nni_refine(tree, sequences, taxon_names, dl_model=None, max_iter=100, gap_pattern=gap_pattern, k=args.kmer_k)
+    elif epa_method == "epa_improved":
+        # Force NNI for epa_improved mode (more iterations for better optimization)
+        print("\n[MAIN] Step 3: EPA-improved - BME NNI refinement (forced, 500 iterations)...")
+        tree = nni_refine(tree, sequences, taxon_names, dl_model=None, max_iter=500, gap_pattern=gap_pattern, k=args.kmer_k)
     elif nni_mode == "default":
         print("\n[MAIN] Step 3: skipping NNI (build_mode=%s, n=%d)" % (build_mode, n))
     # Step 4: write NEWICK
@@ -1051,7 +1346,7 @@ def main():
     elapsed = time.time() - start_time
     print("")
     print("=" * 60)
-    print("  Fusang done! Time: %.2fs" % elapsed)
+    print("  Fusang: Tardigrade Edition done! Time: %.2fs" % elapsed)
     print("   Output: %s" % args.output)
     print("=" * 60)
     return 0

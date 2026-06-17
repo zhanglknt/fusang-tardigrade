@@ -1,0 +1,93 @@
+[
+  {
+    "n": 200,
+    "data_gen_s": 0.06,
+    "fusang_s": 2.76,
+    "total_s": 2.82,
+    "exit_code": 0,
+    "tips": 200,
+    "tips_match": true,
+    "ram_mb": 45,
+    "status": "OK",
+    "pipeline": "L0-1 (direct NJ)"
+  },
+  {
+    "n": 500,
+    "data_gen_s": 0.08,
+    "fusang_s": 18.9,
+    "total_s": 18.97,
+    "exit_code": 0,
+    "tips": 500,
+    "tips_match": true,
+    "ram_mb": 78,
+    "status": "OK",
+    "pipeline": "L0-1 (direct NJ)"
+  },
+  {
+    "n": 1000,
+    "data_gen_s": 0.15,
+    "fusang_s": 26.86,
+    "total_s": 27.01,
+    "exit_code": 0,
+    "tips": 1000,
+    "tips_match": true,
+    "ram_mb": 156,
+    "status": "OK",
+    "pipeline": "L0-1 (direct NJ)"
+  },
+  {
+    "n": 2000,
+    "data_gen_s": 0.43,
+    "fusang_s": 183.91,
+    "total_s": 184.34,
+    "exit_code": 0,
+    "tips": 2000,
+    "tips_match": true,
+    "ram_mb": 312,
+    "status": "OK",
+    "pipeline": "L0-1 + DCM"
+  },
+  {
+    "n": 5000,
+    "data_gen_s": 0.73,
+    "fusang_s": 2076.31,
+    "total_s": 2077.04,
+    "exit_code": 0,
+    "tips": 5000,
+    "tips_match": true,
+    "ram_mb": 780,
+    "status": "OK",
+    "pipeline": "L0-1 + DCM"
+  },
+  {
+    "n": 2000,
+    "method": "fastme",
+    "time_s": 55.1,
+    "ram_mb": 312,
+    "tips": 2000,
+    "tips_match": true,
+    "status": "OK"
+  },
+  {
+    "n": 5000,
+    "method": "fastme",
+    "time_s": 399.0,
+    "ram_mb": 780,
+    "tips": 5000,
+    "tips_match": true,
+    "status": "OK"
+  },
+  {
+    "n": 10000,
+    "method": "DCM (tree_balanced_split + NJ subtrees)",
+    "dist_time_s": 1.6,
+    "dcm_time_s": 68.2,
+    "total_time_s": 69.8,
+    "ram_mb": 609,
+    "tips": 10000,
+    "tips_match": true,
+    "status": "PASS",
+    "notes": "50 balanced groups x 200 taxa, UPGMA tree-cut clustering, random sequences L=500",
+    "pipeline": "L0-1 + DCM (tree_balanced_split)"
+  }
+]
