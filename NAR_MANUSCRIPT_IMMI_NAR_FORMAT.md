@@ -92,7 +92,7 @@ Statistical comparisons use Wilcoxon signed-rank tests (paired per-seed) with Co
 
 **Adaptive pipeline selection.** For n≤500, the full IMMI pipeline adds minimal overhead over flat NJ; the framework defaults to L0–1 (direct tree construction). For n>500, DCM-based clustering is automatically activated: all *n* taxa are partitioned into balanced groups of ≤200 using `tree_balanced_split()`, which builds an UPGMA hierarchical clustering tree on the full pairwise distance matrix and cuts it at heights that produce groups all within the [min_ratio×n, max_group_size] size range. This replaces the earlier k-means clustering, which produced pathological [n−1, 1] splits on coalescent data. Representative (centroid) taxa are selected from each group, a backbone NJ tree is constructed on representatives, and full subtrees are built independently per group, then grafted back via simplified EPA. FastME (O(n²)) replaces traditional NJ (O(n³)) for the backbone step. The resulting pipeline processes n=10,000 in 70 seconds (50 groups × 200 taxa, 609 MB RAM).
 
-**Implementation.** Fusang: Tardigrade Edition is implemented in Python 3.9+ with dependencies on NumPy, SciPy, Biopython, scikit-learn, and FastME v2.1.6.4 (bundled). Source code and pre-compiled binaries are available at [GitHub URL] under MIT license with permanent Zenodo DOI. A Flask-based web server with D3.js visualization is provided for interactive use.
+**Implementation.** Fusang: Tardigrade Edition is implemented in Python 3.9+ with dependencies on NumPy, SciPy, Biopython, scikit-learn, and FastME v2.1.6.4 (bundled). Source code and pre-compiled binaries are available at https://github.com/zhanglknt/fusang-tardigrade under MIT license with permanent Zenodo DOI (https://doi.org/10.5281/zenodo.20746742). A Flask-based web server with D3.js visualization is provided for interactive use.
 
 ### Web Sites/Data Base Referencing
 
@@ -343,25 +343,25 @@ None declared.
 
 ## REFERENCES
 
-1. Pybus OG and Rambaut A. Evolutionary analysis of the dynamics of viral infectious disease. *Nat. Rev. Genet.* 2009; **10**: 540–550.
-2. Hinchliff CE, Smith SA, Allman JF *et al.* Synthesis of phylogeny and taxonomy into a comprehensive tree of life. *Proc. Natl. Acad. Sci. USA* 2015; **112**: 12764–12769.
-3. Minh BQ, Schmidt HA, Chernomor O *et al.* IQ-TREE 2: New models and efficient methods for phylogenetic inference in the genomic era. *Mol. Biol. Evol.* 2020; **37**: 1530–1534.
-4. Price MN, Dehal PS and Arkin AP. FastTree 2 — approximately maximum-likelihood trees for large alignments. *PLoS ONE* 2010; **5**: e9490.
-5. Zielezinski A, Vinga S, Almeida J *et al.* Alignment-free sequence comparison: benefits, applications, and tools. *Genome Biol.* 2017; **18**: 186.
-6. Bernard G, Chan CX, Chan Y-b *et al.* Alignment-free inference of hierarchical and reticulate phylogenomic relationships. *Brief. Bioinform.* 2019; **20**: 426–435.
-7. Zielezinski A, Girgis HZ, Bernard G *et al.* Benchmarking of alignment-free sequence comparison methods. *Genome Biol.* 2019; **20**: 144.
-8. Lefort V, Desper R and Gascuel O. FastME 2.0: A comprehensive, accurate, and fast distance-based phylogeny inference program. *Mol. Biol. Evol.* 2015; **32**: 2798–2800.
-9. Fletcher W and Yang Z. INDELible: a flexible simulator of biological sequence evolution. *Mol. Biol. Evol.* 2009; **26**: 1879–1888.
-10. Katoh K and Standley DM. MAFFT multiple sequence alignment software version 7: improvements in performance and usability. *Mol. Biol. Evol.* 2013; **30**: 772–780.
-11. Kozlov AM, Darriba D, Flouri T *et al.* RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. *Bioinformatics* 2019; **35**: 4453–4455.
-12. Yi H and Jin L. Co-phylog: an assembly-free phylogenomic approach for closely related organisms. *Nucleic Acids Res.* 2013; **41**: e75.
-13. Haubold B, Klötzl F and Pfaffelhuber P. andi: Fast and accurate estimation of evolutionary distances between closely related genomes. *Bioinformatics* 2015; **31**: 1169–1175.
-14. Huson DH, Nettles SM and Warnow TJ. Disk-covering, a fast-converging method for phylogenetic tree reconstruction. *J. Comput. Biol.* 1999; **6**: 369–386.
-15. Liu K, Raghavan S, Nelesen S *et al.* Rapid and accurate large-scale coestimation of sequence alignments and phylogenetic trees. *Science* 2009; **324**: 1561–1564.
-16. Berger SA, Krompass D and Stamatakis A. Performance, accuracy, and web server for evolutionary placement of short sequence reads under maximum likelihood. *Syst. Biol.* 2011; **60**: 291–302.
-17. Dietterich TG. Ensemble methods in machine learning. In: *Multiple Classifier Systems*. Berlin: Springer, 2000, 1–15.
-18. Ondov BD, Treangen TJ, Melsted P *et al.* Mash: fast genome and metagenome distance estimation using MinHash. *Genome Biol.* 2016; **17**: 132.
-19. Mirarab S, Nguyen N, Guo S *et al.* PASTA: ultra-large multiple sequence alignment for nucleotide and amino-acid sequences. *J. Comput. Biol.* 2015; **22**: 377–386.
+1. Pybus OG and Rambaut A. Evolutionary analysis of the dynamics of viral infectious disease. *Nat. Rev. Genet.* 2009; **10**: 540–550. https://doi.org/10.1038/nrg2583.
+2. Hinchliff CE, Smith SA, Allman JF *et al.* Synthesis of phylogeny and taxonomy into a comprehensive tree of life. *Proc. Natl. Acad. Sci. USA* 2015; **112**: 12764–12769. https://doi.org/10.1073/pnas.1423041112.
+3. Minh BQ, Schmidt HA, Chernomor O *et al.* IQ-TREE 2: New models and efficient methods for phylogenetic inference in the genomic era. *Mol. Biol. Evol.* 2020; **37**: 1530–1534. https://doi.org/10.1093/molbev/msaa015.
+4. Price MN, Dehal PS and Arkin AP. FastTree 2 — approximately maximum-likelihood trees for large alignments. *PLoS ONE* 2010; **5**: e9490. https://doi.org/10.1371/journal.pone.0009490.
+5. Zielezinski A, Vinga S, Almeida J *et al.* Alignment-free sequence comparison: benefits, applications, and tools. *Genome Biol.* 2017; **18**: 186. https://doi.org/10.1186/s13059-017-1319-7.
+6. Bernard G, Chan CX, Chan Y-b *et al.* Alignment-free inference of hierarchical and reticulate phylogenomic relationships. *Brief. Bioinform.* 2019; **20**: 426–435. https://doi.org/10.1093/bib/bbx142.
+7. Zielezinski A, Girgis HZ, Bernard G *et al.* Benchmarking of alignment-free sequence comparison methods. *Genome Biol.* 2019; **20**: 144. https://doi.org/10.1186/s13059-019-1752-6.
+8. Lefort V, Desper R and Gascuel O. FastME 2.0: A comprehensive, accurate, and fast distance-based phylogeny inference program. *Mol. Biol. Evol.* 2015; **32**: 2798–2800. https://doi.org/10.1093/molbev/msv124.
+9. Fletcher W and Yang Z. INDELible: a flexible simulator of biological sequence evolution. *Mol. Biol. Evol.* 2009; **26**: 1879–1888. https://doi.org/10.1093/molbev/msp098.
+10. Katoh K and Standley DM. MAFFT multiple sequence alignment software version 7: improvements in performance and usability. *Mol. Biol. Evol.* 2013; **30**: 772–780. https://doi.org/10.1093/molbev/mst010.
+11. Kozlov AM, Darriba D, Flouri T *et al.* RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. *Bioinformatics* 2019; **35**: 4453–4455. https://doi.org/10.1093/bioinformatics/btz305.
+12. Yi H and Jin L. Co-phylog: an assembly-free phylogenomic approach for closely related organisms. *Nucleic Acids Res.* 2013; **41**: e75. https://doi.org/10.1093/nar/gkt101.
+13. Haubold B, Klötzl F and Pfaffelhuber P. andi: Fast and accurate estimation of evolutionary distances between closely related genomes. *Bioinformatics* 2015; **31**: 1169–1175. https://doi.org/10.1093/bioinformatics/btu815.
+14. Huson DH, Nettles SM and Warnow TJ. Disk-covering, a fast-converging method for phylogenetic tree reconstruction. *J. Comput. Biol.* 1999; **6**: 369–386. https://doi.org/10.1089/106652799318382.
+15. Liu K, Raghavan S, Nelesen S *et al.* Rapid and accurate large-scale coestimation of sequence alignments and phylogenetic trees. *Science* 2009; **324**: 1561–1564. https://doi.org/10.1126/science.1171243.
+16. Berger SA, Krompass D and Stamatakis A. Performance, accuracy, and web server for evolutionary placement of short sequence reads under maximum likelihood. *Syst. Biol.* 2011; **60**: 291–302. https://doi.org/10.1093/sysbio/syr010.
+17. Dietterich TG. Ensemble methods in machine learning. In: *Multiple Classifier Systems*. Berlin: Springer, 2000, 1–15. https://doi.org/10.1007/3-540-45014-9_1.
+18. Ondov BD, Treangen TJ, Melsted P *et al.* Mash: fast genome and metagenome distance estimation using MinHash. *Genome Biol.* 2016; **17**: 132. https://doi.org/10.1186/s13059-016-0997-x.
+19. Mirarab S, Nguyen N, Guo S *et al.* PASTA: ultra-large multiple sequence alignment for nucleotide and amino-acid sequences. *J. Comput. Biol.* 2015; **22**: 377–386. https://doi.org/10.1089/cmb.2014.0156.
 
 ## FIGURE LEGENDS
 

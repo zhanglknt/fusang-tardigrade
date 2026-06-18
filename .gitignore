@@ -54,7 +54,7 @@ htmlcov/
 # Exclude from this repo
 FastTree.exe
 *.zip
-*.png
+# *.png -- keep GraphicalAbstract.png for NAR submission
 *.svg
 *.exe
 *.log
