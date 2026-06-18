@@ -3,65 +3,80 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+dist/
+build/
+.eggs/
 
-# IDEs
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Project-specific
-*.nwk
-*.fasta
-*.fastq
-*.gz
-*.aligned
-benchmark_L/
-results/
-*_output/
-*_tree.nwk
-test_n*.fasta
-test_n*_true.nwk
-
-# Logs
-*.log
 
 # Jupyter
 .ipynb_checkpoints/
+*.ipynb
 
-# Large data files
-*.exe
-*.zip
-*.tar.gz
-bench_tools/
-!bench_tools/**/*.exe
-!bench_tools/
+# Benchmark outputs (large files)
+bench_out/
+*.nwk  # generated trees — exclude by default except reference trees
+
+# Simulated sequence data (large)
+simulated_data/
+*.simulated.fasta
+
+# K-mer study cache
+kmer_study/__pycache__/
+kmer_study/*.pyc
 
 # Temp files
-tmp/
-temp/
 *.tmp
+*.bak
+*.log
+*.egg-info
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Coverage
+.coverage
+htmlcov/
+
+# Exclude from this repo
+FastTree.exe
+*.zip
+*.png
+*.svg
+*.exe
+*.log
+*.bak
+*.tmp
+
+# Exclude non-essential reports (can be generated)
+*AUDIT*.md
+*BENCHMARK_REPORT*.md
+*EXPERT_PANEL*.md
+*FASTME_BENCHMARK*.md
+*INDEL_BENCHMARK*.md
+*INNOVATION*.md
+*JOURNAL_STRATEGY*.md
+*KMER_FEATURE*.md
+*METHODS_*.md
+*PEER_REVIEW*.md
+*COVER_*.md
+*GAP_*.md
+*DRAFT.md
+*STRATEGY*.md
+*Environment_setting.md
+*DATA_PROVENANCE.md
+
+# Keep core manuscript and docs

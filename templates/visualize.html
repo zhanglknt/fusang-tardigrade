@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Visualization - Fusang Web Server</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            font-size: 1.2em;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .controls {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .controls button {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #2980b9;
+        }
+        
+        .controls label {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .controls select {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        #tree-container {
+            width: 100%;
+            height: calc(100vh - 110px);
+            background: white;
+        }
+        
+        .node circle {
+            fill: #69b3a2;
+            stroke: #2c3e50;
+            stroke-width: 2px;
+        }
+        
+        .node.leaf circle {
+            fill: #e74c3c;
+            radius: 4px;
+        }
+        
+        .node text {
+            font-size: 12px;
+            fill: #2c3e50;
+        }
+        
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+        
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phylogenetic Tree Visualization</h1>
+        <a href="/result/{{ job_id }}" class="back-link">← Back to Results</a>
+    </header>
+    
+    <div class="controls">
+        <button id="zoomIn">Zoom In</button>
+        <button id="zoomOut">Zoom Out</button>
+        <button id="resetZoom">Reset</button>
+        <button id="toggleLayout">Toggle Layout</button>
+        <label>Layout:</label>
+        <select id="layoutSelect">
+            <option value="horizontal">Horizontal</option>
+            <option value="vertical">Vertical</option>
+            <option value="radial">Radial</option>
+        </select>
+    </div>
+    
+    <div id="tree-container"></div>
+    <div class="tooltip" id="tooltip" style="display:none;"></div>
+    
+    <script>
+        // Parse Newick string
+        function parseNewick(newickStr) {
+            // Remove trailing semicolon
+            let str = newickStr.trim();
+            if (str.endsWith(';')) {
+                str = str.slice(0, -1);
+            }
+            
+            let index = 0;
+            
+            function parseNode() {
+                let node = { name: '', children: [], length: 0 };
+                
+                // Check for branch length
+                // Parse subtree or leaf
+                if (str[index] === '(') {
+                    index++; // skip '('
+                    // Parse children
+                    while (true) {
+                        node.children.push(parseNode());
+                        if (str[index] === ',') {
+                            index++; // skip ','
+                        } else {
+                            break;
+                        }
+                    }
+                    // Expect ')'
+                    if (str[index] === ')') {
+                        index++; // skip ')'
+                    }
+                }
+                
+                // Parse name (might be empty)
+                let name = '';
+                while (index < str.length && str[index] !== ':' && str[index] !== ',' && str[index] !== ')') {
+                    if (str[index] === '(') break;
+                    name += str[index];
+                    index++;
+                }
+                node.name = name.trim();
+                
+                // Parse branch length
+                if (index < str.length && str[index] === ':') {
+                    index++; // skip ':'
+                    let lengthStr = '';
+                    while (index < str.length && str[index] !== ',' && str[index] !== ')' && str[index] !== ';') {
+                        lengthStr += str[index];
+                        index++;
+                    }
+                    node.length = parseFloat(lengthStr) || 0;
+                }
+                
+                return node;
+            }
+            
+            return parseNode();
+        }
+        
+        // Newick string from server
+        const newickStr = {{ newick|tojson }};
+        const treeData = parseNewick(newickStr);
+        
+        // Setup SVG
+        const container = document.getElementById('tree-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        
+        const svg = d3.select('#tree-container')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        const g = svg.append('g')
+            .attr('transform', `translate(50, ${height/2})`);
+        
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 5])
+            .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+            });
+        
+        svg.call(zoom);
+        
+        // Layout functions
+        let currentLayout = 'horizontal';
+        
+        function drawHorizontal() {
+            g.selectAll('*').remove();
+            
+            const root = d3.hierarchy(treeData);
+            const treeLayout = d3.tree().size([height - 100, width - 150]);
+            treeLayout(root);
+            
+            // Links
+            g.selectAll('.link')
+                .data(root.links())
+                .enter()
+                .append('path')
+                .attr('class', 'link')
+                .attr('d', d3.linkHorizontal()
+                    .x(d => d.y)
+                    .y(d => d.x));
+            
+            // Nodes
+            const nodes = g.selectAll('.node')
+                .data(root.descendants())
+                .enter()
+                .append('g')
+                .attr('class', d => 'node' + (d.children ? '' : ' leaf'))
+                .attr('transform', d => `translate(${d.y},${d.x})`);
+            
+            nodes.append('circle')
+                .attr('r', d => d.children ? 4 : 3);
+            
+            nodes.append('text')
+                .attr('dy', '0.31em')
+                .attr('x', d => d.children ? -8 : 8)
+                .attr('text-anchor', d => d.children ? 'end' : 'start')
+                .text(d => d.data.name || '')
+                .clone(true).lower()
+                .attr('stroke', 'white')
+                .attr('stroke-width', 3);
+            
+            // Tooltip
+            nodes.on('mouseover', function(event, d) {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.style.display = 'block';
+                tooltip.innerHTML = `<strong>${d.data.name || 'Internal'}</strong><br/>Branch length: ${d.data.length.toFixed(4)}`;
+            })
+            .on('mousemove', function(event) {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY + 10 + 'px';
+            })
+            .on('mouseout', function() {
+                document.getElementById('tooltip').style.display = 'none';
+            });
+        }
+        
+        function drawVertical() {
+            g.selectAll('*').remove();
+            
+            const root = d3.hierarchy(treeData);
+            const treeLayout = d3.tree().size([width - 100, height - 150]);
+            treeLayout(root);
+            
+            // Links
+            g.selectAll('.link')
+                .data(root.links())
+                .enter()
+                .append('path')
+                .attr('class', 'link')
+                .attr('d', d3.linkVertical()
+                    .x(d => d.x)
+                    .y(d => d.y));
+            
+            // Nodes
+            const nodes = g.selectAll('.node')
+                .data(root.descendants())
+                .enter()
+                .append('g')
+                .attr('class', d => 'node' + (d.children ? '' : ' leaf'))
+                .attr('transform', d => `translate(${d.x},${d.y})`);
+            
+            nodes.append('circle')
+                .attr('r', d => d.children ? 4 : 3);
+            
+            nodes.append('text')
+                .attr('dy', '0.31em')
+                .attr('y', d => d.children ? -8 : -8)
+                .attr('text-anchor', 'middle')
+                .text(d => d.data.name || '')
+                .clone(true).lower()
+                .attr('stroke', 'white')
+                .attr('stroke-width', 3);
+        }
+        
+        function drawRadial() {
+            g.selectAll('*').remove();
+            g.attr('transform', `translate(${width/2},${height/2})`);
+            
+            const root = d3.hierarchy(treeData);
+            const treeLayout = d3.tree().size([2 * Math.PI, Math.min(width, height) / 2 - 100]);
+            treeLayout(root);
+            
+            // Links
+            g.selectAll('.link')
+                .data(root.links())
+                .enter()
+                .append('path')
+                .attr('class', 'link')
+                .attr('d', d3.linkRadial()
+                    .angle(d => d.x)
+                    .radius(d => d.y));
+            
+            // Nodes
+            const nodes = g.selectAll('.node')
+                .data(root.descendants())
+                .enter()
+                .append('g')
+                .attr('class', d => 'node' + (d.children ? '' : ' leaf'))
+                .attr('transform', d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`);
+            
+            nodes.append('circle')
+                .attr('r', d => d.children ? 4 : 3);
+            
+            nodes.append('text')
+                .attr('dy', '0.31em')
+                .attr('x', d => d.x < Math.PI ? 8 : -8)
+                .attr('text-anchor', d => d.x < Math.PI ? 'start' : 'end')
+                .attr('transform', d => d.x >= Math.PI ? 'rotate(180)' : null)
+                .text(d => d.data.name || '');
+        }
+        
+        // Draw initial layout
+        drawHorizontal();
+        
+        // Controls
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            svg.transition().call(zoom.scaleBy, 1.5);
+        });
+        
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            svg.transition().call(zoom.scaleBy, 0.75);
+        });
+        
+        document.getElementById('resetZoom').addEventListener('click', () => {
+            svg.transition().call(zoom.transform, d3.zoomIdentity);
+        });
+        
+        document.getElementById('layoutSelect').addEventListener('change', (e) => {
+            currentLayout = e.target.value;
+            if (currentLayout === 'horizontal') drawHorizontal();
+            else if (currentLayout === 'vertical') drawVertical();
+            else if (currentLayout === 'radial') drawRadial();
+        });
+        
+        document.getElementById('toggleLayout').addEventListener('click', () => {
+            const layouts = ['horizontal', 'vertical', 'radial'];
+            const currentIdx = layouts.indexOf(currentLayout);
+            currentLayout = layouts[(currentIdx + 1) % layouts.length];
+            document.getElementById('layoutSelect').value = currentLayout;
+            if (currentLayout === 'horizontal') drawHorizontal();
+            else if (currentLayout === 'vertical') drawVertical();
+            else if (currentLayout === 'radial') drawRadial();
+        });
+    </script>
+</body>
+</html>

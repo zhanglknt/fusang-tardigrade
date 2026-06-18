@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fusang Web Server - Phylogenetic Inference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #bdc3c7;
+            font-size: 1.1em;
+        }
+        
+        .upload-form {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 4px;
+            background: #fafafa;
+            cursor: pointer;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #3498db;
+        }
+        
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .col {
+            flex: 1;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .info h3 {
+            margin-bottom: 10px;
+        }
+        
+        .info ul {
+            margin-left: 20px;
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner.active {
+            display: block;
+        }
+        
+        .spinner::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fusang Web Server</h1>
+            <p>Scalable Phylogenetic Inference via Divide-and-Conquer</p>
+        </header>
+        
+        <div class="info">
+            <h3>Usage Instructions:</h3>
+            <ul>
+                <li>Upload a FASTA file (.fasta, .fa, .fas)</li>
+                <li>For n ≤ 500: uses simplified pipeline (fast)</li>
+                <li>For n > 500: uses DCM (Divide-and-Conquer)</li>
+                <li>Large files (n>500) may take several minutes</li>
+            </ul>
+        </div>
+        
+        <form class="upload-form" id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fasta_file">FASTA File:</label>
+                <input type="file" id="fasta_file" name="fasta_file" accept=".fasta,.fa,.fas,.txt" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Mode:</label>
+                <select name="mode">
+                    <option value="auto">Auto (Recommended)</option>
+                    <option value="default">Default (NJ+DCM)</option>
+                    <option value="refine">Refine (NJ+DCM+BME)</option>
+                </select>
+            </div>
+            
+            <div class="row">
+                <div class="col form-group">
+                    <label>Tree Method:</label>
+                    <select name="tree_method">
+                        <option value="nj">NJ (Recommended)</option>
+                        <option value="fastme">FastME</option>
+                    </select>
+                </div>
+                
+                <div class="col form-group">
+                    <label>Distance Method:</label>
+                    <select name="distance_method">
+                        <option value="kmer">k-mer (Recommended)</option>
+                        <option value="p-distance">p-distance</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col form-group">
+                    <label>k-mer k (optional):</label>
+                    <input type="number" name="kmer_k" min="4" max="8" placeholder="Auto">
+                </div>
+                
+                <div class="col form-group">
+                    <label>Gap Pattern:</label>
+                    <select name="kmer_gap">
+                        <option value="none">Auto</option>
+                        <option value="gap1">gap1</option>
+                        <option value="gap2">gap2</option>
+                        <option value="gap3">gap3</option>
+                        <option value="gap4">gap4</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col form-group">
+                    <label>Max Group Size:</label>
+                    <input type="number" name="max_group" value="200" min="50" max="1000">
+                </div>
+                
+                <div class="col form-group">
+                    <label>Threads:</label>
+                    <input type="number" name="threads" value="4" min="1" max="16">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Overlap Ratio:</label>
+                <input type="number" name="overlap" value="0.15" min="0" max="0.5" step="0.05">
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">Run Fusang</button>
+            
+            <div class="spinner" id="spinner"></div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            
+            btn.disabled = true;
+            spinner.classList.add('active");
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    btn.disabled = false;
+                    spinner.classList.remove('active');
+                } else {
+                    window.location.href = data.redirect;
+                }
+            } catch (error) {
+                alert('Upload failed: ' + error.message);
+                btn.disabled = false;
+                spinner.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
