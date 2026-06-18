@@ -6,3 +6,4 @@ numba>=0.55.0
 biopython>=1.79
 scipy>=1.7.0
 flask>=2.0.0
+streamlit>=1.25.0
