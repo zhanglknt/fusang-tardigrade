@@ -23,7 +23,7 @@ env/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
+# *.ipynb -- allowed for repro_package/notebooks/
 
 # Benchmark outputs (large files)
 bench_out/

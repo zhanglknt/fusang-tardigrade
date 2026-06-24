@@ -19,17 +19,17 @@ import numpy as np
 from pathlib import Path
 
 sys.setrecursionlimit(10000)
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from af_competitor_methods import (
+from fusang.af_competitor_methods import (
     cophylog_distance_matrix,
     cvtree_distance_matrix,
     kmer_cosine_distance_matrix,
     andi_approx_distance_matrix,
     read_fasta
 )
-from fusang_v4_dahp_v1 import build_nj
-from calc_nrf_simple import get_bipartitions_from_newick
+from fusang.fusang_v4_dahp_v1 import build_nj
+from fusang.calc_nrf_simple import get_bipartitions_from_newick
 
 
 def compute_nrf(pred_nwk, ref_nwk):

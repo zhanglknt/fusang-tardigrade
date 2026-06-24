@@ -1,0 +1,175 @@
+{
+  "summary": {
+    "200": {
+      "n_seeds": 5,
+      "nrf_mean": 0.3071,
+      "nrf_std": 0.0227,
+      "time_mean_s": 4.54,
+      "comment": "JC69 simulator (not INDELible). Clean (no-indel) data only."
+    },
+    "500": {
+      "n_seeds": 5,
+      "nrf_mean": 0.2932,
+      "nrf_std": 0.013,
+      "time_mean_s": 82.14,
+      "comment": "JC69 simulator (not INDELible). Clean (no-indel) data only."
+    },
+    "1000": {
+      "n_seeds": 4,
+      "nrf_mean": 0.2876,
+      "nrf_std": 0.0157,
+      "time_mean_s": 593.47,
+      "comment": "JC69 simulator (not INDELible). Clean (no-indel) data only."
+    },
+    "2000": {
+      "n_seeds": 5,
+      "nrf_mean": 0.2945,
+      "nrf_std": 0.0082,
+      "time_mean_s": 4741.62,
+      "comment": "JC69 simulator (not INDELible). Clean (no-indel) data only."
+    }
+  },
+  "details": [
+    {
+      "n": 200,
+      "seed": 1000,
+      "nrf": 0.3223350253807107,
+      "time_s": 4.69,
+      "status": "OK"
+    },
+    {
+      "n": 200,
+      "seed": 1001,
+      "nrf": 0.2918781725888325,
+      "time_s": 4.45,
+      "status": "OK"
+    },
+    {
+      "n": 200,
+      "seed": 1002,
+      "nrf": 0.2766497461928934,
+      "time_s": 4.48,
+      "status": "OK"
+    },
+    {
+      "n": 200,
+      "seed": 1003,
+      "nrf": 0.33248730964467005,
+      "time_s": 4.49,
+      "status": "OK"
+    },
+    {
+      "n": 200,
+      "seed": 1004,
+      "nrf": 0.31218274111675126,
+      "time_s": 4.59,
+      "status": "OK"
+    },
+    {
+      "n": 500,
+      "seed": 1000,
+      "nrf": 0.28672032193158953,
+      "time_s": 75.99,
+      "status": "OK"
+    },
+    {
+      "n": 500,
+      "seed": 1001,
+      "nrf": 0.27867203219315895,
+      "time_s": 79.66,
+      "status": "OK"
+    },
+    {
+      "n": 500,
+      "seed": 1002,
+      "nrf": 0.30482897384305835,
+      "time_s": 83.56,
+      "status": "OK"
+    },
+    {
+      "n": 500,
+      "seed": 1003,
+      "nrf": 0.28672032193158953,
+      "time_s": 85.32,
+      "status": "OK"
+    },
+    {
+      "n": 500,
+      "seed": 1004,
+      "nrf": 0.30885311871227367,
+      "time_s": 86.15,
+      "status": "OK"
+    },
+    {
+      "n": 1000,
+      "seed": 1000,
+      "nrf": 0.2713139418254764,
+      "time_s": 608.01,
+      "status": "OK"
+    },
+    {
+      "n": 1000,
+      "seed": 1001,
+      "nrf": 0.29839518555667,
+      "time_s": 585.09,
+      "status": "OK"
+    },
+    {
+      "n": 1000,
+      "seed": 1002,
+      "nrf": 0.30341023069207623,
+      "time_s": 587.68,
+      "status": "OK"
+    },
+    {
+      "n": 1000,
+      "seed": 1003,
+      "nrf": 0.2773319959879639,
+      "time_s": 593.09,
+      "status": "OK"
+    },
+    {
+      "n": 1000,
+      "seed": 1004,
+      "nrf": null,
+      "time_s": 588.59,
+      "status": "NRF_FAIL"
+    },
+    {
+      "n": 2000,
+      "seed": 1000,
+      "nrf": 0.30220330495743614,
+      "time_s": 4743.05,
+      "status": "OK"
+    },
+    {
+      "n": 2000,
+      "seed": 1001,
+      "nrf": 0.30070105157736604,
+      "time_s": 4758.36,
+      "status": "OK"
+    },
+    {
+      "n": 2000,
+      "seed": 1002,
+      "nrf": 0.2886830245368052,
+      "time_s": 4731.62,
+      "status": "OK"
+    },
+    {
+      "n": 2000,
+      "seed": 1003,
+      "nrf": 0.2831747621432148,
+      "time_s": 4724.07,
+      "status": "OK"
+    },
+    {
+      "n": 2000,
+      "seed": 1004,
+      "nrf": 0.29769654481722585,
+      "time_s": 4751.01,
+      "status": "OK"
+    }
+  ],
+  "note": "Generated with tree_simulation.py (JC69, coalescent). Different from paper (INDELible, GTR+\u0393)."
+}

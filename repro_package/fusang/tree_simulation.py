@@ -33,6 +33,22 @@ class Node:
         self.parent = None
         self.branch_length = 0.0
 
+    def to_newick(self):
+        """递归生成 Newick 格式字符串（不含末尾分号）。"""
+        if self.is_leaf:
+            name = self.name if self.name else f"t{self.idx:04d}"
+            if self.branch_length > 0:
+                return f"{name}:{self.branch_length:.6f}"
+            return name
+        left_str = self.left.to_newick() if self.left else ""
+        right_str = self.right.to_newick() if self.right else ""
+        inner = f"({left_str},{right_str})"
+        if self.name:
+            inner += self.name
+        if self.branch_length > 0:
+            inner += f":{self.branch_length:.6f}"
+        return inner
+
 
 def make_coalescent_tree(n_taxa: int, seed: int):
     """

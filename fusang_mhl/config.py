@@ -7,17 +7,20 @@ import tempfile
 from pathlib import Path
 
 # ============================================================
-# External Tool Paths (Windows)
+# External Tool Paths (Cross-Platform)
 # ============================================================
-MAFFT_DIR = Path(r"d:/系统发育树项目/Fusang/bench_tools/mafft-win/mafft-win")
-MAFFT_BAT = str(MAFFT_DIR / "mafft.bat")
+# Auto-detect FUSANG_ROOT relative to this config file
+FUSANG_ROOT = Path(__file__).resolve().parent.parent  # fusang_mhl -> project root
+
+# External tools: use environment variables, with sensible defaults
+MAFFT_DIR = Path(os.environ.get("MAFFT_DIR", str(FUSANG_ROOT.parent / "bench_tools" / "mafft-win" / "mafft-win")))
+MAFFT_BAT = os.environ.get("MAFFT_BAT", os.environ.get("MAFFT", str(MAFFT_DIR / "mafft.bat")))
 MAFFT_TMP = MAFFT_DIR / "tmp"
-FASTTREE_EXE = r"d:/系统发育树项目/Fusang/bench_tools/FastTree.exe"
+FASTTREE_EXE = os.environ.get("FASTTREE_EXE", os.environ.get("FASTTREE", str(FUSANG_ROOT.parent / "bench_tools" / "FastTree.exe")))
 
 # ============================================================
 # Model and Temp Directories
 # ============================================================
-FUSANG_ROOT = Path(r"d:/系统发育树项目/Fusang/Fusang-main")
 BOUNDARY_MODEL_DIR = str(FUSANG_ROOT / "dl_model_boundary")
 TEMP_DIR = os.path.join(tempfile.gettempdir(), "fusang_mhl")
 
