@@ -21,7 +21,10 @@ from .mlh_utils import Timer
 
 
 def get_l0_config(n_taxa: int) -> dict:
-    """Get adaptive L0 configuration based on total taxa count.
+    """Get adaptive L0 configuration based on total taxa count (hardcoded thresholds).
+
+    This is the legacy heuristic method. Prefer get_l0_config_ml() when
+    the boundary classifier model is available.
 
     Returns:
         dict with 'max_group_size', 'target_groups', 'should_split'
@@ -34,6 +37,25 @@ def get_l0_config(n_taxa: int) -> dict:
                 "should_split": target_groups > 1,
             }
     return {"max_group_size": 200, "target_groups": 1, "should_split": False}
+
+
+def get_l0_config_ml(
+    D: "np.ndarray",
+    sequences: "List[str]",
+    taxon_names: "List[str]",
+    verbose: bool = False,
+) -> dict:
+    """Get ML-based adaptive L0 configuration.
+
+    Uses the boundary classifier to decide whether to split and how many groups.
+    Falls back to heuristic if model is unavailable or feature extraction fails.
+
+    Returns:
+        dict with 'should_split', 'target_groups', 'max_group_size', and
+        optional 'p_split' and 'model_used' metadata.
+    """
+    from .ml_split import ml_split_decision
+    return ml_split_decision(D, sequences, taxon_names, verbose=verbose)
 
 
 def resolve_gap_pattern(gap_str: str) -> Optional[tuple]:
@@ -239,6 +261,7 @@ def run_level0(
     metric: str = L0_DISTANCE_METHOD,
     n_threads: int = 4,
     verbose: bool = True,
+    use_ml: bool = True,
 ) -> Tuple[
     np.ndarray,                    # Full distance matrix D
     List[List[int]],               # Cluster assignments (indices)
@@ -269,8 +292,12 @@ def run_level0(
         D = compute_l0_distance(sequences, taxon_names, k=k, gap=gap,
                                 metric=metric, n_threads=n_threads)
 
-    # Get adaptive config
-    l0_config = get_l0_config(n)
+    # Get adaptive config — prefer ML when available
+    if use_ml:
+        l0_config = get_l0_config_ml(D, sequences, taxon_names, verbose=verbose)
+    else:
+        l0_config = get_l0_config(n)
+
     if not l0_config["should_split"]:
         if verbose:
             print(f"[L0] n={n} <= 200, skipping L0 splitting", file=sys.stderr)

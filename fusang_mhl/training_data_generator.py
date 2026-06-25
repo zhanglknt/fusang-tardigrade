@@ -35,17 +35,31 @@ logger = setup_logger("train_gen", log_file=os.path.join(LOG_DIR, "train_gen.log
 # ---------------------------------------------------------------------------
 
 DEFAULT_SIM_CONFIGS = [
-    # (n, L, sub, indel, n_trees)
-    (50,   500, 0.01, 0.001, 20),
-    (100,  500, 0.02, 0.005, 20),
-    (200,  500, 0.05, 0.02,  30),
-    (300,  1000, 0.03, 0.01, 15),
-    (500,  1000, 0.02, 0.01, 10),
-    (50,   500, 0.08, 0.05,  15),  # high substitution
-    (100,  500, 0.08, 0.05,  15),
-    (200,  500, 0.08, 0.05,  20),
-    (50,   1000, 0.01, 0.001, 15),  # long sequences
-    (200,  1000, 0.05, 0.02,  20),
+    # (n, L, sub, indel, n_trees) — ~850 trees, target ~10,000 samples
+    # Clean / low-noise baseline
+    (50,   500,  0.01, 0.000, 80),
+    (100,  500,  0.02, 0.000, 65),
+    (200,  500,  0.03, 0.000, 55),
+    (300,  1000, 0.02, 0.000, 35),
+    (500,  1000, 0.02, 0.000, 25),
+    # Moderate noise (close to manuscript params)
+    (50,   500,  0.05, 0.01,  80),
+    (100,  500,  0.05, 0.01,  70),
+    (200,  500,  0.05, 0.02,  60),
+    (300,  1000, 0.04, 0.02,  40),
+    (500,  1000, 0.03, 0.02,  30),
+    # High noise (indel stress test)
+    (50,   500,  0.08, 0.03,  65),
+    (100,  500,  0.08, 0.03,  55),
+    (200,  500,  0.08, 0.05,  55),
+    (300,  1000, 0.06, 0.04,  35),
+    (500,  1000, 0.05, 0.03,  25),
+    # Extreme noise (boundary case)
+    (100,  500,  0.10, 0.08,  45),
+    (200,  500,  0.10, 0.08,  45),
+    # Long sequences (better signal, rarer)
+    (100,  2000, 0.03, 0.01,  30),
+    (200,  2000, 0.05, 0.02,  25),
 ]
 
 
@@ -78,9 +92,8 @@ def generate_simulated_tree(
 ):
     """Generate one simulated tree + aligned sequences.
 
-    Note: `indel` param is accepted for API compatibility but
-    tree_simulation.py currently only simulates substitutions (JC69).
-    For indel simulation, consider post-hoc gap insertion (TODO).
+    Uses JC69 substitutions + post-hoc per-sequence indel simulation
+    (see tree_simulation.py for the indel model).
 
     Returns:
         newick_str: str (true tree in Newick)
@@ -101,8 +114,8 @@ def generate_simulated_tree(
         return f'({left_str},{right_str}){node.name or ""}{bl}'
     true_nwk = _node_to_nwk(root_node) + ';'
 
-    # Simulate sequences — returns (n, L) int8 array
-    leaf_seqs = simulate_seqs(root_node, n, L, sub, seed)
+    # Simulate sequences — returns (n, L) int8 array, with optional indel
+    leaf_seqs = simulate_seqs(root_node, n, L, sub, seed, indel_rate=indel)
 
     # Convert to {name: str} dict
     seqs_dict = _array_to_fasta_dict(leaf_seqs, n)
@@ -214,16 +227,31 @@ def generate_training_sample(
     samples = []
     rng = np.random.RandomState(hash(tuple(taxon_names)) % (2**31))
 
-    # Sample clusters at different granularity levels
-    for n_clusters in [2, 3, 4, 5, min(8, n // 10)]:
-        if n_clusters < 2:
-            continue
+    # Sample clusters at multiple distance thresholds (more robust than fixed n_clusters)
+    # Using percentiles of linkage heights avoids the "one giant cluster" problem
+    z_max = Z[:, 2].max()
+    cut_thresholds = []
+    for pct in [10, 20, 30, 40, 50, 60, 70, 80, 90]:
+        t = z_max * pct / 100.0
+        if t > 0:
+            cut_thresholds.append(t)
+
+    seen_cluster_sets = set()  # deduplicate identical clusters across thresholds
+    for t in cut_thresholds:
         try:
-            labels = fcluster(Z, t=n_clusters, criterion="maxclust")
+            labels = fcluster(Z, t=t, criterion="distance")
+            n_clusters = labels.max()
             for cid in range(1, n_clusters + 1):
                 indices = [i for i, l in enumerate(labels) if l == cid]
-                if len(indices) < 3 or len(indices) > n * 0.8:
+                # Allow wider size range: 4 to 95% of n
+                if len(indices) < 4 or len(indices) > n * 0.95:
                     continue
+                # Deduplicate: skip if we've seen this exact cluster before
+                cluster_key = frozenset(indices)
+                if cluster_key in seen_cluster_sets:
+                    continue
+                seen_cluster_sets.add(cluster_key)
+
                 cluster_names = [taxon_names[i] for i in indices]
 
                 # Extract features
@@ -250,7 +278,8 @@ def generate_training_sample(
                     "meta": {
                         "n_taxa": n,
                         "cluster_size": len(indices),
-                        "n_clusters": n_clusters,
+                        "dist_threshold": round(t, 6),
+                        "n_total_clusters": n_clusters,
                     }
                 })
         except Exception as e:
@@ -268,7 +297,7 @@ def generate_training_sample(
 def generate_training_data(
     configs: List[Tuple] = DEFAULT_SIM_CONFIGS,
     output_pkl: str = "training_data.pkl",
-    n_samples_target: int = 50000,
+    n_samples_target: int = 10000,
     verbose: bool = True,
 ) -> str:
     """Generate training data for boundary classifier.

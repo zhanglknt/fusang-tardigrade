@@ -31,16 +31,20 @@ def main():
         description="Train boundary classifier for Fusang MHL"
     )
     parser.add_argument(
-        "--data", type=str, default=None,
-        help="Pre-generated training data (pkl). If None, generates new data.",
+        "--data", type=str, default="fusang_mhl/models/training_data_v2.pkl",
+        help="Pre-generated training data (pkl). Default: V2 with indel support.",
     )
     parser.add_argument(
-        "--output", type=str, default=BOUNDARY_MODEL_DIR,
+        "--output", type=str, default="fusang_mhl/models",
         help="Output directory for model files",
     )
     parser.add_argument(
-        "--n-samples", type=int, default=50000,
+        "--n-samples", type=int, default=10000,
         help="Target number of training samples (if generating)",
+    )
+    parser.add_argument(
+        "--model-name", type=str, default="boundary_rf_v2.pkl",
+        help="Output model filename",
     )
     parser.add_argument(
         "--grid-search", action="store_true",
@@ -130,7 +134,7 @@ def main():
             verbose=args.verbose,
         )
         # Save model
-        model_path = os.path.join(args.output, "boundary_rf.pkl")
+        model_path = os.path.join(args.output, args.model_name)
         clf.save(model_path)
         logger.info(f"Model: {model_path}")
         logger.info(f"Metrics: {metrics}")

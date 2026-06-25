@@ -88,9 +88,10 @@ def make_coalescent_tree(n_taxa: int, seed: int):
     return nodes[-1], nodes
 
 
-def simulate_seqs(root, n_taxa: int, L: int, mu: float, seed: int) -> np.ndarray:
+def simulate_seqs(root, n_taxa: int, L: int, mu: float, seed: int,
+                  indel_rate: float = 0.0, indel_seed_offset: int = 100000) -> np.ndarray:
     """
-    沿系统发育树模拟 JC69 序列进化。
+    沿系统发育树模拟 JC69 序列进化，支持可选的 indel 模拟。
 
     参数：
         root: 树的根节点
@@ -98,6 +99,8 @@ def simulate_seqs(root, n_taxa: int, L: int, mu: float, seed: int) -> np.ndarray
         L: 序列长度
         mu: 突变率（JC69 模型）
         seed: 随机种子
+        indel_rate: indel 发生率（每序列每碱基，默认 0 不模拟 indel）
+        indel_seed_offset: indel 模拟的种子偏移量
 
     返回：
         leaf_seqs: (n_taxa, L) int8 数组，编码 0=A, 1=T, 2=C, 3=G
@@ -134,7 +137,43 @@ def simulate_seqs(root, n_taxa: int, L: int, mu: float, seed: int) -> np.ndarray
 
     dfs(root)
     leaf_seqs = np.array([seqs[i] for i in range(n_taxa)], dtype=np.int8)
+
+    # --- Indel simulation (post-hoc, per-leaf) ---
+    if indel_rate > 0.0:
+        indel_rng = np.random.RandomState(seed + indel_seed_offset)
+        for i in range(n_taxa):
+            leaf_seqs[i] = _apply_indels_to_sequence(
+                leaf_seqs[i], L, indel_rate, indel_rng)
+
     return leaf_seqs
+
+
+def _apply_indels_to_sequence(seq: np.ndarray, target_L: int,
+                               indel_rate: float, rng: np.random.RandomState) -> np.ndarray:
+    """对单条序列施加独立 indel，然后裁剪/填充到 target_L。"""
+    seq_list = list(seq)
+
+    n_events = rng.poisson(indel_rate * target_L)
+    for _ in range(n_events):
+        if not seq_list:
+            break
+        pos = rng.randint(0, len(seq_list))
+        event_len = rng.randint(1, 6)
+        if rng.random() < 0.5:
+            new_bases = rng.randint(0, 4, size=event_len).tolist()
+            for j, b in enumerate(new_bases):
+                seq_list.insert(pos + j, b)
+        else:
+            end = min(pos + event_len, len(seq_list))
+            del seq_list[pos:end]
+
+    if len(seq_list) > target_L:
+        seq_list = seq_list[:target_L]
+    elif len(seq_list) < target_L:
+        pad = rng.randint(0, 4, size=target_L - len(seq_list)).tolist()
+        seq_list.extend(pad)
+
+    return np.array(seq_list, dtype=np.int8)
 
 
 def get_quartet_topology(root, a: int, b: int, c: int, d: int) -> int:
