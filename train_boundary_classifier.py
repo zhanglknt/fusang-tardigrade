@@ -31,19 +31,19 @@ def main():
         description="Train boundary classifier for Fusang MHL"
     )
     parser.add_argument(
-        "--data", type=str, default="fusang_mhl/models/training_data_v2.pkl",
-        help="Pre-generated training data (pkl). Default: V2 with indel support.",
+        "--data", type=str, default="fusang_mhl/models/training_data_v3.pkl",
+        help="Pre-generated training data (pkl). Default: V3 with whole-tree samples.",
     )
     parser.add_argument(
         "--output", type=str, default="fusang_mhl/models",
         help="Output directory for model files",
     )
     parser.add_argument(
-        "--n-samples", type=int, default=10000,
+        "--n-samples", type=int, default=15000,
         help="Target number of training samples (if generating)",
     )
     parser.add_argument(
-        "--model-name", type=str, default="boundary_rf_v2.pkl",
+        "--model-name", type=str, default="boundary_rf_v3.pkl",
         help="Output model filename",
     )
     parser.add_argument(

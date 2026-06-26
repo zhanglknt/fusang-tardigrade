@@ -17,14 +17,20 @@ from typing import Dict, List, Optional
 
 _MODEL_DIR = Path(__file__).parent / "models"
 _MODEL_PATH = _MODEL_DIR / "boundary_rf.pkl"
-_V2_PATH = _MODEL_DIR / "boundary_rf_v2.pkl"  # V2 with indel training data
+_V2_PATH = _MODEL_DIR / "boundary_rf_v2.pkl"   # V2 with indel training data
+_V3_PATH = _MODEL_DIR / "boundary_rf_v3.pkl"    # V3 with whole-tree samples (L0-aligned)
+_V4b_PATH = _MODEL_DIR / "boundary_rf_v4b.pkl"  # V4b: structured trees, ground-truth whole-tree labels, 6707 samples
 
 _model = None
 _model_path_used = None
 
 
 def _resolve_model_path() -> Path:
-    """Return the best available model path (prefer V2 if exists)."""
+    """Return the best available model path (prefer V4b > V3 > V2 > V1)."""
+    if _V4b_PATH.exists():
+        return _V4b_PATH
+    if _V3_PATH.exists():
+        return _V3_PATH
     if _V2_PATH.exists():
         return _V2_PATH
     if _MODEL_PATH.exists():

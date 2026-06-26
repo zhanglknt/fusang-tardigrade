@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-D4: Generate multi-k ensemble benchmark data.
+D4: Generate multi-k ensemble benchmark data (DAHP-V3).
 
 For each seed:
-1. Build NJ trees with k=5 (gap2), k=7 (gap2), k=9 (contiguous)
-2. Build ensemble via average(k=5, k=7, k=9) distance matrix + NJ
+1. Build NJ trees with k=5, k=7, k=9 (ALL contiguous k-mers)
+2. Build ensemble via simple average of D5+D7+D9 distance matrices + NJ
 3. Compute nRF vs true tree for all methods
 
 NOTE: Uses JC69 simulator (tree_simulation.py), NOT INDELible.
+NOTE: ALL k values use CONTIGUOUS k-mers (no gap pattern).
+This matches the paper's DAHP-V3 method: avg(k=5,7,9) contiguous.
 """
 import sys, os, csv, time, statistics as st, tempfile, argparse, json
 import numpy as np
@@ -27,7 +29,7 @@ def seq_array_to_string(arr):
 
 
 def benchmark_one(seed, n=200, L=500, mu=0.05):
-    """Multi-k benchmark for one seed."""
+    """Multi-k ensemble benchmark for one seed. All k use contiguous k-mers."""
     root, nodes = make_coalescent_tree(n, seed=seed)
     
     leaf_nodes = [nd for nd in nodes if nd.is_leaf]
@@ -43,10 +45,10 @@ def benchmark_one(seed, n=200, L=500, mu=0.05):
     results = {'seed': seed, 'n': n, 'L': L, 'mu': mu}
     nwk_trees = {}
     
-    # k=5 gap2
+    # k=5 contiguous
     t0 = time.time()
     D5 = compute_kmer_distance_matrix(sequences, taxon_names, k=5, metric='cosine',
-                                       gap_pattern=(0, 1, 2, 5, 6), n_threads=1)
+                                       n_threads=1)
     nwk5 = build_nj(D5, taxon_names)
     t5 = time.time() - t0
     results['k5_time_s'] = round(t5, 2)
@@ -55,11 +57,10 @@ def benchmark_one(seed, n=200, L=500, mu=0.05):
     else:
         results['k5_nrf'] = None
     
-    # k=7 gap2
-    gap7 = (0, 1, 2, 7, 8)  # k=7 with 2 gaps
+    # k=7 contiguous
     t0 = time.time()
     D7 = compute_kmer_distance_matrix(sequences, taxon_names, k=7, metric='cosine',
-                                       gap_pattern=gap7, n_threads=1)
+                                       n_threads=1)
     nwk7 = build_nj(D7, taxon_names)
     t7 = time.time() - t0
     results['k7_time_s'] = round(t7, 2)
@@ -80,9 +81,8 @@ def benchmark_one(seed, n=200, L=500, mu=0.05):
     else:
         results['k9_nrf'] = None
     
-    # Multi-k ensemble: average of k=5(gap2) + k=7(gap2) + k=9(contiguous)
-    # Note: compute_multik_distance_matrix applies same gap_pattern to all ks
-    # Here we manually average D5, D7, D9 with their respective gap patterns
+    # Multi-k ensemble: simple average of k=5 + k=7 + k=9 distance matrices
+    # All three use contiguous k-mers (same cosine scale) -> simple average is valid
     t0 = time.time()
     if D5 is not None and D7 is not None and D9 is not None:
         D_ens = (D5 + D7 + D9) / 3.0
@@ -129,7 +129,7 @@ def main():
     n_total = len(seeds)
     
     print(f"Multi-k benchmark: seeds {args.start_seed}-{args.end_seed}, n={args.n}, JC69")
-    print(f"Methods: k=5(gap2), k=7(gap2), k=9(contiguous), ensemble(avg)")
+    print(f"Methods: k=5, k=7, k=9 (ALL contiguous), ensemble(simple avg)")
     t0_total = time.time()
     
     for i, seed in enumerate(seeds):
