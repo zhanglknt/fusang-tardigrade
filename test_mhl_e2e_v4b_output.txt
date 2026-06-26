@@ -1,0 +1,227 @@
+======================================================================
+MHL V4b E2E Test
+======================================================================
+Model available: True
+Scales: [50, 200, 500], seeds per scale: 2
+======================================================================
+
+──────────────────────────────────────────────────────────────────────
+Tree type: coalescent (expected → STOP)
+──────────────────────────────────────────────────────────────────────
+[kmer_distance] 计算 50×50 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 50 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 5/50
+[kmer_distance]   频率向量计算进度: 10/50
+[kmer_distance]   频率向量计算进度: 15/50
+[kmer_distance]   频率向量计算进度: 20/50
+[kmer_distance]   频率向量计算进度: 25/50
+[kmer_distance]   频率向量计算进度: 30/50
+[kmer_distance]   频率向量计算进度: 35/50
+[kmer_distance]   频率向量计算进度: 40/50
+[kmer_distance]   频率向量计算进度: 45/50
+[kmer_distance]   频率向量计算进度: 50/50
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (50, 50)
+[BoundaryClassifier] Loaded from D:\系统发育树项目\Fusang\Fusang-main\fusang_mhl\models\boundary_rf_v4b.pkl
+  n=  50 seed= 0: OK split=False (ml_prediction, p=0.230, model=ML), found=50/50, t=5.61s
+[kmer_distance] 计算 50×50 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 50 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 5/50
+[kmer_distance]   频率向量计算进度: 10/50
+[kmer_distance]   频率向量计算进度: 15/50
+[kmer_distance]   频率向量计算进度: 20/50
+[kmer_distance]   频率向量计算进度: 25/50
+[kmer_distance]   频率向量计算进度: 30/50
+[kmer_distance]   频率向量计算进度: 35/50
+[kmer_distance]   频率向量计算进度: 40/50
+[kmer_distance]   频率向量计算进度: 45/50
+[kmer_distance]   频率向量计算进度: 50/50
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (50, 50)
+  n=  50 seed= 1: OK split=False (ml_prediction, p=0.234, model=ML), found=50/50, t=2.66s
+  → Summary: 2/2 correct (100%), avg_p=0.232, model_used=2/2, complete=2/2, avg_t=4.137s
+[kmer_distance] 计算 200×200 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 200 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 20/200
+[kmer_distance]   频率向量计算进度: 40/200
+[kmer_distance]   频率向量计算进度: 60/200
+[kmer_distance]   频率向量计算进度: 80/200
+[kmer_distance]   频率向量计算进度: 100/200
+[kmer_distance]   频率向量计算进度: 120/200
+[kmer_distance]   频率向量计算进度: 140/200
+[kmer_distance]   频率向量计算进度: 160/200
+[kmer_distance]   频率向量计算进度: 180/200
+[kmer_distance]   频率向量计算进度: 200/200
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (200, 200)
+  n= 200 seed= 0: OK split=False (ml_prediction, p=0.066, model=ML), found=200/200, t=7.23s
+[kmer_distance] 计算 200×200 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 200 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 20/200
+[kmer_distance]   频率向量计算进度: 40/200
+[kmer_distance]   频率向量计算进度: 60/200
+[kmer_distance]   频率向量计算进度: 80/200
+[kmer_distance]   频率向量计算进度: 100/200
+[kmer_distance]   频率向量计算进度: 120/200
+[kmer_distance]   频率向量计算进度: 140/200
+[kmer_distance]   频率向量计算进度: 160/200
+[kmer_distance]   频率向量计算进度: 180/200
+[kmer_distance]   频率向量计算进度: 200/200
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (200, 200)
+  n= 200 seed= 1: OK split=False (ml_prediction, p=0.066, model=ML), found=200/200, t=7.36s
+  → Summary: 2/2 correct (100%), avg_p=0.066, model_used=2/2, complete=2/2, avg_t=7.291s
+[kmer_distance] 计算 500×500 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 500 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 50/500
+[kmer_distance]   频率向量计算进度: 100/500
+[kmer_distance]   频率向量计算进度: 150/500
+[kmer_distance]   频率向量计算进度: 200/500
+[kmer_distance]   频率向量计算进度: 250/500
+[kmer_distance]   频率向量计算进度: 300/500
+[kmer_distance]   频率向量计算进度: 350/500
+[kmer_distance]   频率向量计算进度: 400/500
+[kmer_distance]   频率向量计算进度: 450/500
+[kmer_distance]   频率向量计算进度: 500/500
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (500, 500)
+  n= 500 seed= 0: OK split=False (ml_prediction, p=0.021, model=ML), found=500/500, t=83.86s
+[kmer_distance] 计算 500×500 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 500 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 50/500
+[kmer_distance]   频率向量计算进度: 100/500
+[kmer_distance]   频率向量计算进度: 150/500
+[kmer_distance]   频率向量计算进度: 200/500
+[kmer_distance]   频率向量计算进度: 250/500
+[kmer_distance]   频率向量计算进度: 300/500
+[kmer_distance]   频率向量计算进度: 350/500
+[kmer_distance]   频率向量计算进度: 400/500
+[kmer_distance]   频率向量计算进度: 450/500
+[kmer_distance]   频率向量计算进度: 500/500
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (500, 500)
+  n= 500 seed= 1: OK split=False (ml_prediction, p=0.016, model=ML), found=500/500, t=74.22s
+  → Summary: 2/2 correct (100%), avg_p=0.019, model_used=2/2, complete=2/2, avg_t=79.043s
+
+──────────────────────────────────────────────────────────────────────
+Tree type: structured (expected → SPLIT)
+──────────────────────────────────────────────────────────────────────
+[kmer_distance] 计算 50×50 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 50 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 5/50
+[kmer_distance]   频率向量计算进度: 10/50
+[kmer_distance]   频率向量计算进度: 15/50
+[kmer_distance]   频率向量计算进度: 20/50
+[kmer_distance]   频率向量计算进度: 25/50
+[kmer_distance]   频率向量计算进度: 30/50
+[kmer_distance]   频率向量计算进度: 35/50
+[kmer_distance]   频率向量计算进度: 40/50
+[kmer_distance]   频率向量计算进度: 45/50
+[kmer_distance]   频率向量计算进度: 50/50
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (50, 50)
+  n=  50 seed= 0: OK split=True (ml_prediction, p=0.820, model=ML), found=50/50, t=2.11s
+[kmer_distance] 计算 50×50 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 50 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 5/50
+[kmer_distance]   频率向量计算进度: 10/50
+[kmer_distance]   频率向量计算进度: 15/50
+[kmer_distance]   频率向量计算进度: 20/50
+[kmer_distance]   频率向量计算进度: 25/50
+[kmer_distance]   频率向量计算进度: 30/50
+[kmer_distance]   频率向量计算进度: 35/50
+[kmer_distance]   频率向量计算进度: 40/50
+[kmer_distance]   频率向量计算进度: 45/50
+[kmer_distance]   频率向量计算进度: 50/50
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (50, 50)
+  n=  50 seed= 1: OK split=True (ml_prediction, p=0.830, model=ML), found=50/50, t=1.78s
+  → Summary: 2/2 correct (100%), avg_p=0.825, model_used=2/2, complete=2/2, avg_t=1.944s
+[kmer_distance] 计算 200×200 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 200 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 20/200
+[kmer_distance]   频率向量计算进度: 40/200
+[kmer_distance]   频率向量计算进度: 60/200
+[kmer_distance]   频率向量计算进度: 80/200
+[kmer_distance]   频率向量计算进度: 100/200
+[kmer_distance]   频率向量计算进度: 120/200
+[kmer_distance]   频率向量计算进度: 140/200
+[kmer_distance]   频率向量计算进度: 160/200
+[kmer_distance]   频率向量计算进度: 180/200
+[kmer_distance]   频率向量计算进度: 200/200
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (200, 200)
+  n= 200 seed= 0: OK split=True (ml_prediction, p=0.980, model=ML), found=200/200, t=6.18s
+[kmer_distance] 计算 200×200 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 200 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 20/200
+[kmer_distance]   频率向量计算进度: 40/200
+[kmer_distance]   频率向量计算进度: 60/200
+[kmer_distance]   频率向量计算进度: 80/200
+[kmer_distance]   频率向量计算进度: 100/200
+[kmer_distance]   频率向量计算进度: 120/200
+[kmer_distance]   频率向量计算进度: 140/200
+[kmer_distance]   频率向量计算进度: 160/200
+[kmer_distance]   频率向量计算进度: 180/200
+[kmer_distance]   频率向量计算进度: 200/200
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (200, 200)
+  n= 200 seed= 1: OK split=True (ml_prediction, p=0.940, model=ML), found=200/200, t=6.15s
+  → Summary: 2/2 correct (100%), avg_p=0.960, model_used=2/2, complete=2/2, avg_t=6.166s
+[kmer_distance] 计算 500×500 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 500 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 50/500
+[kmer_distance]   频率向量计算进度: 100/500
+[kmer_distance]   频率向量计算进度: 150/500
+[kmer_distance]   频率向量计算进度: 200/500
+[kmer_distance]   频率向量计算进度: 250/500
+[kmer_distance]   频率向量计算进度: 300/500
+[kmer_distance]   频率向量计算进度: 350/500
+[kmer_distance]   频率向量计算进度: 400/500
+[kmer_distance]   频率向量计算进度: 450/500
+[kmer_distance]   频率向量计算进度: 500/500
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (500, 500)
+  n= 500 seed= 0: OK split=True (ml_prediction, p=1.000, model=ML), found=500/500, t=75.80s
+[kmer_distance] 计算 500×500 距离矩阵，k=5，gap_pattern=(0, 1, 2, 5, 6)，度量=cosine，线程数=4
+[kmer_distance] Step 1: 计算 500 条序列的 k-mer 频率向量...
+[kmer_distance]   频率向量计算进度: 50/500
+[kmer_distance]   频率向量计算进度: 100/500
+[kmer_distance]   频率向量计算进度: 150/500
+[kmer_distance]   频率向量计算进度: 200/500
+[kmer_distance]   频率向量计算进度: 250/500
+[kmer_distance]   频率向量计算进度: 300/500
+[kmer_distance]   频率向量计算进度: 350/500
+[kmer_distance]   频率向量计算进度: 400/500
+[kmer_distance]   频率向量计算进度: 450/500
+[kmer_distance]   频率向量计算进度: 500/500
+[kmer_distance] Step 2: 计算距离矩阵...
+[kmer_distance] 距离矩阵计算完成。形状: (500, 500)
+  n= 500 seed= 1: OK split=True (ml_prediction, p=0.975, model=ML), found=500/500, t=74.89s
+  → Summary: 2/2 correct (100%), avg_p=0.988, model_used=2/2, complete=2/2, avg_t=75.347s
+
+======================================================================
+OVERALL SUMMARY
+======================================================================
+
+  coalescent:
+    Decision accuracy: 100.0%
+    Tree completeness: 100.0%
+    n=  50: acc=100%, avg_p=0.232, model=2/2, t=4.137s
+    n= 200: acc=100%, avg_p=0.066, model=2/2, t=7.291s
+    n= 500: acc=100%, avg_p=0.019, model=2/2, t=79.043s
+
+  structured:
+    Decision accuracy: 100.0%
+    Tree completeness: 100.0%
+    n=  50: acc=100%, avg_p=0.825, model=2/2, t=1.944s
+    n= 200: acc=100%, avg_p=0.960, model=2/2, t=6.166s
+    n= 500: acc=100%, avg_p=0.988, model=2/2, t=75.347s
+
+  OVERALL:
+    Decision accuracy: 100.0%
+    Tree completeness: 100.0%
+
+======================================================================
+PASS: Both coalescent->STOP and structured->SPLIT work correctly
+======================================================================
