@@ -184,7 +184,7 @@ def run_e2e_test(scales=None, seeds_per_scale=5, quick=False, verbose=False):
                     else:
                         D_list = D
                     # BioPhylo expects lower-triangle: list of n lists, row i has i elements
-                    lower_tri = [[D_list[i][j] for j in range(i)] for i in range(len(D_list))]
+                    lower_tri = [[D_list[i][j] for j in range(i+1)] for i in range(len(D_list))]
                     dm = BioDM(list(taxon_names), lower_tri)
                     constructor = DistanceTreeConstructor()
                     tree_obj = constructor.nj(dm)
