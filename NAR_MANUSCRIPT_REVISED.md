@@ -633,10 +633,15 @@ We thank the Fusang v1 users for their feedback and suggestions that motivated t
 
 ## AUTHOR CONTRIBUTIONS
 
-[Author 1] conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks, and wrote the manuscript. [Author 2] contributed to the multi-k ensemble strategy, boundary classifier development, and statistical framework. [Author 3] contributed to the web server implementation and 16S rRNA validation. [Author 4] supervised the project, provided methodological guidance, and contributed to manuscript revision. All authors reviewed and approved the final manuscript.
-
+Li Zhang conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. Lei Kong contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
 
 ---
+
+## CORRESPONDING AUTHOR
+
+**Li Zhang**  
+Department of Bioinformatics, Peking Union Medical College, Beijing, China  
+Email: knightz@pumc.edu.cn---
 
 ## REFERENCES
 

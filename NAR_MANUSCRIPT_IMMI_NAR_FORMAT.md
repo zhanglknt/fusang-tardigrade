@@ -16,7 +16,7 @@
 
 ³ Beijing Institute of Brain Disorders, Beijing, China
 
-\* Corresponding author. Email: zhangli@cibr.ac.cn
+\* Corresponding author. Email: knightz@pumc.edu.cn
 
 **Author Contributions**: L.Z. and L.K. designed the study, analyzed data, and wrote the manuscript.
 
@@ -326,7 +326,14 @@ We thank the developers of FastME, MAFFT, FastTree2, and INDELible for making th
 
 ## AUTHOR CONTRIBUTIONS
 
-**L.Z.**: Conceptualization, Methodology, Software, Validation, Formal Analysis, Investigation, Data Curation, Writing – Original Draft, Writing – Review & Editing, Visualization, Supervision, Project Administration, Funding Acquisition. **L.K.**: Formal Analysis, Investigation, Data Curation, Writing – Review & Editing.
+Li Zhang conceived the study, designed the IMMI framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. Lei Kong contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
+
+---
+
+## CORRESPONDING AUTHOR
+
+**Li Zhang**  
+Email: knightz@pumc.edu.cn
 
 ---
 
