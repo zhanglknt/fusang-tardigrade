@@ -388,7 +388,7 @@ For practitioners, the IMMI framework offers a graduated approach to phylogeneti
 
 ## DATA AVAILABILITY
 
-Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compiled FastME binaries (Windows/Linux x86-64), benchmark scripts, and all analysis code are available at https://github.com/fusang-dev/fusang-tardigrade. A public web server is accessible at https://fusang-tardigrade.streamlit.app. A permanent Zenodo DOI will be assigned upon acceptance. All benchmark datasets — including 130-seed n=200 indel results, n=500/n=1000 multi-seed data, SwissTree protein benchmark results, 74-taxon 16S rRNA dataset, and Level 2 classifier training data — are provided in the repository under `benchmarks/` and as Supplementary Data.
+Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compiled FastME binaries (Windows/Linux x86-64), benchmark scripts, and all analysis code are available at https://github.com/fusang-dev/fusang-tardigrade. A permanent Zenodo DOI (https://doi.org/10.5281/zenodo.20746742) is assigned for archival access. A public web server is accessible at https://fusang-tardigrade.streamlit.app/ for interactive use without local installation. All benchmark datasets — including 130-seed n=200 indel results, n=500/n=1000 multi-seed data, SwissTree protein benchmark results, 74-taxon 16S rRNA dataset, and Level 2 classifier training data — are provided in the repository under `benchmarks/` and as Supplementary Data.
 
 ---
 

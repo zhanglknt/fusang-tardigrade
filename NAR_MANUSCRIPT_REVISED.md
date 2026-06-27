@@ -61,7 +61,7 @@ We systematically evaluate spaced k-mer features for phylogenetic tree inference
 
 6. **Validation of a random forest boundary classifier** achieving 100% accuracy (88/88 scenarios, Wilson 95% CI [0.958, 1.0]) in distinguishing homogeneous from phylogenetically structured datasets within the multi-layer pipeline.
 
-7. **Open-source release** with Windows-native FastME binaries and automated parameter selection.
+7. **Open-source release** with Windows-native FastME binaries, automated parameter selection, and a web server interface.
 
 ---
 
@@ -193,7 +193,7 @@ The server is containerized (Docker, python:3.10-slim base image) and deployed b
 
 ### Code and data availability
 
-Fusang source code, benchmark scripts, and pre-compiled Windows/Linux binaries are available at https://github.com/fusang-dev/fusang-tardigrade under the MIT license. A permanent Zenodo DOI will be assigned upon publication. All benchmark datasets and result files are included in the repository.
+Fusang source code, benchmark scripts, and pre-compiled Windows/Linux binaries are available at https://github.com/fusang-dev/fusang-tardigrade under the MIT license. A permanent Zenodo DOI (https://doi.org/10.5281/zenodo.20746742) is assigned for archival access. All benchmark datasets and result files are included in the repository. A web server is deployed at https://fusang-tardigrade.streamlit.app/ for interactive use without local installation.
 
 ---
 
