@@ -336,9 +336,9 @@ This work was supported by the National Natural Science Foundation of China (NSF
 
 ---
 
-## CONFLICT OF INTEREST
+## COMPETING INTERESTS
 
-None declared.
+The authors declare no competing interests.
 
 ---
 

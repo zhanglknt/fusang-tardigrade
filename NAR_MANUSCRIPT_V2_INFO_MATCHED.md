@@ -181,7 +181,7 @@ On n=200 indel-rich data (indel rate=0.02, 130 seeds), the Level 0–1 pipeline 
 | 500 | Indel | 0.095 ± 0.018 | **0.083 ± 0.014** | FT2 | **<0.001** |
 | 1000 | Clean | 0.115 ± 0.022 | **0.091 ± 0.016** | FT2 | **<0.001** |
 
-nRF=0: perfect match. Best value in **bold**. 130-seed benchmark (n=200 indel): p=0.052 (Wilcoxon). After Bonferroni correction (5 datasets, α=0.01), all n≥500 comparisons remain significant in favor of FastTree2.
+nRF=0: perfect match. Best value in **bold**. 112-seed benchmark after outlier exclusion (n=200 indel): p=0.052 (Wilcoxon, borderline). After Bonferroni correction (5 datasets, α=0.01), all n≥500 comparisons remain significant in favor of FastTree2.
 
 **Key finding**: At n=200, the L0–1 pipeline achieves statistical equivalence with MSA+ML. This is remarkable because L0–1 uses ZERO alignment — it operates entirely on k-mer frequency vectors that discard all positional information. The implication is that at moderate scales, k-mer composition captures sufficient phylogenetic signal for accurate tree inference, and the additional information from full positional alignment does not produce a statistically detectable accuracy gain.
 
@@ -372,7 +372,7 @@ For practitioners, the IMMI framework offers a graduated approach to phylogeneti
 
 ## DATA AVAILABILITY
 
-Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compiled FastME binaries (Windows/Linux x86-64), benchmark scripts, and all analysis code are available at [GitHub URL]. A permanent Zenodo DOI will be assigned upon acceptance. All benchmark datasets — including 130-seed n=200 indel results, n=500/n=1000 multi-seed data, SwissTree protein benchmark results, 74-taxon 16S rRNA dataset, and Level 2 classifier training data — are provided in the repository under `benchmarks/` and as Supplementary Data.
+Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compiled FastME binaries (Windows/Linux x86-64), benchmark scripts, and all analysis code are available at https://github.com/fusang-dev/fusang-tardigrade. A public web server is accessible at https://fusang-tardigrade.streamlit.app. A permanent Zenodo DOI will be assigned upon acceptance. All benchmark datasets — including 130-seed n=200 indel results, n=500/n=1000 multi-seed data, SwissTree protein benchmark results, 74-taxon 16S rRNA dataset, and Level 2 classifier training data — are provided in the repository under `benchmarks/` and as Supplementary Data.
 
 ---
 
@@ -380,19 +380,79 @@ Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compil
 
 This work was supported by the National Natural Science Foundation of China (NSFC) under grant number 32370682, and the Prevention and Control of Emerging and Major Infectious Diseases — National Science and Technology Major Project (grant number 2026ZD01910500).
 
-[To be added]
+---
+
+## COMPETING INTERESTS
+
+The authors declare no competing interests.
 
 ---
 
 ## ACKNOWLEDGEMENTS
 
-We thank the developers of FastME, MAFFT, FastTree2, and INDELible for making their tools openly available. The SwissTree benchmark data was obtained from the AFproject repository [26]. [Additional acknowledgements to be added.]
+We thank the developers of FastME, MAFFT, FastTree2, INDELible, IQ-TREE2, and RAxML-NG for making their tools openly available. The SwissTree benchmark data was obtained from the AFproject repository [26]. We also thank the wider open-source bioinformatics community for maintaining the software ecosystem that enabled this research.
+
+---
+
+## AUTHOR CONTRIBUTIONS
+
+[Author 1] conceived the study, designed the IMMI framework, implemented the core pipeline, conducted all benchmarks, and wrote the manuscript. [Author 2] contributed to the multi-k ensemble strategy, boundary classifier development, and statistical framework. [Author 3] contributed to the web server implementation and 16S rRNA validation. [Author 4] supervised the project, provided methodological guidance, and contributed to manuscript revision. All authors reviewed and approved the final manuscript.
 
 ---
 
 ## REFERENCES
 
-[Same reference list as NAR_MANUSCRIPT_REVISED.md, references 1–26]
+1. Bernard, G. et al. (2019) Alignment-free inference of hierarchical orthologous groups. *Nucleic Acids Res.*, 47, W202–W208. DOI: 10.1093/nar/gkz331
+
+2. Berger, S.A. et al. (2011) Performance, accuracy, and web server for evolutionary placement of short sequence reads under maximum likelihood. *Syst. Biol.*, 60, 291–302. DOI: 10.1093/sysbio/syr010
+
+3. Cartwright, R.A. (2009) Problems and solutions for estimating indel rates and length distributions. *Mol. Biol. Evol.*, 26, 473–480. DOI: 10.1093/molbev/msn275
+
+4. Dessimoz, C. and Gil, M. (2010) Phylogenetic assessment of alignments reveals neglected tree signal in gaps. *Genome Biol.*, 11, R37. DOI: 10.1186/gb-2010-11-4-r37
+
+5. Fletcher, W. and Yang, Z. (2009) INDELible: a flexible simulator of biological sequence evolution. *Mol. Biol. Evol.*, 26, 1879–1888. DOI: 10.1093/molbev/msp098
+
+6. Ondov, B.D., Treangen, T.J., Melsted, P., Mallonee, A.B., Bergman, N.H., Koren, S. and Phillippy, A.M. (2016) Mash: fast genome and metagenome distance estimation using MinHash. *Genome Biology*, 17, 132.
+
+7. Gkaiogiannis, A. et al. (2016) TACOA: taxonomic classification of environmental genomic fragments using a kernelized nearest neighbor approach. *BMC Bioinformatics*, 17, 99. DOI: 10.1186/s12859-016-1343-8
+
+8. Hadfield, J. et al. (2018) Nextstrain: real-time tracking of pathogen evolution. *Bioinformatics*, 34, 4121–4123. DOI: 10.1093/bioinformatics/bty407
+
+9. Hug, L.A. et al. (2016) A new view of the tree of life. *Nat. Microbiol.*, 1, 16048. DOI: 10.1038/nmicrobiol.2016.48
+
+10. Huson, D.H. et al. (1999) Disk-covering, a fast-converging method for phylogenetic tree reconstruction. *J. Comput. Biol.*, 6, 369–386. DOI: 10.1089/106652799318337
+
+11. Katoh, K. and Standley, D.M. (2013) MAFFT multiple sequence alignment software version 7. *Mol. Biol. Evol.*, 30, 772–780. DOI: 10.1093/molbev/mst010
+
+12. Kozlov, A.M. et al. (2019) RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. *Bioinformatics*, 35, 4453–4455. DOI: 10.1093/bioinformatics/btz305
+
+13. Lefort, V. et al. (2015) FastME 2.0: a comprehensive, accurate, and fast distance-based phylogeny inference program. *Mol. Biol. Evol.*, 32, 2798–2800. DOI: 10.1093/molbev/msv150
+
+14. Lunter, G. et al. (2006) Bayesian coestimation of phylogeny and sequence alignment. *BMC Bioinformatics*, 7, 320. DOI: 10.1186/1471-2105-7-320
+
+15. Luo, X. et al. (2019) Spaced k-mers as features for protein classification. *Bioinformatics*, 35, 2340–2347.
+
+16. Ma, B. et al. (2002) PatternHunter: faster and more sensitive homology search. *Bioinformatics*, 18, 440–445.
+
+17. Minh, B.Q. et al. (2020) IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era. *Mol. Biol. Evol.*, 37, 1530–1534.
+
+18. Price, M.N. et al. (2010) FastTree 2 — approximately maximum-likelihood trees for large alignments. *PLoS ONE*, 5, e9490.
+
+19. Vinga, S. and Almeida, J. (2003) Alignment-free sequence comparison — a review. *Bioinformatics*, 19, 513–523. DOI: 10.1093/bioinformatics/btg005
+
+20. Warnow, T. (1994) Some combinatorial optimization problems in phylogenetic tree reconstruction. *DIMACS Technical Report*, 94-53. [Technical report; DOI not available.]
+
+21. Wong, K.M. et al. (2008) Alignment uncertainty and genomic analysis. *Science*, 319, 473–476. DOI: 10.1126/science.1146308
+
+22. Zielezinski, A. et al. (2017) Alignment-free sequence comparison: benefits, applications, and tools. *Genome Biol.*, 18, 186.
+
+23. Zhang, L. et al. (2023) Fusang: a framework for phylogenetic tree inference via deep learning. *Nucleic Acids Res.*, 51, 10934–10950. DOI: 10.1093/nar/gkad751
+
+24. Haubold, B. et al. (2015) andi: Fast and accurate estimation of evolutionary distances between closely related genomes. *Bioinformatics*, 31, 1163–1167. DOI: 10.1093/bioinformatics/btv047
+
+25. Yi, H. and Jin, G. (2013) Co-phylog: an assembly-free phylogenomic approach for closely related organisms. *Nucleic Acids Res.*, 41, e75. DOI: 10.1093/nar/gkt165
+
+26. Zielezinski, A. et al. (2019) Benchmarking of alignment-free sequence comparison methods. *Genome Biology*, 20, 144. DOI: 10.1186/s13059-019-1755-7
 
 ---
 

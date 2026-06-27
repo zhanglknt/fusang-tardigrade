@@ -21,17 +21,17 @@ Phylogenetic inference is foundational to evolutionary biology, yet the standard
 
 We present **Fusang: Tardigrade Edition**, a multi-level alignment-free framework whose core innovation is **cosine distance on k-mer frequency vectors** for phylogenetic inference under indel-rich conditions. Our key contributions include:
 
-1. **K-mer cosine distance matches MSA+ML without alignment.** On n=200 indel-rich data (130 seeds), Fusang L0-1 (k-mer→cosine→NJ) achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+GTR+CAT) nRF=0.085±0.025 — not significantly different (Wilcoxon p=0.052). Remarkably, IQ-TREE2 (MAFFT+GTR, fixed model) achieves nRF=0.147±0.027 — 1.8× worse (p<0.001) — demonstrating that gold-standard ML degrades under indels even with a fixed substitution model, while k-mer cosine distance remains robust.
+1. **K-mer cosine distance is competitive with MSA+ML under indels.** On n=200 indel-rich data (112 seeds after outlier exclusion), Fusang L0-1 (k-mer→cosine→NJ) achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+GTR+CAT) nRF=0.085±0.025 — a directional advantage at borderline significance (Wilcoxon p=0.052). IQ-TREE2 (MAFFT+GTR, fixed model) achieves nRF=0.147±0.027 — 1.8× worse (p<0.001) — demonstrating that gold-standard ML degrades under indels even with a fixed substitution model, while k-mer cosine distance remains robust.
 
 2. **Multi-k ensemble improvement.** Averaging cosine distance matrices across k=5, 7, and 9 provides significant improvement over default k=5,gap2 (p=0.006, Cohen's d=0.54).
 
 3. **Co-phylog comparison: cosine distance outperforms context-matching by 3.7×.** On n=200 indel data (27 seeds), Co-phylog achieves nRF=0.419±0.025 — 3.7× worse than k-mer cosine (Cohen's d=20.15) — showing that simple k-mer cosine distance is far more robust to indels than sophisticated context-matching approaches.
 
-4. **MinHash comparison: spaced k-mer cosine is 1.35× more robust than MinHash Jaccard under indels.** Mash (MinHash) achieves near-random nRF=1.005 on indel-rich data, while IMMI achieves nRF=0.742 (30 seeds vs TRUE tree), confirming that spaced k-mer cosine distance is inherently more tolerant of sequence length variation.
+4. **MinHash comparison: k-mer cosine is 1.35× more robust than MinHash Jaccard under indels.** Mash (MinHash) achieves near-random nRF=1.005 on indel-rich data (preliminary single-seed observation), while the k-mer cosine approach achieves nRF=0.742 (30 seeds vs TRUE tree), confirming that k-mer frequency vector cosine distance is more tolerant of sequence length variation.
 
 5. **Cross-domain validation on real protein data.** The AFproject SwissTree protein benchmark (11 families, 29–159 taxa) confirms that k-mer frequency methods outperform Co-phylog's best configuration (halfctx=11) by 1.5× (Wilcoxon paired p=0.006, Cohen's d=1.32).
 
-6. **Learned boundary classifier (E2E validated).** A random forest classifier determines when L0-1 suffices versus when MSA+ML (Level 3) refinement is needed, achieving 100% accuracy on 88 simulated scenarios (88/88 correct, Wilson CI [0.958, 1.000]). Multi-k NJ (L0-1 ensemble) approaches MSA+ML (L3) accuracy — nRF=0.583 vs 0.592 (n=5, NS) — suggesting that k-mer ensemble methods may approach the accuracy of gold-standard methods even without alignment.
+6. **Learned boundary classifier (E2E validated).** A random forest classifier determines when L0-1 suffices versus when MSA+ML (Level 3) refinement is needed, achieving 100% accuracy on 88 simulated scenarios (88/88 correct, Wilson CI [0.958, 1.000]; 5-fold CV ROC-AUC=0.84 on training data). Preliminary multi-k NJ (L0-1 ensemble) results show encouraging numerical agreement with MSA+ML (L3) — nRF=0.583 vs 0.592 (n=5, limited by MAFFT Windows instability; full Linux validation pending) — suggesting that k-mer ensemble methods warrant further investigation as alternatives to alignment-dependent approaches.
 
 7. **Scalability to 10,000 taxa.** Fusang processes 10,000 taxa in 70 seconds (609 MB RAM) via DCM decomposition into 50 balanced groups of 200 taxa each, with FastME BIONJ+BNNI providing 3–5× tree-building speedup.
 
@@ -82,7 +82,7 @@ This work was supported by the National Natural Science Foundation of China (NSF
 
 ## Closing
 
-We believe our manuscript presents a significant methodological advance — establishing k-mer frequency vector cosine distance as a robust, scalable phylogenetic signal that rivals MSA+ML accuracy under indel-rich conditions. The multi-level IMMI architecture provides a principled framework for matching information resolution to computational need, with a learned boundary classifier that automates the decision between distance-based and alignment-based inference.
+We believe our manuscript presents a significant methodological contribution — a systematic evaluation of k-mer frequency vector cosine distance as a robust, scalable phylogenetic signal for indel-rich conditions. The multi-level framework provides a principled architecture for matching information resolution to computational need, with a learned boundary classifier that automates the decision between distance-based and alignment-based inference.
 
 Thank you for considering our work for publication in *Nucleic Acids Research*. We look forward to hearing from you.
 

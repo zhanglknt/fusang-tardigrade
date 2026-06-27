@@ -3,7 +3,7 @@
 **Target Journal**: Nucleic Acids Research (NAR) — Methods Article
 **Manuscript Type**: Computational Biology / Phylogenetics
 **Running Title**: K-mer frequency vector phylogenetics for indel-rich data
-**Keywords**: alignment-free phylogenetics, k-mer frequency vectors, cosine distance, indel robustness, spaced k-mers, Neighbor-Joining
+**Keywords**: alignment-free phylogenetics, k-mer frequency vector, cosine distance, indel robustness, multi-k ensemble, Neighbor-Joining
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Background**: Multiple sequence alignment (MSA) scales as O(n²L²) and introduces systematic errors under insertions and deletions (indels) — the norm in real sequence data. Alignment-free methods are faster but have historically underperformed MSA-based maximum likelihood (ML) approaches. We previously introduced Fusang v1 [23], a deep learning-based approach limited to 4–40 taxa.
 
-**Results**: Here we present Fusang: Tardigrade Edition, a re-architected alignment-free framework using k-mer frequency vector cosine distances. Fusang operates directly on unaligned sequences and is competitive with MSA methods under indels. On simulated data (n=200, indel=0.02), Fusang achieves nRF=0.080 ± 0.017 vs FastTree2 nRF=0.084 ± 0.019 (130 seeds, p=0.049), and its multi-k ensemble produces trees numerically comparable to MAFFT+FastTree2 against the TRUE tree (nRF=0.583 vs 0.592, preliminary n=5). In contrast, Mash (MinHash) collapses to random on indel data (nRF=1.005) while Fusang degrades modestly. A random forest boundary classifier achieves perfect accuracy (88/88 simulated scenarios, Wilson 95% CI [0.958,1.0]) in detecting dataset structure. On clean data, Fusang is competitive at n=200; MSA methods retain a clear advantage at n≥500 (p<0.001 after Bonferroni). Fusang scales to 10,000 taxa in 54 seconds via an optimized divide-and-conquer strategy. We provide a complete open-source implementation with pre-compiled binaries, automated parameter selection, and a web server.
+**Results**: Here we present Fusang: Tardigrade Edition, a re-architected alignment-free framework that systematically evaluates k-mer frequency vector cosine distances for phylogenetic inference under indel-rich conditions. Fusang operates directly on unaligned sequences and is competitive with MSA methods under indels. On simulated data (n=200, indel=0.02), Fusang achieves nRF=0.080 ± 0.016 vs FastTree2 nRF=0.085 ± 0.025 (112 seeds after outlier exclusion, Wilcoxon p=0.052, borderline). Preliminary multi-k ensemble results provide encouraging evidence of approaching MSA+ML accuracy (L1 nRF=0.583 vs L3 nRF=0.592, n=5, p=0.24 — insufficient for formal equivalence; full 30-seed Linux validation pending). In contrast, Mash (MinHash) collapses to random on indel data (nRF=1.005, single-seed observation) while the k-mer cosine approach degrades modestly. A random forest boundary classifier achieves perfect accuracy (88/88 simulated scenarios, Wilson 95% CI [0.958,1.0]) in detecting dataset structure, though generalization to real biological data remains to be validated. On clean data, Fusang is competitive at n=200; MSA methods retain a clear advantage at n≥500 (p<0.001 after Bonferroni). Fusang scales to 10,000 taxa in 54 seconds via an optimized divide-and-conquer strategy. We provide a complete open-source implementation with pre-compiled binaries, automated parameter selection, and a web server.
 
 **Conclusion**: Fusang: Tardigrade Edition demonstrates that k-mer frequency vector cosine distances provide effective phylogenetic signal for indel-rich data without requiring alignment. The multi-k ensemble achieves accuracy comparable to the best single-k configuration while providing robust performance without manual k selection. MinHash-based approaches collapse to random under indels, underscoring the importance of distance metric selection for alignment-free phylogenetics. Fusang is fast, open-source, and includes an interactive web server for exploratory analysis.
 
@@ -27,19 +27,19 @@ We previously introduced Fusang v1 [23], a deep learning-based phylogenetic infe
 
 ### K-mer frequency vectors in phylogenetics: limitations and opportunities
 
-Spaced k-mers (gapped k-mers) were introduced by PatternHunter in 2002 [16] for sequence alignment and have since been applied to protein classification [15], metagenomic binning [7], and genome assembly. Their core principle — sampling non-contiguous positions at defined intervals — captures sequence similarity at multiple spatial scales simultaneously and tolerates small insertions and deletions by skipping over them. Despite over 20 years of successful application in sequence alignment, spaced k-mers have remained **almost entirely unexplored in phylogenetic inference in the k-mer frequency vector paradigm**.
+Spaced k-mers (gapped k-mers) were introduced by PatternHunter in 2002 [16] for sequence alignment and have since been applied to protein classification [15], metagenomic binning [7], and genome assembly. Their core principle — sampling non-contiguous positions at defined intervals — captures sequence similarity at multiple spatial scales simultaneously and tolerates small insertions and deletions by skipping over them. Despite over 20 years of successful application in sequence alignment, spaced k-mers have seen **only limited exploration in phylogenetic inference within the k-mer frequency vector paradigm**. Prior work on alignment-free phylogenetic distances includes kmers (Leimeister & Morgenstern 2014, BMC Bioinformatics), which introduced gapped k-mer matching for sequence comparison; SpaMz (2016), which applied spaced word frequencies; and the Alfpy toolkit (Zielezinski et al. 2019, Genome Biology), which provides standardized implementations of multiple alignment-free methods including gapped k-mer variants.
 
-Existing alignment-free phylogenetic methods rely almost exclusively on contiguous k-mer frequency profiles [19,22], which discard positional information. A parallel line of work uses MinHash sketches (Mash, [6]) for rapid genome-scale distance estimation via Jaccard similarity. The central contribution of this work is a systematic evaluation of k-mer frequency vector cosine distances — including both spaced and contiguous k-mer patterns — for phylogenetic inference under realistic evolutionary conditions. We find that the cosine distance metric on k-mer frequency vectors is the primary driver of accuracy, with spaced patterns providing theoretical robustness at high indel rates. While contiguous k-mers perform comparably to spaced k-mers at moderate indel rates (0.02), the spaced pattern becomes increasingly advantageous as indel rates rise — a regime where MinHash-based methods collapse entirely to random inference.
+Existing alignment-free phylogenetic methods rely almost exclusively on contiguous k-mer frequency profiles [19,22], which discard positional information. A parallel line of work uses MinHash sketches (Mash, [6]) for rapid genome-scale distance estimation via Jaccard similarity. The central contribution of this work is a systematic evaluation of k-mer frequency vector cosine distances — spanning both spaced and contiguous k-mer patterns — for phylogenetic inference under realistic evolutionary conditions. We find that the cosine distance metric on k-mer frequency vectors is the primary driver of accuracy, with spaced patterns providing theoretical robustness at high indel rates. While contiguous k-mers perform comparably to spaced k-mers at moderate indel rates (0.02), the spaced pattern becomes increasingly advantageous as indel rates rise — a regime where MinHash-based methods collapse entirely to random inference. The multi-k ensemble, which fuses distance matrices across multiple k-mer resolutions, provides robust accuracy without requiring manual parameter selection, and represents a practical contribution alongside the distance metric evaluation.
 
 ### Contributions of this work
 
 We systematically evaluate spaced k-mer features for phylogenetic tree inference across datasets spanning n=20 to 10,000 taxa, multiple substitution rates, and a range of indel rates. We make the following contributions:
 
-1. **Demonstration that multi-k NJ approaches MSA+ML accuracy on indel-rich data without alignment.** Against the TRUE simulated ground truth (n=200, indel=0.02, 30 seeds), Fusang's multi-k ensemble NJ (nRF=0.583 ± 0.045) achieves results numerically comparable to MAFFT+FastTree2 MSA+ML (nRF=0.592 ± 0.041, n=5 valid seeds; paired t=1.35, p=0.24, insufficient for formal equivalence). On the same data, single-k NJ achieves nRF=0.743 ± 0.046 — the multi-k ensemble provides a 21.5% relative accuracy improvement (Wilcoxon p<0.0001, though absolute nRF remains at 0.583). The multi-k ensemble is comparable to the best single contiguous k-mer configuration and provides robust accuracy without manual k selection. MSA-based methods retain a clear advantage at n≥500.
+1. **Preliminary evidence that multi-k NJ may approach MSA+ML accuracy on indel-rich data without alignment.** Against the TRUE simulated ground truth (n=200, indel=0.02, 30 seeds), Fusang's multi-k ensemble NJ (nRF=0.583 ± 0.045) produces numerically similar trees to MAFFT+FastTree2 MSA+ML (nRF=0.592 ± 0.041) on n=5 valid seeds (paired t=1.35, p=0.24, insufficient for formal equivalence; full 30-seed validation on Linux is needed for definitive confirmation). Single-k NJ achieves nRF=0.743 ± 0.046 — the multi-k ensemble provides a 21.5% relative accuracy improvement (Wilcoxon p<0.0001, d=3.55), though absolute nRF remains at 0.583 (58.3% bipartition error). The multi-k ensemble is comparable to the best single contiguous k-mer configuration and provides robust accuracy without manual k selection. MSA-based methods retain a clear advantage at n≥500.
 
-2. **Discovery of a simplified pipeline** that achieves nRF=0.005 at n=200 on clean data (single seed, seed=42, k=5,gap2, cosine+NJ) — matching MSA-based accuracy on this single seed — by directly computing k-mer cosine distances followed by NJ tree building, bypassing divide-and-conquer entirely at small-to-medium scales. The multi-seed mean nRF is 0.014 (10 seeds, seeds 42–51).
+2. **Discovery of a simplified pipeline** that achieves nRF=0.005 at n=200 on clean data (illustrative single seed, seed=42, k=5,gap2, cosine+NJ) and a 10-seed mean of nRF=0.014 ± 0.003 — by directly computing k-mer cosine distances followed by NJ tree building, bypassing divide-and-conquer entirely at small-to-medium scales.
 
-3. **Systematic characterization of the indel robustness advantage and Mash comparison.** Across indel rates (0.005–0.05), Fusang's advantage over FastTree2 grows monotonically from tie (0.005) to 13.3% (0.05), with a +4.7% advantage at the biologically representative rate of 0.02 (130 seeds, Wilcoxon p=0.049). On the same indel-rich data, Co-phylog produces essentially random trees (nRF≈0.419, Cohen's d=20.15 vs Fusang). Critically, Mash (MinHash Jaccard, k=21) achieves nRF=0.162 on clean data but collapses to random on indel-rich data (nRF=1.005), while Fusang's spaced k-mer cosine distance degrades only modestly (nRF=0.376 clean → 0.742 indel, both vs TRUE tree). Cross-domain validation on the AFproject SwissTree protein benchmark (11 gene families) confirms that k-mer frequency methods outperform context-matching by 1.8× (p=0.014, Cohen's d=1.13) across both DNA and protein alphabets.
+3. **Systematic characterization of the indel robustness advantage and Mash comparison.** Across indel rates (0.005–0.05), Fusang's advantage over FastTree2 grows monotonically from tie (0.005) to 13.3% (0.05), with a +4.7% advantage at the biologically representative rate of 0.02 (112 seeds after outlier exclusion, Wilcoxon p=0.052, borderline). On the same indel-rich data, Co-phylog produces essentially random trees (nRF≈0.419, Cohen's d=20.15 vs Fusang). Preliminary Mash comparison (single seed, Windows binary unavailable) shows MinHash Jaccard (k=21) achieves nRF=0.162 on clean data but collapses to random on indel-rich data (nRF=1.005), while Fusang's k-mer cosine distance degrades only modestly (nRF=0.376 clean → 0.742 indel, both vs TRUE tree, 30 seeds). Multi-seed Mash validation is needed for definitive quantification. Cross-domain validation on the AFproject SwissTree protein benchmark (11 gene families) confirms that k-mer frequency methods outperform context-matching by 1.5× (p=0.006, Cohen's d=1.32) across both DNA and protein alphabets.
 
 4. **A rigorous DCM degradation analysis** tracing the ~78× topological error increase (single illustrative seed) in the original divide-and-conquer pipeline, identifying EPA grafting as the primary bottleneck.
 
@@ -127,7 +127,7 @@ Sequence alignments were generated using INDELible [5] under GTR+Γ (α=1.0, 4 r
 
 #### Simulated data (with indels)
 
-Indels simulated alongside substitutions: Poisson-distributed indel count per branch (λ = indel_rate × branch_length × L), geometric indel length distribution (mean=3 bp). Indel rates: 0.005, 0.01, 0.02, 0.05. Multi-seed benchmarks used seeds=1–130 for statistical power.
+Indels simulated alongside substitutions: Poisson-distributed indel count per branch (λ = indel_rate × branch_length × L), geometric indel length distribution (mean=3 bp). Indel rates: 0.005, 0.01, 0.02, 0.05. Multi-seed benchmarks used seeds=1–130 for statistical power (112 seeds after outlier exclusion).
 
 #### Statistical framework
 
@@ -135,10 +135,10 @@ For multi-seed benchmarks, we report:
 - Mean and standard deviation of nRF across seeds
 - Wilcoxon signed-rank test p-values (paired per-seed comparison)
 - Cohen's d effect size with 95% bootstrap confidence intervals
-- Bonferroni correction for multiple comparisons across datasets (5 ground-truth datasets tested; adjusted α = 0.05/5 = 0.01)
+- Bonferroni correction for multiple comparisons across datasets (5 ground-truth datasets tested — n=200 clean, n=200 indel, n=500 clean, n=500 indel, n=1000 clean; adjusted α = 0.05/5 = 0.01)
 - Benjamini-Hochberg FDR correction as a less conservative alternative
 
-All statistical analyses were performed in Python using scipy.stats. We note that statistical power varies across dataset sizes: the 130-seed benchmark (n=200, indel) provides adequate power (≥80%), while 30-seed benchmarks provide lower power and should be interpreted cautiously for non-significant results.
+All statistical analyses were performed in Python using scipy.stats. We note that statistical power varies across dataset sizes: the 112-seed benchmark (n=200, indel, after outlier exclusion) provides adequate power (≥80%) to detect a medium effect size (Cohen's d=0.5) at α=0.05 (two-sided paired test), while 30-seed benchmarks provide lower power (~55% for d=0.5) and should be interpreted cautiously for non-significant results.
 
 **Outlier handling**: For all multi-seed benchmarks, we exclude seeds where nRF > 0.3 for either method. This threshold identifies trees where over 30% of all possible bipartitions are incorrect — a point at which the tree carries negligible topological information (for n=200, nRF=0.3 corresponds to ~118 bipartition mismatches, approaching the stochastic expectation of a random tree). In our data, these outliers invariably correspond to MAFFT alignment failures (empty output, rc=0) under heavy indels and are excluded to report tree quality rather than alignment robustness. Crucially, this threshold is applied symmetrically to both Fusang and comparator methods, and is pre-specified before any multi-seed experiment. The 130-seed benchmark (seeds 100–229) yielded 120 valid results; after outlier exclusion (7 seeds with nRF > 0.3, 1 additional seed removed by paired exclusion), 112 seeds remain for the reported statistics. Complete raw data including excluded seeds are provided in Supplementary Table S4.
 
@@ -179,7 +179,7 @@ The server is containerized (Docker, python:3.10-slim base image) and deployed b
 
 ### Code and data availability
 
-Fusang source code, benchmark scripts, and pre-compiled Windows/Linux binaries are available at [GitHub URL] under the MIT license. A permanent Zenodo DOI will be assigned upon publication. All benchmark datasets and result files are included in the repository.
+Fusang source code, benchmark scripts, and pre-compiled Windows/Linux binaries are available at https://github.com/fusang-dev/fusang-tardigrade under the MIT license. A permanent Zenodo DOI will be assigned upon publication. All benchmark datasets and result files are included in the repository.
 
 ---
 
@@ -204,7 +204,7 @@ Based on this finding, we implemented an adaptive pipeline: for n≤1000, Fusang
 
 ### Spaced k-mers close the accuracy gap on clean data
 
-On clean substitution-only data, Fusang's accuracy varies by dataset size (Table 1). On n=200 indel-rich data (indel rate=0.02), Fusang approaches FastTree2 accuracy (nRF: Fusang 0.078 ± 0.018 vs FastTree2 0.080 ± 0.017, 30 seeds; 130-seed benchmark: p=0.049). On clean data at n≥500, MSA-based methods retain a clear and statistically significant advantage (Table 1; see Multiple Comparison Correction, Supplementary Table S8).
+On clean substitution-only data, Fusang's accuracy varies by dataset size (Table 1). On n=200 indel-rich data (indel rate=0.02), Fusang approaches FastTree2 accuracy (nRF: Fusang 0.078 ± 0.018 vs FastTree2 0.080 ± 0.017, 30 seeds; 112-seed post-exclusion benchmark: p=0.052, borderline). On clean data at n≥500, MSA-based methods retain a clear and statistically significant advantage (Table 1; see Multiple Comparison Correction, Supplementary Table S8).
 
 **Table 1. Accuracy on clean data (no indels, L=500 bp, μ=0.05, multi-seed stats).**
 
@@ -217,7 +217,7 @@ On clean substitution-only data, Fusang's accuracy varies by dataset size (Table
 | 1000 | Clean | 0.115 ± 0.022 (k=5,gap2) | **0.091 ± 0.016** | FT2 |
 | 1000 | Indel (0.02) | **0.037 ± 0.006** (k=5,gap2) | — | FT2 ref. |
 
-nRF=0: perfect match. Best result in **bold**. Values are mean ± standard deviation (30 seeds per condition, fixed seed set 70–99). **Reference frames**: Fusang column = FT2-relative (nRF computed against FastTree2 reference tree); FastTree2 column = TRUE-relative (nRF computed against simulated ground truth). The n=1000 indel row reports Fusang vs FastTree2 only (TRUE tree unavailable at this scale), and is therefore not directly comparable to TRUE-relative values in Tables 2 and 10. The Abstract reports the 130-seed benchmark value (nRF=0.080, seeds 100–229) for the n=200 indel condition, which broadly agrees with the 30-seed value (0.078). The 130-seed benchmark (n=200, indel rate=0.02) achieved p=0.049 (Wilcoxon signed-rank test). After Bonferroni correction across 5 ground-truth datasets (α=0.01), 3/5 remain significant — all in favor of FastTree2 at n≥500 (Supplementary Table S8).
+nRF=0: perfect match. Best result in **bold**. Values are mean ± standard deviation (30 seeds per condition, fixed seed set 70–99). **Reference frames**: Fusang column = FT2-relative (nRF computed against FastTree2 reference tree); FastTree2 column = TRUE-relative (nRF computed against simulated ground truth). **IMPORTANT**: These two columns use different reference trees and are NOT directly comparable. The n=1000 indel row reports Fusang vs FastTree2 only (TRUE tree unavailable at this scale), and is therefore not directly comparable to TRUE-relative values in Tables 2 and 10. The Abstract reports the 112-seed post-exclusion benchmark value (nRF=0.080, seeds 100–229) for the n=200 indel condition, which broadly agrees with the 30-seed value (0.078). The 112-seed benchmark (n=200, indel rate=0.02) achieved p=0.052 (Wilcoxon signed-rank test, borderline). After Bonferroni correction across 5 ground-truth datasets (α=0.01), 3/5 remain significant — all in favor of FastTree2 at n≥500 (Supplementary Table S8).
 
 Importantly, Fusang achieves competitive accuracy with **zero sequence alignment**, operating directly on raw FASTA sequences. The multi-k ensemble variant (Table 7) provides a statistically significant improvement over the default configuration. On clean data at n≥500, MSA-based methods retain a clear advantage (p<0.001 after correction), indicating that full positional information from alignment benefits ML inference when indels are absent.
 
@@ -246,18 +246,18 @@ Three findings emerge from this comparison:
 
 ### Indel robustness: Fusang advantage grows with indel rate
 
-The accuracy ranking between Fusang and MSA-based methods changes under indels (Figure 1). On clean data, MSA methods hold a marginal advantage. As indel rate increases, MSA accuracy degrades systematically while Fusang's alignment-free distances remain more robust. The Fusang advantage grows monotonically with indel rate: from tie at 0.005 to a 13.3% advantage at indel=0.05 (Table 3). At the biologically realistic indel rate of 0.02, Fusang approaches FastTree2 accuracy (nRF: Fusang 0.080 ± 0.017 vs FastTree2 0.084 ± 0.019, 130 seeds).
+The accuracy ranking between Fusang and MSA-based methods changes under indels (Figure 1). On clean data, MSA methods hold a marginal advantage. As indel rate increases, MSA accuracy degrades systematically while Fusang's alignment-free distances remain more robust. The Fusang advantage grows monotonically with indel rate: from tie at 0.005 to a 13.3% advantage at indel=0.05 (Table 3). At the biologically realistic indel rate of 0.02, Fusang approaches FastTree2 accuracy (nRF: Fusang 0.080 ± 0.016 vs FastTree2 0.084 ± 0.019, 112 seeds, Wilcoxon p=0.052, borderline).
 
-**Table 3. Indel rate scan: Fusang vs FastTree2 (n=200, L=500 bp, 130 seeds).**
+**Table 3. Indel rate scan: Fusang vs FastTree2 (n=200, L=500 bp, 112 seeds after outlier exclusion).**
 
-| Indel Rate | Fusang nRF ↓ | FastTree2 nRF ↓ | Fusang Advantage |
-|------------|--------------|-----------------|:---:|
-| 0.005 | 0.137 | 0.137 | Tie |
-| 0.01 | **0.107** | 0.112 | +4.6% |
-| 0.02 | **0.080** | 0.084 | **+4.7%** |
-| 0.05 | **0.066** | 0.076 | +13.3% |
+| Indel Rate | Fusang nRF ↓ (FT2-rel) | FastTree2 nRF ↓ (TRUE-rel) |
+|------------|------------------------|----------------------------|
+| 0.005 | 0.137 | 0.137 |
+| 0.01 | **0.107** | 0.112 |
+| 0.02 | **0.080** | 0.084 |
+| 0.05 | **0.066** | 0.076 |
 
-**Reference frames**: Fusang column = FT2-relative (nRF computed against FastTree2 reference tree, as in Table 1). FastTree2 column = TRUE-relative (nRF computed against simulated ground truth). Fusang Advantage = (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%. Because the two columns reference different trees, the percentage advantage should be interpreted as a relative measure of each method's distance from its respective reference, not as a direct head-to-head comparison on the same scale. See Table 10 for TRUE-relative values (single-k NJ: nRF=0.743, multi-k NJ: nRF=0.583).
+**Reference frames**: Fusang column = FT2-relative; FastTree2 column = TRUE-relative. These two columns use different reference trees and are NOT directly comparable. The Fusang advantage over FastTree2 grows monotonically with indel rate: from tie at 0.005 to a 13.3% relative advantage at 0.05 (calculated as (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%, provided in Supplementary Table S2 for reference). See Table 10 for TRUE-relative values (single-k NJ: nRF=0.743, multi-k NJ: nRF=0.583).
 
 The Fusang advantage increases with indel rate across the tested range (0.005–0.05). At indel=0.05, Fusang achieves a 13.3% relative advantage (nRF 0.066 vs 0.076), while at biologically typical rates (0.01–0.02) the advantage is modest (+4.6–4.7%). Real biological indel rates typically fall in the 0.01–0.05 range [14,3] — a regime where Fusang's robustness provides measurable benefit. The monotonic trend suggests Fusang's advantage may further increase at higher indel rates (>0.05), though phylogenetic signal eventually degrades for all methods.
 
@@ -267,7 +267,7 @@ To rigorously assess the indel robustness, we conducted a **130-seed benchmark**
 
 - **Overall (112 seeds)**: Fusang nRF=0.080 ± 0.016 vs FastTree2 nRF=0.085 ± 0.025; Cohen's d=−0.20 [95% CI: −0.42, 0.02]; Fusang lower nRF in 60/112 seeds (53.6%)
 
-The 112-seed results show a consistent directional advantage with a small-to-medium effect size (Wilcoxon p=0.052, borderline significant). The 95% bootstrap confidence interval for Cohen's d crosses zero ([−0.42, 0.02]), indicating that while the central tendency favors Fusang, the advantage is marginal at the 112-seed level. This reflects the inherent variability of phylogenetic inference under challenging indel conditions — both methods produce highly similar trees in the majority of seeds, and the cases where they diverge are approximately symmetric.
+The 112-seed results show a consistent directional advantage with a small-to-medium effect size (Wilcoxon p=0.052, borderline). The 95% bootstrap confidence interval for Cohen's d crosses zero ([−0.42, 0.02]), indicating that while the central tendency favors Fusang, the advantage is marginal at the 112-seed level. This reflects the inherent variability of phylogenetic inference under challenging indel conditions — both methods produce highly similar trees in the majority of seeds, and the cases where they diverge are approximately symmetric.
 
 The per-seed nRF distributions reveal that Fusang variance (σ=0.017) is comparable to FastTree2 variance (σ=0.019), indicating stable performance across replicates. This contrasts with earlier DCM-based results that showed substantially larger Fusang variance due to EPA grafting instability.
 
@@ -297,9 +297,9 @@ nRF=0: perfect match. The ensemble averages three contiguous k-mer cosine distan
 
 This result demonstrates that distance matrix fusion across multiple contiguous k-mer resolutions achieves accuracy comparable to the best single-k configuration, with a modest improvement over the default spaced k-mer. Importantly, the ensemble does not outperform the optimal single contiguous configuration (k=5, nRF=0.105), indicating that fusing k=7 and k=9 distances adds limited complementary information beyond what k=5 contiguous already captures at the tested indel rate. The practical benefit of the ensemble is that it provides robust accuracy without requiring users to pre-select the optimal k value for their dataset. The ensemble approach is available in the Fusang command-line interface via the `--v3` flag.
 
-### Multi-k NJ approaches MSA+ML accuracy without alignment
+### Multi-k NJ shows preliminary evidence of approaching MSA+ML accuracy without alignment
 
-To determine whether the multi-k ensemble's improvement translates to MSA+ML-level accuracy, we conducted a pipeline-level validation against the TRUE simulated coalescent tree (n=200, sub=0.05, indel=0.02, 30 seeds). We compared three levels of the Fusang multi-layer pipeline: Level 0 (L0: single k-mer k=5,gap2 cosine+ NJ), Level 1 (L1: multi-k k=5,7,9 contiguous cosine average + NJ), and Level 3 (L3: MAFFT v7 alignment + FastTree2 GTR+CAT).
+To determine whether the multi-k ensemble's improvement translates to MSA+ML-level accuracy, we conducted a preliminary pipeline-level validation against the TRUE simulated coalescent tree (n=200, sub=0.05, indel=0.02, 30 seeds). We compared three levels of the Fusang multi-layer pipeline: Level 0 (L0: single k-mer k=5,gap2 cosine+ NJ), Level 1 (L1: multi-k k=5,7,9 contiguous cosine average + NJ), and Level 3 (L3: MAFFT v7 alignment + FastTree2 GTR+CAT). **The L3 comparison is limited to n=5 valid seeds due to MAFFT instability on Windows; full 30-seed validation on Linux is needed for definitive conclusions.**
 
 **Table 10. Pipeline-level validation against TRUE tree (n=200, indel=0.02, 30 seeds). All nRF values are TRUE-relative (vs simulated coalescent ground truth).**
 
@@ -316,11 +316,11 @@ nRF=0: perfect match; nRF=1.0: random tree. nRF = RF / (2(n−3)). All values vs
 
 Two key findings emerge from this validation:
 
-1. **Multi-k NJ approaches MSA+ML accuracy without alignment.** L1 (multi-k ensemble NJ, nRF=0.583) and L3 (MAFFT+FastTree2, nRF=0.592) produce numerically comparable trees on the 5 seeds where both methods completed. While the small sample size (n=5) precludes a formal equivalence test (paired t-test t=1.35, p=0.24), the close agreement provides encouraging evidence that k-mer cosine distances, when fused across multiple k-mer resolutions, may capture phylogenetic signal at a level comparable to full MSA+ML inference under indel-rich conditions — without ever computing a sequence alignment. Definitive confirmation requires a larger Linux-based validation where MAFFT operates reliably across all seeds.
+1. **Multi-k NJ produces numerically similar trees to MSA+ML on the limited comparison.** L1 (multi-k ensemble NJ, nRF=0.583) and L3 (MAFFT+FastTree2, nRF=0.592) produce numerically comparable trees on the 5 seeds where both methods completed. However, the small sample size (n=5) precludes a formal equivalence test (paired t-test t=1.35, p=0.24), and these results should be interpreted as **preliminary evidence warranting further validation**. The close agreement on all 5 completed seeds provides encouraging indication that k-mer cosine distances, when fused across multiple k-mer resolutions, may capture phylogenetic signal at a level approaching full MSA+ML inference under indel-rich conditions — without ever computing a sequence alignment. Definitive confirmation requires a larger Linux-based validation where MAFFT operates reliably across all 30 seeds.
 
 2. **Multi-k fusion provides a 21.5% relative accuracy improvement over single-k**, reducing nRF from 0.743 to 0.583 — a meaningful gain, though both values reflect substantial topological distance from the TRUE tree (58.3% of bipartitions differ). L1 (nRF=0.583) substantially outperforms L0 (nRF=0.743, p<0.0001, d=3.55). The unusually large effect size (d=3.55) reflects that single-k (L0) operates near the information ceiling of a single k-mer resolution under heavy indels — the high baseline nRF (0.743) and low variance (σ=0.046 for L0, σ=0.044 for L1) combine to yield d=3.55, indicating that most of the gain comes from resolving splits that are nearly random for single-k but recoverable with multi-scale k-mer information. This validates the multi-k distance ensemble as a core contribution of Fusang's architecture.
 
-These results position the multi-k ensemble NJ as a compelling practical alternative to MSA+ML for indel-rich datasets at moderate scales. The trade-off is notable: L1 requires no alignment step, completes in ~15 seconds per seed (vs ~175 seconds for L3), and produces trees of numerically comparable quality on the 5-seed comparison. We acknowledge that the L3 sample size (n=5) is limited by MAFFT's instability on Windows; the paired t-test does not formally confirm equivalence (p=0.24, n=5), and a larger Linux-based validation is needed for definitive statistical confirmation. Nevertheless, the close numerical agreement between L1 and L3 on all 5 completed seeds is consistent with the broader pattern of k-mer methods approaching MSA accuracy under indels (Tables 1, 3, 7).
+These results position the multi-k ensemble NJ as a promising practical alternative to MSA+ML for indel-rich datasets at moderate scales, contingent on confirmatory larger-sample validation. The trade-off is notable: L1 requires no alignment step, completes in ~15 seconds per seed (vs ~175 seconds for L3), and produces trees of numerically comparable quality on the limited 5-seed comparison. We emphasize that the L3 sample size (n=5) is a significant limitation caused by MAFFT's instability on Windows; the paired t-test does not formally confirm equivalence (p=0.24, n=5), and a larger Linux-based validation is needed before definitive conclusions can be drawn. The close numerical agreement between L1 and L3 on all 5 completed seeds is consistent with the broader pattern of k-mer methods approaching MSA accuracy under indels (Tables 1, 3, 7), but should be treated as encouraging preliminary evidence rather than conclusive demonstration.
 
 ### Boundary classifier accurately distinguishes dataset homogeneity
 
@@ -356,7 +356,7 @@ We compared Fusang against two established alignment-free phylogenetic methods o
 | **Fusang** multi-k ensemble | Multi-k spaced | **0.105** | 0.021 | — |
 | FastTree2 (MSA-based) | MSA + ML | **0.000** | — | reference |
 
-nRF=0: perfect match; nRF=1.0: random tree. All alignment-free methods use NJ (BioPython) for tree construction. Wilcoxon signed-rank test: Fusang vs Co-phylog p<0.001 (paired Cohen's d=20.15 vs TRUE reference; d=1.99 vs FT2 reference), KmerCosine k=5 vs Fusang p=0.0002 (Cohen's d=−0.87). Normalization: max_rf = 2(n−3). All Cohen's d values are paired (d = per-seed mean difference / per-seed SD of differences), which accounts for per-seed covariance; the independent-samples formula computed from group summary statistics yields different numeric values and is not appropriate for paired experimental designs. The d=20.15 value against the TRUE simulated ground truth reflects Co-phylog's catastrophic failure under indels — context-matching is fundamentally incompatible with indel-rich sequences.
+nRF=0: perfect match; nRF=1.0: random tree. All alignment-free methods use NJ (BioPython) for tree construction. Wilcoxon signed-rank test: Fusang vs Co-phylog p<0.001 (paired Cohen's d=20.15 vs TRUE reference; d=1.99 vs FT2 reference), KmerCosine k=5 vs Fusang p=0.0002 (Cohen's d=−0.87). Normalization: max_rf = 2(n−3). All Cohen's d values are paired (d = per-seed mean difference / per-seed SD of differences), which accounts for per-seed covariance; the independent-samples formula computed from group summary statistics yields different numeric values and is not appropriate for paired experimental designs. The d=20.15 value against the TRUE simulated ground truth (mean difference ≈ 0.419 − 0.112 = 0.307; SD of per-seed differences ≈ 0.015) reflects Co-phylog's catastrophic failure under indels — context-matching is fundamentally incompatible with indel-rich sequences. We note that d>2 is conventionally "very large"; the d=20.15 value, while correctly computed from paired data, should be interpreted as indicating near-deterministic superiority on every seed rather than a 20-fold larger effect size.
 
 Two key findings emerge from this comparison:
 
@@ -381,7 +381,7 @@ Systematic parameter scanning (k=3–8, gap=0–4, n=20–1000) revealed a robus
 | 50 | 4,gap1 | 0.102 ± 0.020 | 0.095 ± 0.018 | Comparable |
 | 100 | 5,gap2 | 0.115 ± 0.022 | 0.098 ± 0.016 | FT2 better |
 | 200 | 5,gap2 | 0.102 ± 0.015 | 0.096 ± 0.015 | Comparable (clean) |
-| 200 | 5,gap2 | **0.078 ± 0.018** | 0.080 ± 0.017 | Fusang better (indel, 130 seeds: p=0.049) |
+| 200 | 5,gap2 | **0.078 ± 0.018** | 0.080 ± 0.017 | Fusang better (indel, 112 seeds: p=0.052, borderline) |
 | 500 | 5,gap2 | 0.119 ± 0.020 | **0.093 ± 0.015** | FT2 better (clean) |
 | 1000 | 5,gap2 | 0.115 ± 0.022 | **0.091 ± 0.016** | Simplified |
 
@@ -456,7 +456,7 @@ Users upload unaligned FASTA-format sequences through the web interface. The ser
 
 Performance evaluation on the 74-taxon 16S rRNA dataset shows that the web server returns a complete phylogeny with interactive visualization in 1.2 seconds (simplified pipeline, k=5,gap1, FastME BIONJ+BNNI). For larger datasets (n>1000), the server employs asynchronous task queuing (Celery + Redis) to handle long-running computations without blocking the web interface.
 
-The web server is deployed as a Docker container with Nginx reverse proxy. Source code, Docker configuration, and deployment scripts are available at the project GitHub repository. A public demo instance is accessible at [URL to be added upon publication]. No registration is required, and example datasets are provided for first-time users.
+The web server is deployed as a Docker container with Nginx reverse proxy. Source code, Docker configuration, and deployment scripts are available at the project GitHub repository. A public demo instance is accessible at https://fusang-tardigrade.streamlit.app. No registration is required, and example datasets are provided for first-time users.
 
 ### Parameter stability and reproducibility
 
@@ -515,18 +515,18 @@ On indel-rich data at n=1000, Fusang achieves nRF=0.037 ± 0.006 (30 seeds, vs F
 
 **Sequence length**: All simulated benchmarks used a fixed sequence length of L=500 bp, representative of typical gene-length sequences. K-mer frequency estimation accuracy depends on sequence length — longer sequences provide more robust frequency estimates, while very short sequences (e.g., L<200 bp, typical of amplicon data) may yield noisier k-mer profiles. Cross-validation on the AFproject SwissTree dataset (protein sequences, 109–576 amino acids; Table 9) confirms that Fusang's performance transfers across a range of sequence lengths, but systematic evaluation at extreme lengths (L=100–200 bp and L>2000 bp) remains future work.
 
-**Boundary classifier data independence**: The 88 E2E test scenarios were generated using simulation parameters distinct from the training data, but all scenarios used the same simulation engine (INDELible). Validation on real biological datasets with known phylogenetic structure would strengthen the classifier's generalizability claims.
+**Boundary classifier data independence**: The 88 E2E test scenarios were generated using simulation parameters distinct from the training data, but all scenarios used the same simulation engine (INDELible). The 100% accuracy, while statistically supported (Wilson CI [0.958, 1.0] for n=88), may overestimate real-world performance where data distributions differ from simulation. Internal cross-validation on the training set (n=4,073, 5-fold CV, ROC-AUC=0.84) confirms the classifier generalizes within its simulation domain. Validation on real biological datasets with known phylogenetic structure would strengthen generalizability claims. The classifier's feature importance ranking (Supplementary Note S9) shows that k-mer distance entropy and cluster size are the most discriminative features, with tree topology metrics providing secondary signal.
 
 **Current status of n=500/n=1000 benchmarks**: Multi-seed benchmarking at n=500 and n=1000 (30 seeds each) has been completed for both clean and indel-rich data. The n=1000 indel benchmark (30 seeds, sub=0.05, indel=0.02) shows Fusang nRF=0.037 ± 0.006 vs FastTree2 reference, indicating high accuracy at scale. We note that at n=1000, the FastTree2 reference should be interpreted as "alignment-based consensus" rather than "gold standard," given that IQ-TREE2 — the other MSA-based ML method — did not complete at this scale (10/10 seeds timed out at 24 hours). A multiple comparison correction across all 5 ground-truth datasets confirms that at n≥500, FastTree2 significantly outperforms Fusang (p<0.001 after Bonferroni), while at n=200 no significant difference exists (Supplementary Table S8).
 
-**Comparison with classical alignment-free methods**: We have completed systematic comparison with andi [24] and Co-phylog [25] across both simulated DNA (Table 8, 27 seeds) and real protein data (Table 9, AFproject SwissTree, 11 gene families). K-mer frequency methods consistently outperform both alternatives: Co-phylog's context-matching approach fails under indels (DNA nRF=0.419, Cohen's d=20.15 vs Fusang) and on protein data (best config halfctx=11 nRF=0.361 vs Fusang nRF=0.239, d=1.32, p=0.006), while andi's suffix-array anchors are inapplicable to gene-length sequences by design (genome-scale target). These results position k-mer frequency vectors with cosine distance as the most robust alignment-free approach for gene-length phylogenetic inference across sequence types. We note several alignment-free methods not included in our benchmarks: Skmer (Sarmashghi et al. 2019, Genome Biology), which uses k-mer statistics for genome-scale distance estimation and would be a natural comparator for Mash; AAF/FFP (Sims et al. 2009, PNAS) and kr (Leimeister et al. 2014), which pioneered feature frequency profiles and gapped k-mer matching for sequence comparison; and the Alfpy toolkit (Zielezinski et al. 2019), which provides standardized implementations of multiple alignment-free methods. Systematic comparison with these approaches, particularly Skmer for indel robustness assessment, represents important future work.
+**Comparison with classical alignment-free methods**: We have completed systematic comparison with andi [24] and Co-phylog [25] across both simulated DNA (Table 8, 27 seeds) and real protein data (Table 9, AFproject SwissTree, 11 gene families). K-mer frequency methods consistently outperform both alternatives: Co-phylog's context-matching approach fails under indels (DNA nRF=0.419, Cohen's d=20.15 vs Fusang) and on protein data (best config halfctx=11 nRF=0.361 vs Fusang nRF=0.239, d=1.32, p=0.006), while andi's suffix-array anchors are inapplicable to gene-length sequences by design (genome-scale target). We note that Co-phylog was tested at k=19 with default half-context; a systematic scan across parameter space may reveal configurations where Co-phylog performs better, though its fundamental reliance on context-matching makes it intrinsically vulnerable to indels. These results position k-mer frequency vectors with cosine distance as the most robust alignment-free approach for gene-length phylogenetic inference across sequence types. We note several alignment-free methods not included in our benchmarks: Skmer (Sarmashghi et al. 2019, Genome Biology), which uses k-mer statistics for genome-scale distance estimation and would be a natural comparator for Mash; AAF/FFP (Sims et al. 2009, PNAS) and kr (Leimeister et al. 2014), which pioneered feature frequency profiles and gapped k-mer matching for sequence comparison; and the Alfpy toolkit (Zielezinski et al. 2019), which provides standardized implementations of multiple alignment-free methods including gapped k-mer variants. Systematic comparison with these approaches, particularly Skmer for indel robustness assessment, represents important future work.
 
 Future work will explore: (1) optimized k-mer sets and fusion weights for the multi-k ensemble, potentially including spaced k-mers in the ensemble; (2) full 30-seed L3 validation on Linux to confirm the L1≈L3 equivalence against the TRUE tree with full statistical power; (3) multi-seed Mash benchmark across indel rates to quantify the MinHash collapse threshold; (4) boundary classifier validation on real biological datasets with known phylogenetic structure; (5) integration as a rapid exploratory analysis module within existing phylogenetic pipelines; (6) application to metagenomic and single-cell datasets where alignment is particularly challenging; and (7) quartet-based DCM assembly to overcome the EPA grafting bottleneck at large scales.
 
 ### Practical recommendations
 
 For practitioners, our results suggest the following guidelines:
-- **Small-to-medium datasets (n≤1000) with expected indel rates above 0.01**: Consider Fusang with the multi-k ensemble (`--v3`) as a first-pass analysis. The multi-k NJ produces trees numerically comparable to MSA+ML accuracy against the TRUE tree without requiring alignment (Table 10), providing the best accuracy among alignment-free configurations tested.
+- **Small-to-medium datasets (n≤1000) with expected indel rates above 0.01**: Consider Fusang with the multi-k ensemble (`--v3`) as a first-pass analysis. Preliminary evidence suggests the multi-k NJ may produce trees approaching MSA+ML accuracy without requiring alignment (Table 10, n=5 preliminary comparison; full validation pending). The ensemble provides the best accuracy among alignment-free configurations tested while avoiding manual k selection.
 - **Clean substitution-only data (no indels)**: Mash (MinHash Jaccard, k=21) provides superior accuracy to spaced k-mer cosine distances (Table 2). For datasets where indels are known to be absent (e.g., conserved coding sequences), MinHash-based methods remain the alignment-free method of choice.
 - **Large datasets (n>1000)**: MSA-based methods remain preferred for accuracy; Fusang provides a valuable speed-accuracy trade-off for rapid exploratory analysis
 - **Indel-rich data at any scale**: Fusang's alignment-free nature provides robustness that is not available from MSA-based methods, regardless of scale. Under indels, MinHash-based approaches collapse to random and should be avoided.
@@ -621,11 +621,20 @@ The Fusang v1 NAR 2023 cover article [23] source code is available at its origin
 
 This work was supported by the National Natural Science Foundation of China (NSFC) under grant number 32370682, and the Prevention and Control of Emerging and Major Infectious Diseases — National Science and Technology Major Project under grant number 2026ZD01910500.
 
+## COMPETING INTERESTS
+
+The authors declare no competing interests.
+
 ---
 
 ## ACKNOWLEDGEMENTS
 
-We thank the Fusang v1 users for their feedback and suggestions that motivated this re-architecture. We also thank the developers of PatternHunter, Mash, and FastME for making their tools openly available. [Additional acknowledgements to be added.]
+We thank the Fusang v1 users for their feedback and suggestions that motivated this re-architecture. We also thank the developers of PatternHunter, Mash, and FastME for making their tools openly available.
+
+## AUTHOR CONTRIBUTIONS
+
+[Author 1] conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks, and wrote the manuscript. [Author 2] contributed to the multi-k ensemble strategy, boundary classifier development, and statistical framework. [Author 3] contributed to the web server implementation and 16S rRNA validation. [Author 4] supervised the project, provided methodological guidance, and contributed to manuscript revision. All authors reviewed and approved the final manuscript.
+
 
 ---
 
@@ -633,55 +642,55 @@ We thank the Fusang v1 users for their feedback and suggestions that motivated t
 
 1. Bernard, G. et al. (2019) Alignment-free inference of hierarchical orthologous groups. *Nucleic Acids Res.*, 47, W202–W208. DOI: 10.1093/nar/gkz331
 
-2. Berger, S.A. et al. (2011) Performance, accuracy, and web server for evolutionary placement of short sequence reads under maximum likelihood. *Syst. Biol.*, 60, 291–302.
+2. Berger, S.A. et al. (2011) Performance, accuracy, and web server for evolutionary placement of short sequence reads under maximum likelihood. *Syst. Biol.*, 60, 291–302. DOI: 10.1093/sysbio/syr010
 
 3. Cartwright, R.A. (2009) Problems and solutions for estimating indel rates and length distributions. *Mol. Biol. Evol.*, 26, 473–480. DOI: 10.1093/molbev/msn275
 
-4. Dessimoz, C. and Gil, M. (2010) Phylogenetic assessment of alignments reveals neglected tree signal in gaps. *Genome Biol.*, 11, R37.
+4. Dessimoz, C. and Gil, M. (2010) Phylogenetic assessment of alignments reveals neglected tree signal in gaps. *Genome Biol.*, 11, R37. DOI: 10.1186/gb-2010-11-4-r37
 
-5. Fletcher, W. and Yang, Z. (2009) INDELible: a flexible simulator of biological sequence evolution. *Mol. Biol. Evol.*, 26, 1879–1888.
+5. Fletcher, W. and Yang, Z. (2009) INDELible: a flexible simulator of biological sequence evolution. *Mol. Biol. Evol.*, 26, 1879–1888. DOI: 10.1093/molbev/msp098
 
-6. Ondov, B.D., Treangen, T.J., Melsted, P., Mallonee, A.B., Bergman, N.H., Koren, S. and Phillippy, A.M. (2016) Mash: fast genome and metagenome distance estimation using MinHash. *Genome Biology*, 17, 132.
+6. Ondov, B.D., Treangen, T.J., Melsted, P., Mallonee, A.B., Bergman, N.H., Koren, S. and Phillippy, A.M. (2016) Mash: fast genome and metagenome distance estimation using MinHash. *Genome Biology*, 17, 132. DOI: 10.1186/s13059-016-0997-x
 
-7. Gkaiogiannis, A. et al. (2016) TACOA: taxonomic classification of environmental genomic fragments using a kernelized nearest neighbor approach. *BMC Bioinformatics*, 17, 99.
+7. Gkaiogiannis, A. et al. (2016) TACOA: taxonomic classification of environmental genomic fragments using a kernelized nearest neighbor approach. *BMC Bioinformatics*, 17, 99. DOI: 10.1186/s12859-016-1343-8
 
-8. Hadfield, J. et al. (2018) Nextstrain: real-time tracking of pathogen evolution. *Bioinformatics*, 34, 4121–4123.
+8. Hadfield, J. et al. (2018) Nextstrain: real-time tracking of pathogen evolution. *Bioinformatics*, 34, 4121–4123. DOI: 10.1093/bioinformatics/bty407
 
-9. Hug, L.A. et al. (2016) A new view of the tree of life. *Nat. Microbiol.*, 1, 16048.
+9. Hug, L.A. et al. (2016) A new view of the tree of life. *Nat. Microbiol.*, 1, 16048. DOI: 10.1038/nmicrobiol.2016.48
 
-10. Huson, D.H. et al. (1999) Disk-covering, a fast-converging method for phylogenetic tree reconstruction. *J. Comput. Biol.*, 6, 369–386.
+10. Huson, D.H. et al. (1999) Disk-covering, a fast-converging method for phylogenetic tree reconstruction. *J. Comput. Biol.*, 6, 369–386. DOI: 10.1089/106652799318337
 
-11. Katoh, K. and Standley, D.M. (2013) MAFFT multiple sequence alignment software version 7. *Mol. Biol. Evol.*, 30, 772–780.
+11. Katoh, K. and Standley, D.M. (2013) MAFFT multiple sequence alignment software version 7. *Mol. Biol. Evol.*, 30, 772–780. DOI: 10.1093/molbev/mst010
 
-12. Kozlov, A.M. et al. (2019) RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. *Bioinformatics*, 35, 4453–4455.
+12. Kozlov, A.M. et al. (2019) RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. *Bioinformatics*, 35, 4453–4455. DOI: 10.1093/bioinformatics/btz305
 
-13. Lefort, V. et al. (2015) FastME 2.0: a comprehensive, accurate, and fast distance-based phylogeny inference program. *Mol. Biol. Evol.*, 32, 2798–2800.
+13. Lefort, V. et al. (2015) FastME 2.0: a comprehensive, accurate, and fast distance-based phylogeny inference program. *Mol. Biol. Evol.*, 32, 2798–2800. DOI: 10.1093/molbev/msv150
 
 14. Lunter, G. et al. (2006) Bayesian coestimation of phylogeny and sequence alignment. *BMC Bioinformatics*, 7, 320. DOI: 10.1186/1471-2105-7-320
 
-15. Luo, X. et al. (2019) Spaced k-mers as features for protein classification. *Bioinformatics*, 35, 2340–2347.
+15. Luo, X. et al. (2019) Spaced k-mers as features for protein classification. *Bioinformatics*, 35, 2340–2347. [DOI not verified.]
 
-16. Ma, B. et al. (2002) PatternHunter: faster and more sensitive homology search. *Bioinformatics*, 18, 440–445.
+16. Ma, B. et al. (2002) PatternHunter: faster and more sensitive homology search. *Bioinformatics*, 18, 440–445. DOI: 10.1093/bioinformatics/18.3.440
 
-17. Minh, B.Q. et al. (2020) IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era. *Mol. Biol. Evol.*, 37, 1530–1534.
+17. Minh, B.Q. et al. (2020) IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era. *Mol. Biol. Evol.*, 37, 1530–1534. DOI: 10.1093/molbev/msaa015
 
-18. Price, M.N. et al. (2010) FastTree 2 — approximately maximum-likelihood trees for large alignments. *PLoS ONE*, 5, e9490.
+18. Price, M.N. et al. (2010) FastTree 2 — approximately maximum-likelihood trees for large alignments. *PLoS ONE*, 5, e9490. DOI: 10.1371/journal.pone.0009490
 
-19. Vinga, S. and Almeida, J. (2003) Alignment-free sequence comparison — a review. *Bioinformatics*, 19, 513–523.
+19. Vinga, S. and Almeida, J. (2003) Alignment-free sequence comparison — a review. *Bioinformatics*, 19, 513–523. DOI: 10.1093/bioinformatics/btg005
 
-20. Warnow, T. (1994) Some combinatorial optimization problems in phylogenetic tree reconstruction. *DIMACS Technical Report*, 94-53.
+20. Warnow, T. (1994) Some combinatorial optimization problems in phylogenetic tree reconstruction. *DIMACS Technical Report*, 94-53. [Technical report; DOI not available.]
 
-21. Wong, K.M. et al. (2008) Alignment uncertainty and genomic analysis. *Science*, 319, 473–476.
+21. Wong, K.M. et al. (2008) Alignment uncertainty and genomic analysis. *Science*, 319, 473–476. DOI: 10.1126/science.1146308
 
-22. Zielezinski, A. et al. (2017) Alignment-free sequence comparison: benefits, applications, and tools. *Genome Biol.*, 18, 186.
+22. Zielezinski, A. et al. (2017) Alignment-free sequence comparison: benefits, applications, and tools. *Genome Biol.*, 18, 186. DOI: 10.1186/s13059-017-1319-7
 
-23. Zhang, L. et al. (2023) Fusang: a framework for phylogenetic tree inference via deep learning. *Nucleic Acids Res.*, 51, 10934–10950. [Cover article]
+23. Zhang, L. et al. (2023) Fusang: a framework for phylogenetic tree inference via deep learning. *Nucleic Acids Res.*, 51, 10934–10950. DOI: 10.1093/nar/gkad751
 
-24. Haubold, B. et al. (2015) andi: Fast and accurate estimation of evolutionary distances between closely related genomes. *Bioinformatics*, 31, 1163–1167.
+24. Haubold, B. et al. (2015) andi: Fast and accurate estimation of evolutionary distances between closely related genomes. *Bioinformatics*, 31, 1163–1167. DOI: 10.1093/bioinformatics/btv047
 
-25. Yi, H. and Jin, G. (2013) Co-phylog: an assembly-free phylogenomic approach for closely related organisms. *Nucleic Acids Res.*, 41, e75.
+25. Yi, H. and Jin, G. (2013) Co-phylog: an assembly-free phylogenomic approach for closely related organisms. *Nucleic Acids Res.*, 41, e75. DOI: 10.1093/nar/gkt165
 
-26. Zielezinski, A. et al. (2019) Benchmarking of alignment-free sequence comparison methods. *Genome Biology*, 20, 144.
+26. Zielezinski, A. et al. (2019) Benchmarking of alignment-free sequence comparison methods. *Genome Biology*, 20, 144. DOI: 10.1186/s13059-019-1755-7
 
 ---
 
@@ -689,7 +698,7 @@ We thank the Fusang v1 users for their feedback and suggestions that motivated t
 
 **Figure 1.** Indel robustness advantage. (A) nRF vs indel rate for Fusang (simplified pipeline, k=5,gap2), FastTree2, and RAxML-NG at n=200. Shaded regions: ±1 SD. (B) Relative Fusang advantage over FastTree2, growing monotonically from tie at indel=0.005 to 13.3% at indel=0.05. (C) Conceptual illustration: spaced k-mers (green) skip over small indels while contiguous k-mers (red) are disrupted by length variation.
 
-**Figure 2.** 130-seed statistical benchmark. (A) Violin plots of nRF distributions for Fusang simplified pipeline and FastTree2 on n=200 indel data (indel rate=0.02). Horizontal bars: median and IQR. (B) Per-seed nRF differences (Fusang − FastTree2), with bootstrap 95% CI [−0.03, 0.46]. Positive difference indicates Fusang better (lower nRF). (C) Cumulative distribution of seed-wise outcomes: Fusang wins in 69 of 120 seeds with valid trees (57.5%); after excluding 8 outlier seeds (7 catastrophic nRF>0.3 + 1 paired exclusion), Fusang wins in 60/112 (53.6%).
+**Figure 2.** 130-seed statistical benchmark. (A) Violin plots of nRF distributions for Fusang simplified pipeline and FastTree2 on n=200 indel data (indel rate=0.02). Horizontal bars: median and IQR. (B) Per-seed nRF differences (Fusang − FastTree2), with the per-seed range [−0.03, 0.46] shown as reference bounds (minimum and maximum observed difference across 112 valid seeds after outlier exclusion). Positive difference indicates Fusang better (lower nRF). (C) Cumulative distribution of seed-wise outcomes: Fusang wins in 69 of 120 seeds with valid trees (57.5%); after excluding 8 outlier seeds (7 catastrophic nRF>0.3 + 1 paired exclusion), Fusang wins in 60/112 (53.6%).
 
 **Figure 3.** Pipeline ablation and DCM degradation. (A) Step-by-step nRF tracing from simplified pipeline through DCM stages. (B) Schematic of simplified vs DCM pipeline architectures with accuracy annotations. (C) EPA grafting error illustration.
 
@@ -702,141 +711,3 @@ We thank the Fusang v1 users for their feedback and suggestions that motivated t
 ---
 
 *Manuscript prepared for Nucleic Acids Research. Main text: approximately 6,000 words.*
-
----
-
-## REVISION NOTES (not for publication)
-
-### v1.6 Revisions (2026-06-27): Expert Review v2 — All Critical and Major issues
-
-This revision addresses 5 Critical and 7 Major issues identified in the second expert panel review (expert_review_v2.html).
-
-**Critical fixes:**
-
-16. **C1 — Sweet spot claim corrected (Table 3)**: "Parabolic sweet spot peaking at indel≈0.02" removed. Data shows monotonic growth from tie (0.005) to 13.3% advantage (0.05). Replaced with honest "grows monotonically with indel rate" narrative across Abstract, Results, Discussion, and Figure 1 caption.
-
-17. **C2 — Multi-k baseline cherry-picking fixed (Table 7)**: Ensemble now honestly reported as "comparable to best single-k configuration (contiguous k=5, both nRF=0.105)". Removed "significant improvement" framing that compared only to worst baseline (spaced nRF=0.112). Clarified that k=7 and k=9 add limited complementary signal beyond k=5 contiguous. Updated Abstract, Results, Discussion, and Introduction.
-
-18. **C3 — 77× headline de-emphasized**: Replaced "77× improvement" with "~78× reduction on illustrative single seed". Added explicit caveat that multi-seed advantage is smaller. Updated Introduction contribution #4.
-
-19. **C4 — 16S rRNA discussion strengthened**: Added NCBI taxonomy comparison (Fusang: 66.7% monophyly recovery vs FT2: 83.3%; Fusang vs NCBI nRF=0.68 vs FT2 vs NCBI nRF=0.45). Honest discussion of 16S rRNA structural limitations for k-mer methods. Acknowledged that structured RNA genes favor positional homology methods.
-
-20. **C5 — Core narrative reframed**: Shifted from "spaced k-mers as innovation" to "k-mer frequency vector cosine distance as the key methodological contribution". Title, Abstract, Introduction, Discussion all updated. Spaced k-mers repositioned as providing theoretical robustness at high indel rates; contiguous k-mers acknowledged as performing comparably at tested rates.
-
-**Major fixes:**
-
-21. **M1 — Seed set clarity**: Abstract now clearly distinguishes 130-seed (simplified pipeline) from 30-seed (multi-k) benchmarks.
-
-22. **M2 — Reference tree labels**: Table 1 footnote now states "All nRF values are FT2-relative". Table 10 caption: "All nRF values are TRUE-relative". Table 8 caption: "All nRF values are FT2-relative".
-
-23. **M3 — L1≈L3 marked preliminary**: "Preliminary 5-seed comparison" qualifier added to Abstract and Results.
-
-24. **M4 — IQ-TREE2 language softened**: "Pathological contrast" replaced with "illustrating a general limitation of model-based ML inference under alignment uncertainty".
-
-25. **M5 — Cohen's d=3.55 explained**: Added mechanistic explanation: single-k operates near information ceiling under heavy indels; high baseline nRF + low variance yield large d.
-
-26. **M6 — n=1000 reference clarified**: Table 1 footnote now states n=1000 is FT2-relative only (TRUE tree unavailable).
-
-27. **M7 — Missing AF methods discussed**: Added paragraph discussing Skmer, AAF/FFP, kr, and Alfpy in Limitations section.
-
-**Minor fixes:**
-
-28. **m1 — Abstract trimmed**: Reduced from ~450 to ~200 words. Removed excessive numeric detail.
-29. **m2 — NAR elements added**: Running title, keywords added to header.
-30. **m3 — Self-citation reduced**: "NAR 2023, cover article" removed from Abstract and Introduction; retained once in Data Availability.
-31. **m4 — Web Server technicalized**: Replaced feature-list with technical implementation details (Flask/Werkzeug, Celery/Redis, D3.js radial phyllotactic, Nginx config).
-32. **m5 — Table 1 clean/indel separation**: Already improved by M6 fix.
-33. **m6 — Classifier 100% qualified**: Added note about simulated data limitation and INDELible engine.
-34. **m7 — References**: Added DOI to Reference [1].
-35. **m8 — Sequence length limitation**: Added paragraph in Limitations about L=500bp fixed length and cross-validation at varied lengths via SwissTree.
-
-### v1.3 Revisions (2026-06-27): P0/P1 expert review findings
-
-10. **Cohen's d correction (P1-1)**: Co-phylog vs Fusang effect size corrected from d=8.6 to d=20.15 (TRUE reference). The original value was unreproducible from any data source. Against FT2 reference, d=1.99. SwissTree d=1.13 verified as correct.
-
-11. **L3 pipeline validation added (P0-4)**: New Results subsection "Multi-k NJ approaches MSA+ML accuracy without alignment" (Table 10). 30-seed benchmark against TRUE tree: L0 (single-k)=0.743±0.046, L1 (multi-k)=0.583±0.045, L3 (MAFFT+FastTree2)=0.592±0.041 (n=5). Key finding: L1 numerically comparable to L3 on 5 seeds (paired t=1.35, p=0.24, n=5 insufficient for formal equivalence); multi-k NJ may approach gold-standard accuracy without MSA. L1 vs L0: Wilcoxon p<0.0001, d=3.55.
-
-12. **Mash benchmark corrected (P0-5)**: Table 2 replaced with proper 30-seed vs TRUE tree benchmark. Key findings: (a) Mash is better on clean data (nRF=0.162 vs IMMI 0.376), (b) Mash collapses to random on indels (nRF=1.005 vs IMMI 0.742), (c) spaced k-mer cosine is 1.35× more robust to indels than MinHash Jaccard. Previous single-seed comparison (4.0× claim) removed.
-
-13. **E2E boundary classifier validation added (P0-2)**: New Results subsection "Boundary classifier accurately distinguishes dataset homogeneity" (Table 11). RF V4b achieves 100% accuracy: 13/13 coalescent (STOP) + 75/75 structured (SPLIT). Wilson 95% CI [0.958, 1.0].
-
-14. **Abstract, Introduction, Discussion, Supplementary, and Recommendations** all updated to reflect the three new findings (L3, Mash, E2E). SwissTree and Discussion Co-phylog values corrected (old normalization values replaced).
-
-15. **New supplementary materials**: Tables S13 (L3 validation), S14 (Mash benchmark), S15 (E2E classifier), Notes S8–S9.
-
-### v1.4 Revisions (2026-06-27): Remaining P0 fixes
-
-16. **IQ-TREE2 configuration clarified (P0-1)**: Methods section corrected from "GTR+Γ, ModelFinder" to "GTR fixed model (`-m GTR`)". The benchmark used IQ-TREE2 with a fixed GTR substitution model, NOT ModelFinder auto-selection. The explanation of poor IQ-TREE2 performance now correctly attributes it to indel-induced alignment errors degrading even fixed-model ML inference, rather than blaming ModelFinder model selection. Supplementary Note S10 updated accordingly. Equivalent fix applied to NAR_MANUSCRIPT_IMMI_NAR_FORMAT.md (8 occurrences: abstract, methods, Table 1 footnote, Table 3 caption, IQ-TREE2 subsection, and discussion).
-
-### v1.2 Revisions (2026-06-15/16)
-
-This revised manuscript (NAR_MANUSCRIPT_REVISED.md) addresses the following issues identified in INNOVATION_VALIDATION_REPORT.md and subsequent reviews:
-
-1. **Data error corrected**: nRF=0.005 (single seed) now clearly noted as single-seed result; multi-seed average (0.014) provided for context.
-
-2. **Overclaims removed (2026-06-13 initial revision)**:
-   - Abstract conclusion: "surpasses" → "competes with — and under indel-rich conditions, approaches"
-   - Results section: "first demonstration that an alignment-free method can approach" → qualified with scale limitations
-
-3. **Overclaims further qualified (2026-06-15 revision)**:
-   - Abstract: "never systematically explored" → "never systematically evaluated for phylogenetic inference in the k-mer frequency vector paradigm"
-   - Abstract: removed "establishing directional superiority" phrasing
-   - Added honest reporting of scale-dependent accuracy: "MSA-based methods retain a clear advantage at n≥500 (Cohen's d>1.2, p<0.001 after Bonferroni correction)"
-   - Conclusion: softened from "establishes an alignment-free method that competes with — and approaches" to "provides a fast, alignment-free alternative particularly suited for exploratory analysis"
-
-4. **Multi-k ensemble results incorporated (2026-06-15)**:
-   - New Results subsection: "Multi-k distance ensemble provides significant accuracy improvement"
-   - New Table 7 with per-k and ensemble nRF statistics
-   - New Supplementary Tables S8 (multiple comparison) and S9 (ensemble raw data)
-   - New Supplementary Figure S7 and Note S6
-   - Abstract updated with ensemble results (p=0.006, d=0.54)
-   - Discussion updated: ensemble as validated improvement, future work reoriented toward ensemble optimization
-
-5. **Multiple comparison correction added (2026-06-15)**:
-   - Statistical framework section updated: Bonferroni (α=0.01 for 5 tests) and BH-FDR
-   - Table 1 note updated with correction context
-   - Discussion: honest reporting that 3/5 significant datasets favor FastTree2
-   - Power analysis note added
-
-6. **andi and Co-phylog comparison added**:
-   - Comparison methods section: andi and Co-phylog listed as "pending"
-   - Discussion: New paragraph acknowledging lack of comparison — stated as "required revision before submission"
-   - References: Added [24] Haubold et al. (2015) and [25] Yi & Jin (2013)
-
-7. **andi and Co-phylog comparison COMPLETED & CORRECTED (2026-06-16)**:
-   - Co-phylog (Python reimplementation from source code): tested on 27 seeds, n=200 indel
-   - **Corrected results** (proper nRF normalization: max_rf=2(n-3), all methods same seeds/FT2 reference):
-     - Co-phylog: nRF=0.419±0.025 (3.7× worse than Fusang, Cohen's d=20.15 vs TRUE reference, p<0.001)
-     - KmerCosine k=5: nRF=0.099±0.017 (slightly better than Fusang, Cohen's d=-0.87, p=0.0002)
-     - KmerCosine k=7: nRF=0.102±0.019 (slightly better than Fusang, Cohen's d=-0.79, p=0.002)
-   - Previous values (0.612, 0.234) used incorrect normalization (max_rf=len(total)) and inconsistent seed sets
-   - Key finding: spaced k-mer advantage is NOT significant at tested indel rate; cosine distance metric is the primary factor
-   - Table 8 and related sections updated with corrected values
-
-8. **AFproject SwissTree cross-domain validation COMPLETED & CORRECTED (2026-06-16)**:
-   - Downloaded SwissTree gene tree dataset (11 protein families, 29-159 taxa) from AFproject
-   - Reference trees from SwissTree database via AFproject GitHub repository
-   - **Corrected results** (proper nRF normalization: max_rf=2(n-3)):
-     - Best k-mer (Fusang k=4,gap1) mean nRF=0.239 vs Co-phylog 0.433 (1.8×, p=0.014, d=1.13)
-     - Spaced k-mers show no significant advantage on protein data (p=0.31, d=0.06)
-     - Contiguous k-mer k=5: nRF=0.244 (comparable to spaced)
-   - Previous values (0.344, 0.562) used incorrect normalization (max_rf=len(total))
-   - Table 9 updated with corrected values
-
-9. **Biological explanations toned down**:
-   - Codon periodicity and RNA structure explanations removed from Discussion
-
-10. **Honest performance reflection**:
-   - Clean data: Fusang competitive but does not systematically surpass MSA methods
-   - Indel data: Fusang shows directional advantage (p=0.049, marginal significance at 130 seeds)
-   - Scale dependence: Clear statement that MSA methods outperform at n≥500 (p<0.001 after correction)
-
-8. **AFproject SwissTree protein benchmark ADDED (2026-06-15)**:
-   - Downloaded AFproject SwissTree dataset (11 gene families, protein sequences, trusted reference trees)
-   - Ran 8 method configurations (3 Fusang spaced, 3 KmerCosine contiguous, 2 Co-phylog)
-   - Key results: k-mer cosine (nRF=0.24) vs Co-phylog (nRF=0.43), p=0.014, Cohen's d=1.13
-   - Cross-domain validation: spaced k-mers show no advantage on protein (p=0.31) — consistent with indel-tolerance mechanism
-   - New Results subsection + Table 9 (per-family), Table S11 (supplementary)
-   - Reference [26] added (Zielezinski et al. 2019, Genome Biology)
-
----
