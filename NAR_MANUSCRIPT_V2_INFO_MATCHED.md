@@ -5,6 +5,22 @@
 
 ---
 
+**Authors**:
+
+Li Zhang¹·²·³,* and Lei Kong⁴
+
+¹ Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China
+
+² Chinese Institute for Brain Research, Beijing, Beijing, China
+
+³ Translational Medical Center, Weifang Second People's Hospital, 7 Yuanxiao St., Weifang, 261041, Shandong Province, China
+
+⁴ School of Life Sciences, Peking University, Beijing, China
+
+* To whom correspondence should be addressed. Email: knightz@pumc.edu.cn
+
+---
+
 ## ABSTRACT
 
 **Motivation**: Phylogenetic inference faces a fundamental information-efficiency problem. Full multiple sequence alignment (MSA) followed by maximum likelihood (ML) inference preserves all positional information but scales as O(n²L²), becoming intractable beyond several thousand taxa. Alignment-free methods discard positional information for speed but lose accuracy at moderate scales. No single approach optimally balances information content against computational cost across the full range of dataset sizes and evolutionary regimes.
@@ -396,7 +412,13 @@ We thank the developers of FastME, MAFFT, FastTree2, INDELible, IQ-TREE2, and RA
 
 ## AUTHOR CONTRIBUTIONS
 
-Li Zhang conceived the study, designed the IMMI framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. Lei Kong contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
+Li Zhang conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. Lei Kong contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
+
+## CORRESPONDING AUTHOR
+
+Li Zhang (knightz@pumc.edu.cn)
+Telephone: [to be added]
+Mailing address: [to be added]
 
 ---
 

@@ -5,6 +5,20 @@
 **Running Title**: K-mer frequency vector phylogenetics for indel-rich data
 **Keywords**: alignment-free phylogenetics, k-mer frequency vector, cosine distance, indel robustness, multi-k ensemble, Neighbor-Joining
 
+**Authors**:
+
+Li Zhang¹·²·³,* and Lei Kong⁴
+
+¹ Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China
+
+² Chinese Institute for Brain Research, Beijing, Beijing, China
+
+³ Translational Medical Center, Weifang Second People's Hospital, 7 Yuanxiao St., Weifang, 261041, Shandong Province, China
+
+⁴ School of Life Sciences, Peking University, Beijing, China
+
+* To whom correspondence should be addressed. Email: knightz@pumc.edu.cn
+
 ---
 
 ## ABSTRACT
@@ -634,6 +648,12 @@ We thank the Fusang v1 users for their feedback and suggestions that motivated t
 ## AUTHOR CONTRIBUTIONS
 
 Li Zhang conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. Lei Kong contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
+
+## CORRESPONDING AUTHOR
+
+Li Zhang (knightz@pumc.edu.cn)
+Telephone: [to be added]
+Mailing address: [to be added]
 
 ---
 

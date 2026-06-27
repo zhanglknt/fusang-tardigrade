@@ -8,17 +8,19 @@
 
 ## AUTHORS AND AFFILIATIONS
 
-**Lei Kong**¹, **Li Zhang**²·³·*
+**Lei Kong**¹, **Li Zhang**²·³·⁴,*
 
 ¹ School of Life Sciences, Peking University, Beijing, China
 
-² Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Beijing, China
+² Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China
 
-³ Beijing Institute of Brain Disorders, Beijing, China
+³ Chinese Institute for Brain Research, Beijing, Beijing, China
 
-\* Corresponding author. Email: knightz@pumc.edu.cn
+⁴ Translational Medical Center, Weifang Second People's Hospital, 7 Yuanxiao St., Weifang, 261041, Shandong Province, China
 
-**Author Contributions**: L.Z. and L.K. designed the study, analyzed data, and wrote the manuscript.
+* Corresponding author. Email: knightz@pumc.edu.cn
+
+**Author Contributions**: L.Z. conceived the study, designed the Fusang framework, implemented the core pipeline, conducted all benchmarks and testing, and wrote the manuscript. L.K. contributed to testing and participated in manuscript writing. Both authors reviewed and approved the final manuscript.
 
 ---
 
