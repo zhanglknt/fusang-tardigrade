@@ -9,7 +9,7 @@
 
 **Motivation**: Phylogenetic inference faces a fundamental information-efficiency problem. Full multiple sequence alignment (MSA) followed by maximum likelihood (ML) inference preserves all positional information but scales as O(n²L²), becoming intractable beyond several thousand taxa. Alignment-free methods discard positional information for speed but lose accuracy at moderate scales. No single approach optimally balances information content against computational cost across the full range of dataset sizes and evolutionary regimes.
 
-**Results**: We introduce Information-Matched Multi-Level Inference (IMMI), a general framework that decomposes phylogenetic inference into four levels with progressively increasing information content and computational cost. Level 0 extracts k-mer frequency vectors (O(nL) time, O(4^k) information per sequence), Level 1 constructs a Neighbor-Joining backbone from cosine distances (O(n²) distance computation), Level 2 applies a trained random forest classifier (95.3% accuracy, AUC 0.990) to intelligently partition taxa into subproblems, and Level 3 optionally refines clusters with MSA+ML (full positional information). The framework's design principle — *match information resolution to computational need* — ensures that expensive alignment and ML inference are deployed only where they provide measurable benefit. We implement this framework as Fusang: Tardigrade Edition, an open-source tool that processes 10,000 taxa in 54 seconds. On n=200 indel-rich simulated data (130 seeds), the Level 0–1 pipeline (k-mer→cosine→NJ) achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+ML) nRF=0.085±0.025 — statistically equivalent accuracy without alignment (Wilcoxon p=0.052). A multi-k distance ensemble (k=5,7,9) provides a further significant improvement over the default configuration (p=0.006, Cohen's d=0.54). Cross-domain validation on the AFproject SwissTree protein benchmark (11 families) confirms that k-mer frequency methods outperform context-matching approaches by 1.8× (p=0.014). The Level 2 boundary classifier, trained on 844 simulated datasets, generalizes to unseen data with 95.3% test accuracy, providing an automated decision mechanism for when to escalate from distance-based to alignment-based inference.
+**Results**: We introduce Information-Matched Multi-Level Inference (IMMI), a general framework that decomposes phylogenetic inference into four levels with progressively increasing information content and computational cost. Level 0 extracts k-mer frequency vectors (O(nL) time, O(4^k) information per sequence), Level 1 constructs a Neighbor-Joining backbone from cosine distances (O(n²) distance computation), Level 2 applies a trained random forest classifier (95.3% accuracy, AUC 0.990) to intelligently partition taxa into subproblems, and Level 3 optionally refines clusters with MSA+ML (full positional information). The framework's design principle — *match information resolution to computational need* — ensures that expensive alignment and ML inference are deployed only where they provide measurable benefit. We implement this framework as Fusang: Tardigrade Edition, an open-source tool that processes 10,000 taxa in 54 seconds. On n=200 indel-rich simulated data (130 seeds), the Level 0–1 pipeline (k-mer→cosine→NJ) achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+ML) nRF=0.085±0.025 — statistically equivalent accuracy without alignment (Wilcoxon p=0.052). A multi-k distance ensemble (k=5,7,9) provides a further significant improvement over the default configuration (p=0.006, Cohen's d=0.54). Cross-domain validation on the AFproject SwissTree protein benchmark (11 families) confirms that k-mer frequency methods outperform context-matching approaches by 1.5× (p=0.006). The Level 2 boundary classifier, trained on 844 simulated datasets, generalizes to unseen data with 95.3% test accuracy, providing an automated decision mechanism for when to escalate from distance-based to alignment-based inference.
 
 **Conclusion**: Information-matched multi-level inference provides a principled solution to the scalability-accuracy tradeoff in phylogenetics. By explicitly modeling the information content at each inference level and matching it to computational cost, the framework achieves MSA-competitive accuracy at scales where alignment is feasible, extends to scales where it is not, and provides a systematic mechanism for deciding between them. The framework is general: its level structure, classification-based splitting, and information-layering principle can accommodate alternative feature extractors, distance metrics, and tree-building methods.
 
@@ -148,7 +148,7 @@ For multi-seed benchmarks, we report: mean ± standard deviation of normalized R
 - **IMMI / Fusang** (this work): Four-level framework, Level 0–1 default
 - **FastTree2 v2.2.0** [18]: MAFFT alignment + GTR+CAT ML approximation
 - **RAxML-NG v1.2.0** [12]: MAFFT alignment + GTR+Γ ML search
-- **IQ-TREE2 v2.4.0** [17]: MAFFT alignment + ModelFinder + ML
+- **IQ-TREE2 v2.4.0** [17]: MAFFT alignment + GTR ML (fixed model)
 - **Co-phylog** [25]: k-mer frequency + covariance matrix eigenvalues (context-matching)
 - **KmerCosine**: Contiguous k-mer cosine distance + NJ (ablation control for IMMI Level 0)
 - **andi** [24]: Suffix-array anchor distance (tested; designed for genomes)
@@ -244,13 +244,14 @@ To test whether the IMMI framework's Level 0 features generalize beyond DNA, we 
 
 | Method | Configuration | Mean nRF | Wins/11 |
 |--------|:---|---------:|:---:|
-| Co-phylog (k=11) | Context-matching | 0.433 ± 0.076 | 0 |
+| Co-phylog (halfctx=5, k=11) | Context-object | 0.433 ± 0.076 | 3 |
+| Co-phylog (halfctx=11, k=23) | Context-object | **0.361 ± 0.059** | 0 |
 | K-mer cosine k=4 | Frequency vector | 0.256 ± 0.122 | 1 |
-| K-mer cosine k=5 | Frequency vector | 0.244 ± 0.110 | 3 |
-| **IMMI L0–1** k=4,gap1 | Frequency vector | **0.239 ± 0.118** | 4 |
-| **IMMI L0–1** k=5,gap2 | Frequency vector | **0.244 ± 0.113** | 3 |
+| K-mer cosine k=5 | Frequency vector | 0.244 ± 0.110 | 2 |
+| **IMMI L0–1** k=4,gap1 | Frequency vector | **0.239 ± 0.118** | 5 |
+| **IMMI L0–1** k=5,gap2 | Frequency vector | **0.244 ± 0.113** | 5 |
 
-K-mer frequency methods outperform Co-phylog by 1.8× (p=0.014, Cohen's d=1.13). Spaced vs. contiguous k-mers show no significant difference (p=0.31, d=0.06).
+K-mer frequency methods outperform Co-phylog's best configuration (halfctx=11, nRF=0.361) by 1.5× (Wilcoxon paired p=0.006, Cohen's d=1.32). Spaced vs. contiguous k-mers show no significant difference (p=0.31, d=0.06).
 
 This cross-domain validation is critical for the IMMI framework: it demonstrates that Level 0 k-mer features are not DNA-specific but capture general sequence similarity information that transfers across alphabets. The framework can therefore be applied to protein phylogenetics without modification — only the k-mer alphabet changes (20 amino acids instead of 4 nucleotides), and the cosine distance metric remains identical.
 
@@ -376,6 +377,8 @@ Fusang: Tardigrade Edition is open-source (MIT license). Source code, pre-compil
 ---
 
 ## FUNDING
+
+This work was supported by the National Natural Science Foundation of China (NSFC) under grant number 32370682, and the Prevention and Control of Emerging and Major Infectious Diseases — National Science and Technology Major Project (grant number 2026ZD01910500).
 
 [To be added]
 

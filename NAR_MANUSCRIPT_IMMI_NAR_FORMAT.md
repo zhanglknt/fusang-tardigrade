@@ -30,7 +30,7 @@
 
 ## ABSTRACT
 
-Phylogenetic inference faces a fundamental tradeoff: full sequence alignment preserves positional information at O(n²L²) cost, while alignment-free methods sacrifice accuracy for speed. We introduce Information-Matched Multi-Level Inference (IMMI), a framework that decomposes inference into four levels of increasing information resolution, controlled by a learned classifier. On n=200 indel-rich data, IMMI L0-1 achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+GTR+CAT) nRF=0.085±0.025 — statistically equivalent without alignment. Strikingly, IQ-TREE2 (MAFFT+ModelFinder+GTR) achieves nRF=0.147±0.027 — 1.8× worse (p<0.001) — revealing that MSA+ML degrades under high indel rates. A multi-k ensemble improves further (p=0.006). Cross-domain validation on AFproject SwissTree benchmarks confirms k-mer methods outperform context-matching by 1.8× (p=0.014). The boundary classifier (random forest, 844 samples) achieves 95.3% accuracy and AUC 0.990. The framework processes 10,000 taxa in 70 seconds (609 MB RAM) via DCM decomposition. By matching information resolution to computational need, IMMI provides a principled solution to the scalability-accuracy tradeoff.
+Phylogenetic inference faces a fundamental tradeoff: full sequence alignment preserves positional information at O(n²L²) cost, while alignment-free methods sacrifice accuracy for speed. We introduce Information-Matched Multi-Level Inference (IMMI), a framework that decomposes inference into four levels of increasing information resolution, controlled by a learned classifier. On n=200 indel-rich data, IMMI L0-1 achieves nRF=0.080±0.016 versus FastTree2 (MAFFT+GTR+CAT) nRF=0.085±0.025 — not significantly different without alignment (p=0.052). Strikingly, IQ-TREE2 (MAFFT+GTR, fixed model) achieves nRF=0.147±0.027 — 1.8× worse (p<0.001) — revealing that MSA-dependent ML degrades under high indel rates even with a fixed substitution model. A multi-k ensemble improves further (p=0.006). Cross-domain validation on AFproject SwissTree benchmarks confirms k-mer methods outperform context-matching by 1.5× (p=0.006). The boundary classifier (random forest, 844 samples) achieves 95.3% accuracy and AUC 0.990. The framework processes 10,000 taxa in 70 seconds (609 MB RAM) via DCM decomposition. By matching information resolution to computational need, IMMI provides a principled solution to the scalability-accuracy tradeoff.
 
 **Keywords**: phylogenetics, alignment-free, k-mer, multi-level inference, scalability
 
@@ -102,7 +102,7 @@ The following public databases and tools were used: NCBI GenBank (https://www.nc
 
 **Simulated data.** Sequences were generated using INDELible (9) under GTR+Γ (α=1.0, 4 rate categories) with birth-death tree priors. Sequence length L=500 bp, substitution rate μ=0.05, dataset sizes n=20–10,000. Indels: Poisson-distributed count per branch, geometric length distribution (mean=3 bp), rates 0.005–0.05. Multi-seed benchmarks used 130 seeds (100–229) for n=200 indel data and 30 seeds for n=500 and n=1,000.
 
-**Comparison methods.** Methods evaluated: (i) IMMI/Fusang L0–1 (k=5,gap2, cosine distance, NJ); (ii) IMMI multi-k ensemble (average of k=5,7,9 contiguous cosine); (iii) FastTree2 v2.2.0 (MAFFT + GTR+CAT ML); (iv) IQ-TREE2 v2.4.0 (MAFFT + ModelFinder + GTR ML, benchmarked on n=200 and n=503 indel data); (v) Co-phylog (12) (k-mer context-matching, k=19 for DNA, k=11 for protein); (vi) KmerCosine (contiguous k-mer cosine distance + NJ, k=5,7). RAxML-NG v1.2.0 and andi were considered but excluded: RAxML-NG failed at n≥500 due to memory constraints on the benchmark hardware; andi (13) is designed for genome-scale data and not applicable to gene-length sequences.
+**Comparison methods.** Methods evaluated: (i) IMMI/Fusang L0–1 (k=5,gap2, cosine distance, NJ); (ii) IMMI multi-k ensemble (average of k=5,7,9 contiguous cosine); (iii) FastTree2 v2.2.0 (MAFFT + GTR+CAT ML); (iv) IQ-TREE2 v2.4.0 (MAFFT + GTR ML, fixed model via `-m GTR`, benchmarked on n=200 and n=503 indel data); (v) Co-phylog (12) (k-mer context-matching, k=19 for DNA, k=11 for protein); (vi) KmerCosine (contiguous k-mer cosine distance + NJ, k=5,7). RAxML-NG v1.2.0 and andi were considered but excluded: RAxML-NG failed at n≥500 due to memory constraints on the benchmark hardware; andi (13) is designed for genome-scale data and not applicable to gene-length sequences.
 
 **Hardware.** All benchmarks: Intel Xeon E-2124 (4C/4T, 3.3 GHz), 32 GB RAM, Windows 10 with WSL2 (Ubuntu 24.04) for Linux-native tools.
 
@@ -126,9 +126,9 @@ On n=200 indel-rich data (indel rate=0.02, 130 seeds), the IMMI L0–1 pipeline 
 | 500 | Indel | 0.095 ± 0.018 | **0.083 ± 0.014** | 0.130 ± 0.017 | FT2 | **<0.001** |
 | 1000 | Clean | 0.115 ± 0.022 | **0.091 ± 0.016** | timeout | FT2 | **<0.001** |
 
-nRF=0: perfect match. Best value in **bold** (excluding IQ-TREE2, which is uniformly worse). n.s. = not significant. IQ-TREE2: MAFFT+ModelFinder+GTR (121/130 valid seeds at n=200 indel; 24/30 at n=503; 10/10 timeout at n=1,000). After Bonferroni correction (5 datasets, α=0.01), all n≥500 comparisons remain significant in favor of FastTree2. IQ-TREE2 vs IMMI L0–1 on n=200 indel: p<0.001, Cohen's d=3.1. *Note*: Abstract reports 121 valid seeds (all methods with valid output); Table 1 reports 112 paired seeds (both methods valid on same seed) for fair paired comparison.
+nRF=0: perfect match. Best value in **bold** (excluding IQ-TREE2, which is uniformly worse). n.s. = not significant. IQ-TREE2: MAFFT+GTR fixed model (121/130 valid seeds at n=200 indel; 24/30 at n=503; 10/10 timeout at n=1,000). After Bonferroni correction (5 datasets, α=0.01), all n≥500 comparisons remain significant in favor of FastTree2. IQ-TREE2 vs IMMI L0–1 on n=200 indel: p<0.001, Cohen's d=3.1. *Note*: Abstract reports 121 valid seeds (all methods with valid output); Table 1 reports 112 paired seeds (both methods valid on same seed) for fair paired comparison.
 
-At n≥500, MSA+ML clearly outperforms L0–1. This is expected and motivates the IMMI framework: as dataset size grows, the cumulative benefit of positional information increases, and the Level 2–3 refinement is designed to close this gap. Notably, IQ-TREE2 (MAFFT+ModelFinder+GTR) uniformly underperforms both L0–1 and FastTree2 on indel-rich data (Table 1, 1.7–1.8× worse at n=200; see 'IQ-TREE2 gold-standard ML degrades on indel-rich data' below), demonstrating that gold-standard ML inference is not inherently superior when alignment errors are present.
+At n≥500, MSA+ML clearly outperforms L0–1. This is expected and motivates the IMMI framework: as dataset size grows, the cumulative benefit of positional information increases, and the Level 2–3 refinement is designed to close this gap. Notably, IQ-TREE2 (MAFFT+GTR fixed model) uniformly underperforms both L0–1 and FastTree2 on indel-rich data (Table 1, 1.7–1.8× worse at n=200; see 'IQ-TREE2 gold-standard ML degrades on indel-rich data' below), demonstrating that gold-standard ML inference is not inherently superior when alignment errors are present.
 
 ### Indel robustness validates alignment-free foundation
 
@@ -147,7 +147,7 @@ This pattern validates the IMMI framework's foundation: Level 0 k-mer features a
 
 ### IQ-TREE2 gold-standard ML degrades on indel-rich data
 
-The superiority of k-mer distance methods over MSA+ML under high indel rates extends even to the current gold-standard maximum-likelihood method, IQ-TREE2. We benchmarked IQ-TREE2 v2.4.0 (MAFFT alignment + ModelFinder + GTR ML) on the same 130-seed n=200 indel-rich dataset (indel rate=0.02) and on n=503 (30 seeds).
+The superiority of k-mer distance methods over MSA+ML under high indel rates extends even to the current gold-standard maximum-likelihood method, IQ-TREE2. We benchmarked IQ-TREE2 v2.4.0 (MAFFT alignment + GTR ML, fixed model via `-m GTR`) on the same 130-seed n=200 indel-rich dataset (indel rate=0.02) and on n=503 (30 seeds).
 
 **Table 3. IQ-TREE2 GTR vs k-mer methods on indel-rich data (n=200, 130 seeds, indel=0.02).**
 
@@ -155,9 +155,9 @@ The superiority of k-mer distance methods over MSA+ML under high indel rates ext
 |--------|----------|-----------------|-------------|----------------------|
 | **IMMI L0–1** (k=5,gap2) | k-mer → cosine → NJ | **0.080 ± 0.016** | 112/130 | 0 |
 | FastTree2 | MAFFT + GTR+CAT | 0.085 ± 0.025 | 112/130 | 0 |
-| **IQ-TREE2 GTR** | MAFFT + ModelFinder + GTR | 0.147 ± 0.027 | 121/130 | 3 (nRF > 0.50) |
+| **IQ-TREE2 GTR** | MAFFT + GTR (fixed model) | 0.147 ± 0.027 | 121/130 | 3 (nRF > 0.50) |
 
-IQ-TREE2's nRF of 0.147±0.027 is 1.8× worse than IMMI L0–1 (Wilcoxon p<0.001, Cohen's d=3.1) and 1.7× worse than FastTree2 (p<0.001, d=2.4). Three seeds (110, 153, 160) produced nRF>0.50 — catastrophic failures where the inferred tree was essentially random — despite IQ-TREE2 ModelFinder converging normally. Six additional seeds produced null results (MAFFT alignment failure or IQ-TREE2 numerical error). At n=503, IQ-TREE2 achieved nRF=0.130±0.017 (24/30 valid seeds; 6 failed outright), while 10 out of 10 attempted n=1,000 runs exceeded the 5-minute timeout. This result is consistent with the indel robustness pattern observed for FastTree2 (Figure 2): indels corrupt column-wise homology in MSAs, and even sophisticated model selection (ModelFinder) and ML optimization cannot compensate for fundamentally misaligned input columns. FastTree2's approximate ML (GTR+CAT with rapid hill-climbing) appears more robust to MSA errors than IQ-TREE2's full ModelFinder+ML pipeline, likely because CAT pseudo-categories average over alignment uncertainty rather than fitting precise substitution parameters to misaligned sites.
+IQ-TREE2's nRF of 0.147±0.027 is 1.8× worse than IMMI L0–1 (Wilcoxon p<0.001, Cohen's d=3.1) and 1.7× worse than FastTree2 (p<0.001, d=2.4). Three seeds (110, 153, 160) produced nRF>0.50 — catastrophic failures where the inferred tree was essentially random — despite IQ-TREE2 converging normally. Six additional seeds produced null results (MAFFT alignment failure or IQ-TREE2 numerical error). At n=503, IQ-TREE2 achieved nRF=0.130±0.017 (24/30 valid seeds; 6 failed outright), while 10 out of 10 attempted n=1,000 runs exceeded the 5-minute timeout. This result is consistent with the indel robustness pattern observed for FastTree2 (Figure 2): indels corrupt column-wise homology in MSAs, and even a fixed substitution model (GTR) with full ML optimization cannot compensate for fundamentally misaligned input columns. FastTree2's approximate ML (GTR+CAT with rapid hill-climbing) appears more robust to MSA errors than IQ-TREE2's full ML pipeline, likely because CAT pseudo-categories average over alignment uncertainty rather than fitting precise substitution parameters to misaligned sites.
 
 This finding has important implications for the IMMI framework: when indels are present, Level 0 k-mer features are not merely a "fast approximation" to MSA+ML but a fundamentally more robust information source, adding further justification for the framework's alignment-free foundation.
 
@@ -198,14 +198,15 @@ Co-phylog's context-matching approach fails catastrophically under indels, while
 **Table 6. SwissTree protein benchmark (11 families, AFproject standard).**
 
 | Method | Configuration | Mean nRF | Wins/11 |
-|--------|--------------|----------|---------|
-| Co-phylog (k=11) | Context-matching | 0.433 ± 0.076 | 0 |
+|--------|:---|---------:|:---:|
+| Co-phylog (halfctx=5, k=11) | Context-object | 0.433 ± 0.076 | 3 |
+| Co-phylog (halfctx=11, k=23) | Context-object | **0.361 ± 0.059** | 0 |
 | K-mer cosine k=4 | Frequency vector | 0.256 ± 0.122 | 1 |
-| K-mer cosine k=5 | Frequency vector | 0.244 ± 0.110 | 3 |
-| **IMMI L0–1** k=4,gap1 | Frequency vector | **0.239 ± 0.118** | 4 |
-| **IMMI L0–1** k=5,gap2 | Frequency vector | **0.244 ± 0.113** | 3 |
+| K-mer cosine k=5 | Frequency vector | 0.244 ± 0.110 | 2 |
+| **IMMI L0–1** k=4,gap1 | Frequency vector | **0.239 ± 0.118** | 5 |
+| **IMMI L0–1** k=5,gap2 | Frequency vector | **0.244 ± 0.113** | 5 |
 
-K-mer frequency methods outperform Co-phylog by 1.8× (p=0.014, Cohen's d=1.13). This cross-domain validation demonstrates that Level 0 features capture general sequence similarity that transfers from DNA to protein — only the k-mer alphabet changes (20 amino acids vs. 4 nucleotides), while the cosine distance metric remains identical.
+K-mer frequency methods outperform Co-phylog's best configuration (halfctx=11, nRF=0.361) by 1.5× (Wilcoxon paired p=0.006, Cohen's d=1.32). This cross-domain validation demonstrates that Level 0 features capture general sequence similarity that transfers from DNA to protein — only the k-mer alphabet changes (20 amino acids vs. 4 nucleotides), while the cosine distance metric remains identical.
 
 ### Level 2 boundary classifier performance
 
@@ -265,7 +266,7 @@ Among state-of-the-art maximum-likelihood methods, IQ-TREE2 (3) and RAxML-NG (11
 
 From an information-theoretic perspective, k-mer frequencies at L0 provide O(4^k) bits per sequence — sufficient for coarse topology but insufficient for fine branch resolution. Full positional alignment at L3 provides O(L) bits per column per taxon — substantially more information at proportionally higher cost. The key insight is that information quality matters more than quantity for many phylogenetic questions. Resolving whether two phyla are sister groups requires only coarse distance information; resolving whether two species diverged 10M or 11M years ago requires precise branch lengths from aligned columns. IMMI allocates resolution where it matters.
 
-This principle is validated empirically by three observations. First, at n=200 with indels, the full information of MSA+ML produces nRF=0.085±0.025 (FastTree2) versus k-mer NJ at nRF=0.080±0.016 — a statistically indistinguishable result (p=0.052) achieved without alignment. Second, and more strikingly, IQ-TREE2 — widely regarded as the gold standard for ML phylogenetics — achieves nRF=0.147±0.027 on the same data, significantly worse than either FastTree2 or k-mer NJ (p<0.001 for both comparisons). This counterintuitive result arises because IQ-TREE2's ModelFinder selects an optimal substitution model based on the alignment it receives; when indels corrupt column-wise homology in the MSA, model selection and subsequent tree search optimize for an already-distorted signal, amplifying rather than correcting errors. FastTree2's GTR+CAT model uses pseudo-categories that average over sites, providing implicit robustness to MSA errors that IQ-TREE2's precise per-site modeling lacks. This phenomenon — where sophisticated inference compounds input errors — is a form of "garbage in, garbage out" that is well-recognized in statistics but underappreciated in phylogenetics. Third, the Level 2 classifier demonstrates that escalation decisions can be learned from 50 features describing cluster geometry and k-mer dispersion (AUC=0.990), confirming that information need is predictable from low-resolution features. The classifier's top features — cluster size, within-cluster distance dispersion, and silhouette score — align with phylogenetic intuition: large, heterogeneous clusters benefit most from positional alignment, while small, homogeneous clusters are adequately resolved by k-mer distances.
+This principle is validated empirically by three observations. First, at n=200 with indels, the full information of MSA+ML produces nRF=0.085±0.025 (FastTree2) versus k-mer NJ at nRF=0.080±0.016 — a statistically indistinguishable result (p=0.052) achieved without alignment. Second, and more strikingly, IQ-TREE2 — widely regarded as the gold standard for ML phylogenetics — achieves nRF=0.147±0.027 on the same data, significantly worse than either FastTree2 or k-mer NJ (p<0.001 for both comparisons). This counterintuitive result arises because indels corrupt column-wise homology in the MSA; even when IQ-TREE2 is run with a fixed GTR substitution model (not auto-selected via ModelFinder), the tree search optimizes a likelihood function computed over misaligned positions, amplifying rather than correcting alignment errors. FastTree2's GTR+CAT model uses pseudo-categories that average over sites, providing implicit robustness to MSA errors that IQ-TREE2's precise per-site modeling lacks. This phenomenon — where sophisticated inference compounds input errors — is a form of "garbage in, garbage out" that is well-recognized in statistics but underappreciated in phylogenetics. Third, the Level 2 classifier demonstrates that escalation decisions can be learned from 50 features describing cluster geometry and k-mer dispersion (AUC=0.990), confirming that information need is predictable from low-resolution features. The classifier's top features — cluster size, within-cluster distance dispersion, and silhouette score — align with phylogenetic intuition: large, heterogeneous clusters benefit most from positional alignment, while small, homogeneous clusters are adequately resolved by k-mer distances.
 
 ### Implications for emerging infectious disease surveillance
 
@@ -331,7 +332,7 @@ We thank the developers of FastME, MAFFT, FastTree2, and INDELible for making th
 
 ## FUNDING
 
-This work was supported by the National Natural Science Foundation of China (grant no. 32370682) and the National Science and Technology Major Project for Prevention and Control of Emerging Infectious Diseases (grant no. 2026ZD01910500).
+This work was supported by the National Natural Science Foundation of China (NSFC) under grant number 32370682, and the Prevention and Control of Emerging and Major Infectious Diseases — National Science and Technology Major Project (grant number 2026ZD01910500).
 
 ---
 
