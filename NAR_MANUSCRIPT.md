@@ -25,9 +25,9 @@ Li Zhang¹·²·³,* and Lei Kong⁴
 
 **Background**: Multiple sequence alignment (MSA) scales as O(n²L²) and introduces systematic errors under insertions and deletions (indels) — the norm in real sequence data. Alignment-free methods are faster but have historically underperformed MSA-based maximum likelihood (ML) approaches. We previously introduced Fusang v1 [23], a deep learning-based approach limited to 4–40 taxa.
 
-**Results**: Here we present Fusang: Tardigrade Edition, a re-architected alignment-free framework that systematically evaluates k-mer frequency vector cosine distances for phylogenetic inference under indel-rich conditions. Fusang operates directly on unaligned sequences and is competitive with MSA methods under indels. On simulated data (n=200, indel=0.02), Fusang achieves nRF=0.080 ± 0.016 vs FastTree2 nRF=0.085 ± 0.025 (112 seeds after outlier exclusion, Wilcoxon p=0.052, borderline). Preliminary multi-k ensemble results provide encouraging evidence of approaching MSA+ML accuracy (L1 nRF=0.583 vs L3 nRF=0.592, n=5, p=0.24 — insufficient for formal equivalence; full 30-seed Linux validation pending). In contrast, Mash (MinHash) collapses to random on indel data (nRF=1.005, single-seed observation) while the k-mer cosine approach degrades modestly. A random forest boundary classifier achieves perfect accuracy (88/88 simulated scenarios, Wilson 95% CI [0.958,1.0]) in detecting dataset structure, though generalization to real biological data remains to be validated. On clean data, Fusang is competitive at n=200; MSA methods retain a clear advantage at n≥500 (p<0.001 after Bonferroni). Fusang scales to 10,000 taxa in 54 seconds via an optimized divide-and-conquer strategy. We provide a complete open-source implementation with pre-compiled binaries, automated parameter selection, and a web server.
+**Results**: Here we present Fusang: Tardigrade Edition, a re-architected alignment-free framework that systematically evaluates k-mer frequency vector cosine distances for phylogenetic inference under indel-rich conditions. Fusang operates directly on unaligned sequences and is competitive with MSA methods under indels. On simulated data (n=200, indel=0.02), Fusang achieves nRF=0.080 ± 0.016 vs FastTree2 nRF=0.085 ± 0.025 (112 seeds after outlier exclusion, Wilcoxon p=0.052, borderline). Preliminary multi-k ensemble results provide encouraging evidence of approaching MSA+ML accuracy (L1 nRF=0.583 vs L3 nRF=0.592, n=5, p=0.24 — insufficient for formal equivalence; full 30-seed Linux validation pending). In contrast, Mash (MinHash) collapses to random on indel data (nRF=1.005, single-seed observation) while the k-mer cosine approach degrades modestly. A random forest boundary classifier achieves perfect accuracy (88/88 simulated scenarios, Wilson 95% CI [0.958,1.0]) in detecting dataset structure, though generalization to real biological data remains to be validated. On clean data, Fusang is competitive at n=200; MSA methods retain a clear advantage at n≥500 (p<0.001 after Bonferroni). Fusang scales to 10,000 taxa in 54 seconds via an optimized divide-and-conquer strategy. We provide a complete open-source implementation with pre-compiled binaries and automated parameter selection.
 
-**Conclusion**: Fusang: Tardigrade Edition demonstrates that k-mer frequency vector cosine distances provide effective phylogenetic signal for indel-rich data without requiring alignment. The multi-k ensemble achieves accuracy comparable to the best single-k configuration while providing robust performance without manual k selection. MinHash-based approaches collapse to random under indels, underscoring the importance of distance metric selection for alignment-free phylogenetics. Fusang is fast, open-source, and includes an interactive web server for exploratory analysis.
+**Conclusion**: Fusang: Tardigrade Edition demonstrates that k-mer frequency vector cosine distances provide effective phylogenetic signal for indel-rich data without requiring alignment. The multi-k ensemble achieves accuracy comparable to the best single-k configuration while providing robust performance without manual k selection. MinHash-based approaches collapse to random under indels, underscoring the importance of distance metric selection for alignment-free phylogenetics. Fusang is fast and open-source, with pre-compiled binaries and automated parameter selection available from the project repository.
 
 ---
 
@@ -61,7 +61,7 @@ We systematically evaluate spaced k-mer features for phylogenetic tree inference
 
 6. **Validation of a random forest boundary classifier** achieving 100% accuracy (88/88 scenarios, Wilson 95% CI [0.958, 1.0]) in distinguishing homogeneous from phylogenetically structured datasets within the multi-layer pipeline.
 
-7. **Open-source release** with Windows-native FastME binaries, automated parameter selection, and a web server interface.
+7. **Open-source release** with Windows-native FastME binaries and automated parameter selection.
 
 ---
 
@@ -462,16 +462,6 @@ Fusang completes phylogenetic inference on 10,000 taxa in 54.4 seconds (Table 6)
 | 1000 | 5.2 | Simplified | — |
 | 10000 | 54.4 | DCM | — |
 
-### Web Server: interactive exploration and visualization
-
-We implemented a web-based interface to enable interactive exploration and visualization of Fusang phylogenetic inference results. The interface supports two operation modes aligned with the backend pipeline: the simplified pipeline (n≤1000) for rapid tree building, and the adaptive DCM pipeline (n>1000) for large-scale analysis.
-
-Users upload unaligned FASTA-format sequences through the web interface. The server accepts sequences of any length and returns a Newick-format tree file accompanied by an interactive D3.js visualization rendered in SVG format with pan and zoom functionality. The visualization provides several interactive features: branch zooming via click-to-zoom on any clade, taxon search with real-time filtering, subtree collapsing to improve readability of large trees, and multiple export formats (Newick, SVG, PNG).
-
-Performance evaluation on the 74-taxon 16S rRNA dataset shows that the web server returns a complete phylogeny with interactive visualization in 1.2 seconds (simplified pipeline, k=5,gap1, FastME BIONJ+BNNI). For larger datasets (n>1000), the server employs asynchronous task queuing (Celery + Redis) to handle long-running computations without blocking the web interface.
-
-The web server is deployed as a Docker container with Nginx reverse proxy. Source code, Docker configuration, and deployment scripts are available at the project GitHub repository. A public demo instance is accessible at https://fusang-tardigrade.streamlit.app. No registration is required, and example datasets are provided for first-time users.
-
 ### Parameter stability and reproducibility
 
 Automated adaptive parameter selection was validated across dataset scales with 100% reproducibility: all 5 stability repeats at n=20/50/100/200/500 returned identical k,gap selections and nRF within 0.005 units of each other (Supplementary Table S5). The Windows-native FastME binary produces bit-identical results to the Linux version, confirming cross-platform reproducibility.
@@ -693,7 +683,7 @@ Email: knightz@pumc.edu.cn---
 
 14. Lunter, G. et al. (2006) Bayesian coestimation of phylogeny and sequence alignment. *BMC Bioinformatics*, 7, 320. DOI: 10.1186/1471-2105-7-320
 
-15. Luo, X. et al. (2019) Spaced k-mers as features for protein classification. *Bioinformatics*, 35, 2340–2347. [DOI not verified.]
+15. Morgenstern, B., Zhu, B., Zielezinski, A. and Karlowski, W.M. (2015) Estimating evolutionary distances between genomic sequences from spaced-word matches. *Algorithms Mol. Biol.*, 10, 5. https://doi.org/10.1186/s13015-015-0032-x
 
 16. Ma, B. et al. (2002) PatternHunter: faster and more sensitive homology search. *Bioinformatics*, 18, 440–445. DOI: 10.1093/bioinformatics/18.3.440
 

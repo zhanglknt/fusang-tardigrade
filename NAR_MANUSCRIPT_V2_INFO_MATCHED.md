@@ -83,7 +83,7 @@ We implement the IMMI framework as Fusang: Tardigrade Edition and evaluate it th
 
 5. **Scalability**: 10,000 taxa processed in 54 seconds on a single CPU core, demonstrating the framework's practical applicability to large-scale phylogenetics.
 
-We release the complete implementation as open-source software with pre-compiled binaries and a web server.
+We release the complete implementation as open-source software with pre-compiled binaries.
 
 ---
 
@@ -459,7 +459,7 @@ Email: knightz@pumc.edu.cn
 
 14. Lunter, G. et al. (2006) Bayesian coestimation of phylogeny and sequence alignment. *BMC Bioinformatics*, 7, 320. DOI: 10.1186/1471-2105-7-320
 
-15. Luo, X. et al. (2019) Spaced k-mers as features for protein classification. *Bioinformatics*, 35, 2340–2347.
+15. Morgenstern, B., Zhu, B., Zielezinski, A. and Karlowski, W.M. (2015) Estimating evolutionary distances between genomic sequences from spaced-word matches. *Algorithms Mol. Biol.*, 10, 5. https://doi.org/10.1186/s13015-015-0032-x
 
 16. Ma, B. et al. (2002) PatternHunter: faster and more sensitive homology search. *Bioinformatics*, 18, 440–445.
 
