@@ -1,9 +1,11 @@
-# Fusang: Tardigrade Edition — Reproducibility Package
+# Fusang: Tardigrade Edition — Reproducibility Package v1.4
 
 This package reproduces all results from:
 
-> **"Information-Matched Multi-Level Inference: A General Framework for Scalable Phylogenetics"**
-> Submitted to *Nucleic Acids Research Methods*, 2026.
+> **"Spaced K-mer Frequency Vector Cosine Distances Enable Robust Phylogenetic Inference Under Indel-Rich Conditions"**
+> Submitted to *Nucleic Acids Research*, 2026.
+
+**v1.4 Update (2026-06-28)**: Updated Mash benchmark with full 30-seed results (was single-seed). Added Jupyter notebook 07 for Mash vs Fusang comparison. Updated manuscript references to v2.2.
 
 ---
 
@@ -100,6 +102,7 @@ python -c "import numpy, scipy, sklearn, Bio, numba, pandas; print('All OK')"
 | **Table 1: L0-1 vs MSA+ML** | `scripts/benchmark_mhl.py --methods nj,mhl,ft2` | Python + **MAFFT** + **FastTree2** |
 | **SwissTree 蛋白质验证** | `notebooks/03_swisstree_validation.ipynb` | Python + **MAFFT** |
 | **IQ-TREE2 金标准对比** | `scripts/benchmark_mhl.py --methods nj,iqtree` | Python + **IQ-TREE2** |
+| **Mash vs Fusang 对比** (MinHash Jaccard vs k-mer cosine, 30 seeds) | `notebooks/07_mash_benchmark.ipynb` | **仅 Python** ✅ (预计算数据) |
 | **Boundary 分类器训练** | `notebooks/04_boundary_classifier.ipynb` | **仅 Python** ✅ |
 | **Indel-rich 基准** (n=200/500/1000) | 见 bench_tools/README.md | Python + **INDELible** |
 | **16S rRNA 验证** | 外部数据 (SILVA/Greengenes) | Python + **MAFFT** + 数据库下载 |
@@ -233,6 +236,12 @@ repro_package/
 |   |-- training_data.pkl                   # 分类器训练数据
 |   |-- boundary_rf.pkl                     # 预训练 RF 分类器
 |   |-- multik_ensemble_n200_30seeds.csv    # Multi-k 30-seed ensemble
+|   |-- mash_benchmark_30seeds.csv          # Mash 30-seed benchmark CSV
+|   |-- mash_vs_immi_results.json           # Fusang vs Mash benchmark (30 seeds each)
+|   |-- e2e_extended_results.json           # Boundary classifier E2E (88 scenarios)
+|   |-- l3_validation_n200/                 # L3 validation (L0/L1/FT2, 30 seeds)
+|   |-- table8_results_TRUE_reference.csv   # Co-phylog vs Fusang (TRUE ref)
+|   |-- DATA_SOURCES.json                   # v2.0 claim-to-data audit map
 |
 |-- fusang/                            # 核心源码
 |   |-- __init__.py
@@ -270,6 +279,12 @@ repro_package/
 |   |-- train_boundary_classifier.py       # 训练边界分类器
 |   |-- merge_benchmarks.py                # 合并 benchmark 结果
 |   |-- summarize_results.py               # 结果汇总
+|   |-- validate_l3_e2e.py                 # L3 (MSA+ML) 端到端验证
+|   |-- run_l3_batches.py                  # L3 分批运行器
+|   |-- run_e2e_structured.py              # E2E structured tree 测试
+|   |-- compute_mash_vs_immi.py            # Mash vs IMMI benchmark
+|   |-- compute_all_nrf.py                 # Mash nRF 计算
+|   |-- test_mhl_e2e_v4b.py                # MHL V4b 端到端测试
 |
 |-- notebooks/                         # Jupyter Notebooks
 |   |-- 01_main_benchmark.ipynb            # 主 Benchmark 分析
@@ -278,6 +293,7 @@ repro_package/
 |   |-- 04_boundary_classifier.ipynb       # 边界分类器训练/评估
 |   |-- 05_scalability_demo.ipynb          # 可扩展性演示
 |   |-- 06_generate_figures.ipynb          # 论文用图生成
+|   |-- 07_mash_benchmark.ipynb             # Mash vs Fusang 对比 (30 seeds)
 |
 |-- bench_tools/                       # 外部工具说明
 |   |-- README.md                          # 下载和安装指南
