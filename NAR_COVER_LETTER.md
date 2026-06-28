@@ -88,10 +88,10 @@ Thank you for considering our work for publication in *Nucleic Acids Research*. 
 
 Sincerely,
 
-[Corresponding Author Name]
-[Corresponding Author Affiliation]
-[Corresponding Author Email]
-[Corresponding Author ORCID]
+Li Zhang (张力), Ph.D.
+Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College
+26 Huacai Road, Longtan Industrial Park, Chenghua District, Chengdu 610052, Sichuan, China
+Email: knightz@pumc.edu.cn
 
 On behalf of all co-authors
 

@@ -7,15 +7,15 @@
 
 **Authors**:
 
-Li Zhang¹·²·³,* and Lei Kong⁴
+Lei Kong¹ and Li Zhang²·³·⁴,*
 
-¹ Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China
+¹ School of Life Sciences, Peking University, Beijing, China
 
-² Chinese Institute for Brain Research, Beijing, China
+² Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China
 
-³ Translational Medical Center, Weifang Second People's Hospital, 7 Yuanxiao St., Weifang, 261041, Shandong Province, China
+³ Chinese Institute for Brain Research, Beijing, China
 
-⁴ School of Life Sciences, Peking University, Beijing, China
+⁴ Translational Medical Center, Weifang Second People's Hospital, 7 Yuanxiao St., Weifang, 261041, Shandong Province, China
 
 * To whom correspondence should be addressed. Email: knightz@pumc.edu.cn
 
