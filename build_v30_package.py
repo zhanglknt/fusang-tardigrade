@@ -55,7 +55,7 @@ for old in glob.glob(os.path.join(SUBMIT_DIR, "*")):
 files = [DOCX, os.path.join(SRC, "cover_letter.docx"), os.path.join(SRC, "GraphicalAbstract.pdf"), tables_docx]
 files += sorted(glob.glob(os.path.join(SRC, "Figure*.pdf")))
 files += sorted(glob.glob(os.path.join(SRC, "Supplementary_Figure_*.pdf")))
-files.append(os.path.join(SRC, "repro_package_v1.8.zip"))
+files.append(os.path.join(SRC, "repro_package_v1.9.zip"))
 copied = []
 for fp in files:
     if os.path.exists(fp):
