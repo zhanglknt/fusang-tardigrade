@@ -1,0 +1,158 @@
+{
+ "1": {
+  "n": 9,
+  "authors": [
+   "Hadfield, J.",
+   "Megill, C.",
+   "Bell, S.M.",
+   "Huddleston, J.",
+   "Potter, B.",
+   "Callender, C.",
+   "Sagulenko, P.",
+   "Bedford, T.",
+   "Neher, R.A."
+  ]
+ },
+ "2": {
+  "n": 17,
+  "authors": [
+   "Hug, L.A.",
+   "Baker, B.J.",
+   "Anantharaman, K.",
+   "Brown, C.T.",
+   "Probst, A.J.",
+   "Castelle, C.J.",
+   "Butterfield, C.N.",
+   "Hernsdorf, A.W.",
+   "Amano, Y.",
+   "Ise, K.",
+   "Suzuki, Y.",
+   "Dudek, N.",
+   "Relman, D.A.",
+   "Finstad, K.M.",
+   "Amundson, R.",
+   "Thomas, B.C.",
+   "Banfield, J.F."
+  ]
+ },
+ "6": {
+  "n": 10,
+  "authors": [
+   "Zhou, Y.",
+   "Zhang, Y.",
+   "Zhao, D.",
+   "Yu, X.",
+   "Shen, X.",
+   "Zhou, Y.",
+   "Wang, S.",
+   "Qiu, Y.",
+   "Chen, Y.",
+   "Zhu, F."
+  ]
+ },
+ "8": {
+  "n": 4,
+  "authors": [
+   "Marques, Y.B.",
+   "de Paiva Oliveira, A.",
+   "Ribeiro Vasconcelos, A.T.",
+   "Cerqueira, F.R."
+  ]
+ },
+ "11": {
+  "n": 2,
+  "authors": [
+   "Dall\u2019Antonia, F.",
+   "Keller, W."
+  ]
+ },
+ "15": {
+  "n": 3,
+  "authors": [
+   "Huson, D.H.",
+   "Nettles, S.M.",
+   "Warnow, T.J."
+  ]
+ },
+ "16": {
+  "n": 3,
+  "authors": [
+   "Berger, S.A.",
+   "Krompass, D.",
+   "Stamatakis, A."
+  ]
+ },
+ "17": {
+  "n": 3,
+  "authors": [
+   "Lefort, V.",
+   "Desper, R.",
+   "Gascuel, O."
+  ]
+ },
+ "20": {
+  "n": 3,
+  "authors": [
+   "Price, M.N.",
+   "Dehal, P.S.",
+   "Arkin, A.P."
+  ]
+ },
+ "22": {
+  "n": 5,
+  "authors": [
+   "Kozlov, A.M.",
+   "Darriba, D.",
+   "Flouri, T.",
+   "Morel, B.",
+   "Stamatakis, A."
+  ]
+ },
+ "23": {
+  "n": 7,
+  "authors": [
+   "Minh, B.Q.",
+   "Schmidt, H.A.",
+   "Chernomor, O.",
+   "Schrempf, D.",
+   "Woodhams, M.D.",
+   "von Haeseler, A.",
+   "Lanfear, R."
+  ]
+ },
+ "24": {
+  "n": 7,
+  "authors": [
+   "Ondov, B.D.",
+   "Treangen, T.J.",
+   "Melsted, P.",
+   "Mallonee, A.B.",
+   "Bergman, N.H.",
+   "Koren, S.",
+   "Phillippy, A.M."
+  ]
+ },
+ "25": {
+  "n": 2,
+  "authors": [
+   "Joly, V.",
+   "Matton, D.P."
+  ]
+ },
+ "27": {
+  "n": 3,
+  "authors": [
+   "Ooi, C.H.",
+   "Chetty, M.",
+   "Teng, S.W."
+  ]
+ },
+ "30": {
+  "n": 3,
+  "authors": [
+   "Ma, B.",
+   "Tromp, J.",
+   "Li, M."
+  ]
+ }
+}

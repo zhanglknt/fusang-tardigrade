@@ -1,0 +1,234 @@
+{
+ "1": {
+  "title": "Nextstrain: real-time tracking of pathogen evolution",
+  "year": 2018,
+  "journal": "Bioinformatics",
+  "vol": "34",
+  "page": "4121-4123",
+  "first": "Hadfield"
+ },
+ "2": {
+  "title": "A new view of the tree of life",
+  "year": 2016,
+  "journal": "Nature Microbiology",
+  "vol": "1",
+  "page": "",
+  "first": "Hug"
+ },
+ "4": {
+  "title": "Phylogenetic assessment of alignments reveals neglected tree signal in gaps",
+  "year": 2010,
+  "journal": "Genome Biology",
+  "vol": "11",
+  "page": "",
+  "first": "Dessimoz"
+ },
+ "6": {
+  "title": "TTD:\n                    <i>Therapeutic Target Database</i>\n                    describing target druggability information",
+  "year": 2023,
+  "journal": "Nucleic Acids Research",
+  "vol": "52",
+  "page": "D1465-D1477",
+  "first": "Zhou"
+ },
+ "7": {
+  "title": "Estimating evolutionary distances between genomic sequences from spaced-word matches",
+  "year": 2015,
+  "journal": "Algorithms for Molecular Biology",
+  "vol": "10",
+  "page": "",
+  "first": "Morgenstern"
+ },
+ "8": {
+  "title": "Mirnacle: machine learning with SMOTE and random forest for improving selectivity in pre-miRNA ab initio prediction",
+  "year": 2016,
+  "journal": "BMC Bioinformatics",
+  "vol": "17",
+  "page": "",
+  "first": "Marques"
+ },
+ "9": {
+  "title": "Alignment-free sequence comparison\u2014a review",
+  "year": 2003,
+  "journal": "Bioinformatics",
+  "vol": "19",
+  "page": "513-523",
+  "first": "Vinga"
+ },
+ "10": {
+  "title": "Alignment-free sequence comparison: benefits, applications, and tools",
+  "year": 2017,
+  "journal": "Genome Biology",
+  "vol": "18",
+  "page": "",
+  "first": "Zielezinski"
+ },
+ "11": {
+  "title": "SPADE web service for prediction of allergen IgE epitopes",
+  "year": 2019,
+  "journal": "Nucleic Acids Research",
+  "vol": "47",
+  "page": "W496-W501",
+  "first": "Dall\u2019Antonia"
+ },
+ "12": {
+  "title": "kmacs: the\n                    <i>k</i>\n                    -mismatch average common substring approach to alignment-free sequence comparison",
+  "year": 2014,
+  "journal": "Bioinformatics",
+  "vol": "30",
+  "page": "2000-2008",
+  "first": "Leimeister"
+ },
+ "13": {
+  "title": "Fast alignment-free sequence comparison using spaced-word frequencies",
+  "year": 2014,
+  "journal": "Bioinformatics",
+  "vol": "30",
+  "page": "1991-1999",
+  "first": "Leimeister"
+ },
+ "14": {
+  "title": "Benchmarking of alignment-free sequence comparison methods",
+  "year": 2019,
+  "journal": "Genome Biology",
+  "vol": "20",
+  "page": "",
+  "first": "Zielezinski"
+ },
+ "15": {
+  "title": "Disk-Covering, a Fast-Converging Method for Phylogenetic Tree Reconstruction",
+  "year": 1999,
+  "journal": "Journal of Computational Biology",
+  "vol": "6",
+  "page": "369-386",
+  "first": "Huson"
+ },
+ "16": {
+  "title": "Performance, Accuracy, and Web Server for Evolutionary Placement of Short Sequence Reads under Maximum Likelihood",
+  "year": 2011,
+  "journal": "Systematic Biology",
+  "vol": "60",
+  "page": "291-302",
+  "first": "Berger"
+ },
+ "17": {
+  "title": "FastME 2.0: A Comprehensive, Accurate, and Fast Distance-Based Phylogeny Inference Program: Table 1.",
+  "year": 2015,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "32",
+  "page": "2798-2800",
+  "first": "Lefort"
+ },
+ "18": {
+  "title": "BIONJ: an improved version of the NJ algorithm based on a simple model of sequence data",
+  "year": 1997,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "14",
+  "page": "685-695",
+  "first": "Gascuel"
+ },
+ "19": {
+  "title": "INDELible: A Flexible Simulator of Biological Sequence Evolution",
+  "year": 2009,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "26",
+  "page": "1879-1888",
+  "first": "Fletcher"
+ },
+ "20": {
+  "title": "FastTree 2 \u2013 Approximately Maximum-Likelihood Trees for Large Alignments",
+  "year": 2010,
+  "journal": "PLoS ONE",
+  "vol": "5",
+  "page": "e9490",
+  "first": "Price"
+ },
+ "21": {
+  "title": "MAFFT Multiple Sequence Alignment Software Version 7: Improvements in Performance and Usability",
+  "year": 2013,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "30",
+  "page": "772-780",
+  "first": "Katoh"
+ },
+ "22": {
+  "title": "RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference",
+  "year": 2019,
+  "journal": "Bioinformatics",
+  "vol": "35",
+  "page": "4453-4455",
+  "first": "Kozlov"
+ },
+ "23": {
+  "title": "IQ-TREE 2: New Models and Efficient Methods for Phylogenetic Inference in the Genomic Era",
+  "year": 2020,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "37",
+  "page": "1530-1534",
+  "first": "Minh"
+ },
+ "24": {
+  "title": "Mash: fast genome and metagenome distance estimation using MinHash",
+  "year": 2016,
+  "journal": "Genome Biology",
+  "vol": "17",
+  "page": "",
+  "first": "Ondov"
+ },
+ "25": {
+  "title": "KAPPA, a simple algorithm for discovery and clustering of proteins defined by a key amino acid pattern: a case study of the cysteine-rich proteins",
+  "year": 2015,
+  "journal": "Bioinformatics",
+  "vol": "31",
+  "page": "1716-1723",
+  "first": "Joly"
+ },
+ "26": {
+  "title": "The effect of hybridization-induced secondary structure alterations on RNA detection using backscattering interferometry",
+  "year": 2013,
+  "journal": "Nucleic Acids Research",
+  "vol": "41",
+  "page": "e103-e103",
+  "first": "Adams"
+ },
+ "27": {
+  "title": "Differential prioritization between relevance and redundancy in correlation-based feature selection techniques for multiclass gene expression data",
+  "year": 2006,
+  "journal": "BMC Bioinformatics",
+  "vol": "7",
+  "page": "",
+  "first": "Ooi"
+ },
+ "28": {
+  "title": "Problems and Solutions for Estimating Indel Rates and Length Distributions",
+  "year": 2008,
+  "journal": "Molecular Biology and Evolution",
+  "vol": "26",
+  "page": "473-480",
+  "first": "Cartwright"
+ },
+ "29": {
+  "title": "Skmer: assembly-free and alignment-free sample identification using genome skims",
+  "year": 2019,
+  "journal": "Genome Biology",
+  "vol": "20",
+  "page": "",
+  "first": "Sarmashghi"
+ },
+ "30": {
+  "title": "PatternHunter: faster and more sensitive homology search",
+  "year": 2002,
+  "journal": "Bioinformatics",
+  "vol": "18",
+  "page": "440-445",
+  "first": "Ma"
+ },
+ "31": {
+  "title": "Alignment-free genome comparison with feature frequency profiles (FFP) and optimal resolutions",
+  "year": 2009,
+  "journal": "Proceedings of the National Academy of Sciences",
+  "vol": "106",
+  "page": "2677-2682",
+  "first": "Sims"
+ }
+}
