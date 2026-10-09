@@ -1,5 +1,45 @@
 # Revision Changelog (internal record, not for submission)
 
+## v2.8 (2026-10-09) — inherent reservation ③ resolved: real indel-rich genome benchmarks
+
+Reservation ③ (real indel-rich data validation) executed via the AFproject community
+benchmark's real whole-genome datasets (trusted published reference trees), replacing the
+earlier 2–4 week estimate with a same-day result:
+
+1. **Datasets** (from `real_data/swisstree/afproject_repo/datasets/genome/`, sequences
+   downloaded from NCBI eutils by worker; 52/52 accessions validated):
+   - Fish mtDNA: 25 mitochondrial genomes (~17 kb), Fischer et al. 2013 reference tree;
+     MAFFT alignment gap content 9.1%.
+   - E. coli/Shigella: 27 whole genomes (4.4–5.5 Mb), Skippington & Ragan 2011 tree.
+2. **Gap-content quantification**: SwissTree 11 protein families measured at median 50%
+   gap cells (range 11–81%) — retroactively establishes the existing Table 10 benchmark
+   as strongly indel-rich real data.
+3. **Fish mtDNA (positive result)**: multi-k cosine ensemble (k=5,7,9 and k=7,9,11
+   variants) achieves nRF=0.045 — tied with MAFFT+FastTree2 (MSA+ML) and with kmacs
+   (k=10), Mash (k=11,s=5000), Co-phylog (halfctx=5) at their AFproject-published best
+   configurations. Gene-scale default k=5 saturates at genome length (nRF=0.545);
+   multi-k automatically rescues this (no length-aware k selection needed).
+4. **E. coli/Shigella (boundary delineation)**: k-mer cosine plateaus at nRF=0.50 for
+   all k≥9 and all multi-k variants (forward-strand k-mers, 64-bit rolling-hash
+   implementation cross-validated against the dict implementation); Mash 0.208 (our
+   run) / 0.12 (published); published anchors (andi, Co-phylog, phylonium) 0.08.
+   Conclusion: shallow recombination-dominated divergence is outside the cosine
+   regime — anchor-based or MinHash methods recommended there.
+5. **Pipeline cross-validation**: kmacs k=10 and Mash k=11/s=5000 at AFproject-published
+   configurations reproduce published scores within one split (0.045 vs 0.05),
+   validating our scoring pipeline (ETE3 Tree.compare unrooted nRF, BioPython NJ vs
+   AFproject's fneighbor).
+6. **Manuscript changes**: new Methods subsection (Real genome-scale validation), new
+   Results section + Table 12 (placed after Scalability to keep table order 1–12
+   monotonic), Supplementary Table S16 (full results + accessions + gap stats),
+   Abstract clause (197 words), Limitations "Simulated-to-real transfer" expanded,
+   Practical recommendations +2 bullets, future work item (2) updated, Data
+   Availability extended.
+7. **Artifacts**: `real_data/afproject_genome/` (fish_mito/, ecoli_shigella/,
+   fish_mito_results/, ecoli_results/, ecoli_results_canon/, wsl_out/,
+   real_genome_scores.json, Supplementary_Table_S16.md, suite scripts); ete3
+   compatibility shim (cgi.py) for Python 3.13.
+
 ## v2.7 (2026-10-09) — inherent reservations ① and ② resolved
 
 Reservations ① (L3 Linux 30-seed validation) and ② (kmacs/Skmer head-to-head) from

@@ -1,0 +1,80 @@
+loaded 27 genomes, 4.4-5.5 Mb
+tip sets match (27 tips)
+  [k=5] hash 19s + cosine 0s, unique k-mers/genome: 1,024
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\kmer_k5.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 19
+RF distance: 15 (= 8 + 7)
+Max RF: 48
+nRF distance: 0.312500
+  kmer_k5: nRF = 0.3125  (19.3s)
+  [k=7] hash 29s + cosine 0s, unique k-mers/genome: 16,370
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\kmer_k7.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 18
+RF distance: 17 (= 9 + 8)
+Max RF: 48
+nRF distance: 0.354167
+  kmer_k7: nRF = 0.3542  (29.8s)
+  [k=9] hash 36s + cosine 9s, unique k-mers/genome: 246,516
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\kmer_k9.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 17
+RF distance: 19 (= 10 + 9)
+Max RF: 48
+nRF distance: 0.395833
+  kmer_k9: nRF = 0.3958  (44.5s)
+  [k=11] hash 46s + cosine 68s, unique k-mers/genome: 1,986,345
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\kmer_k11.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 19
+RF distance: 15 (= 8 + 7)
+Max RF: 48
+nRF distance: 0.312500
+  kmer_k11: nRF = 0.3125  (113.7s)
+  [k=13] hash 70s + cosine 146s, unique k-mers/genome: 4,078,172
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\kmer_k13.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 20
+RF distance: 13 (= 7 + 6)
+Max RF: 48
+nRF distance: 0.270833
+  kmer_k13: nRF = 0.2708  (215.6s)
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\multik_579.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 18
+RF distance: 17 (= 9 + 8)
+Max RF: 48
+nRF distance: 0.354167
+  multik_579: nRF = 0.3542  (0.0s)
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\multik_57911.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 19
+RF distance: 15 (= 8 + 7)
+Max RF: 48
+nRF distance: 0.312500
+  multik_57911: nRF = 0.3125  (0.0s)
+Tree1: D:\系统发育树项目\Fusang\Fusang-main\real_data\afproject_genome\ecoli_results\multik_791113.nwk
+Tree2: D:\系统发育树项目\Fusang\Fusang-main\real_data\swisstree\afproject_repo\datasets\genome\ecoli_shigella\tree.newick
+Taxa: 27
+Bipartitions: tree1=27, tree2=26
+Shared: 20
+RF distance: 13 (= 7 + 6)
+Max RF: 48
+nRF distance: 0.270833
+  multik_791113: nRF = 0.2708  (0.0s)
+saved genome_cosine.json

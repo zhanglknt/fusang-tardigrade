@@ -1,0 +1,127 @@
+{
+ "fish": {
+  "fusang_k5g2": {
+   "nrf_ete": 0.5455,
+   "rf": 24.0,
+   "max_rf": 44.0
+  },
+  "kmer_k5": {
+   "nrf_ete": 0.5455,
+   "rf": 24.0,
+   "max_rf": 44.0
+  },
+  "kmer_k7": {
+   "nrf_ete": 0.2273,
+   "rf": 10.0,
+   "max_rf": 44.0
+  },
+  "kmer_k9": {
+   "nrf_ete": 0.0909,
+   "rf": 4.0,
+   "max_rf": 44.0
+  },
+  "multik": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "cophylog": {
+   "nrf_ete": 0.5455,
+   "rf": 24.0,
+   "max_rf": 44.0
+  },
+  "cophylog_halfctx5_published_cfg": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "kmer_k11": {
+   "nrf_ete": 0.0909,
+   "rf": 4.0,
+   "max_rf": 44.0
+  },
+  "multik_7911": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "kmacs_k3": {
+   "nrf_ete": 0.1818,
+   "rf": 8.0,
+   "max_rf": 44.0
+  },
+  "kmacs_k10_published_cfg": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "mash_k21": {
+   "nrf_ete": 0.0909,
+   "rf": 4.0,
+   "max_rf": 44.0
+  },
+  "mash_k11_published_cfg": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "mafft_fasttree2_msa_ml": {
+   "nrf_ete": 0.0455,
+   "rf": 2.0,
+   "max_rf": 44.0
+  },
+  "alignment": {
+   "n": 25,
+   "length": 18284,
+   "gap_fraction": 0.0908,
+   "all_gap_cols": 0
+  }
+ },
+ "ecoli": {
+  "kmer_k5": {
+   "nrf_ete": 0.875,
+   "rf": 42.0,
+   "max_rf": 48.0
+  },
+  "kmer_k7": {
+   "nrf_ete": 0.7083,
+   "rf": 34.0,
+   "max_rf": 48.0
+  },
+  "kmer_k9": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "kmer_k11": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "kmer_k13": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "multik_579": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "multik_57911": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "multik_791113": {
+   "nrf_ete": 0.5,
+   "rf": 24.0,
+   "max_rf": 48.0
+  },
+  "mash_k21": {
+   "nrf_ete": 0.2083,
+   "rf": 10.0,
+   "max_rf": 48.0
+  }
+ }
+}

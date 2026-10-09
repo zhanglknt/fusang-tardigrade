@@ -108,7 +108,7 @@
 |----------|------|------|
 | ① L3 Linux 30-seed 验证 | **RESOLVED** | 全 30 seeds 完成（WSL2, MAFFT --auto + FastTree2 `-nt -gtr -nosupport`）；L1=0.583±0.044 vs L3=0.601±0.055，paired Wilcoxon **p=0.024**，d=−0.45，L1 胜 19/30（Bonferroni 后 p_adj=0.071 borderline）。旧 5-seed Windows 运行的 `-nt` 缺失协议缺陷已披露并取代（Note S8） |
 | ② Skmer/kmacs 实测 | **RESOLVED** | kmacs（源码 Wayback 恢复编译）：best k=3，vs FT2 0.177±0.024，显著差于 Fusang（p=5.6×10⁻⁶, d=2.54）但远好于 Co-phylog；Skmer 3.3.0：基因长度结构性不适用（coverage 估计除零，k=31/21 全部 27 seeds 失败），与 andi 平行 |
-| ③ 真实 indel-rich 数据 | **DEFERRED** | 保留为 Limitations + future work (2)；预计 2–4 周 |
+| ③ 真实 indel-rich 数据 | **RESOLVED (2026-10-09 晚)** | 经 AFproject 社区标准真实数据集验证（带已发表参考树）：**fish mtDNA（25 鱼线粒体基因组，比对 gap 9.1%）：multi-k cosine nRF=0.045，与 MSA+ML 及 kmacs/Mash/Co-phylog 的 AFproject 最佳配置并列第一**（kmacs k=10 与 Mash k=11 复现已发表 0.05 分数，交叉验证管线）；**E. coli/Shigella（27 全基因组）**：cosine 0.50 vs Mash 0.21/0.12、已发表 andi/co-phylog 0.08 → 划定浅分歧重组主导区边界；SwissTree 11 家族 gap 含量实测中位数 50%（11–81%）确证既有蛋白质基准本身重度 indel-rich。稿件 v2.8 新增 Methods/Results 小节 + Table 12 + Supp Table S16。剩余缺口：基因长度 DNA（500–1,000bp）真实 indel-rich 家族（已在 Limitations 如实声明） |
 
 附加发现并修复：v2.6 表7 为"嵌合体"（cophy/k5/k7/fusang 行来自 seeds 227–253 的 definitive 运行，multik 行抄自表4 的 seeds 230–259，标题却写 100–126）——已在恢复数据上统一按 seeds 100–126 重算全表（cophy 0.408, kmacs 0.177, k5 0.104, k7 0.107, fusang 0.108, multik 0.111）；k5 vs spaced 由 "p=0.0002 显著" 改为 "p=0.26 n.s."（与蛋白质域结果一致）。基准数据磁盘损坏已通过三条独立路径恢复并验证（53/54 per-seed nRF 匹配，seed109 FT2 差 2 bipartitions），已隔离损坏原件并在 Data Availability 披露。
 
