@@ -102,5 +102,15 @@
 
 固有保留意见 3 项（Skmer/kmacs 实测、L3 Linux 30-seed 验证、真实 indel-rich 数据）均为新实验需求，已在 Limitations 声明并列入修回后应对预案，不阻塞投稿。
 
+## 六、v2.7 保留意见清零更新（2026-10-09）
+
+| 保留意见 | 状态 | 结果 |
+|----------|------|------|
+| ① L3 Linux 30-seed 验证 | **RESOLVED** | 全 30 seeds 完成（WSL2, MAFFT --auto + FastTree2 `-nt -gtr -nosupport`）；L1=0.583±0.044 vs L3=0.601±0.055，paired Wilcoxon **p=0.024**，d=−0.45，L1 胜 19/30（Bonferroni 后 p_adj=0.071 borderline）。旧 5-seed Windows 运行的 `-nt` 缺失协议缺陷已披露并取代（Note S8） |
+| ② Skmer/kmacs 实测 | **RESOLVED** | kmacs（源码 Wayback 恢复编译）：best k=3，vs FT2 0.177±0.024，显著差于 Fusang（p=5.6×10⁻⁶, d=2.54）但远好于 Co-phylog；Skmer 3.3.0：基因长度结构性不适用（coverage 估计除零，k=31/21 全部 27 seeds 失败），与 andi 平行 |
+| ③ 真实 indel-rich 数据 | **DEFERRED** | 保留为 Limitations + future work (2)；预计 2–4 周 |
+
+附加发现并修复：v2.6 表7 为"嵌合体"（cophy/k5/k7/fusang 行来自 seeds 227–253 的 definitive 运行，multik 行抄自表4 的 seeds 230–259，标题却写 100–126）——已在恢复数据上统一按 seeds 100–126 重算全表（cophy 0.408, kmacs 0.177, k5 0.104, k7 0.107, fusang 0.108, multik 0.111）；k5 vs spaced 由 "p=0.0002 显著" 改为 "p=0.26 n.s."（与蛋白质域结果一致）。基准数据磁盘损坏已通过三条独立路径恢复并验证（53/54 per-seed nRF 匹配，seed109 FT2 差 2 bipartitions），已隔离损坏原件并在 Data Availability 披露。
+
 **Git**: commit e1afe41（v2.6），已推送 GitHub。
 **投稿包**: `NAR_Submission_v2.6/`（18 文件）+ `NAR_Submission_v2.6.zip`（5.33 MB）。

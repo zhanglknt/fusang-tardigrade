@@ -1,5 +1,57 @@
 # Revision Changelog (internal record, not for submission)
 
+## v2.7 (2026-10-09) — inherent reservations ① and ② resolved
+
+Reservations ① (L3 Linux 30-seed validation) and ② (kmacs/Skmer head-to-head) from
+`review_v3_CLOSURE.md` executed in full; reservation ③ (real indel-rich data) deferred.
+
+1. **L3 Linux rerun (reservation ①)**: MAFFT --auto + FastTree2 `-nt -gtr -nosupport`
+   on WSL2 Ubuntu-24.04, all 30 seeds complete (`~/l3run/run_l3.sh`, merged by
+   `merge_l3_results.py` into `l3_validation_n200/l3_validation_results.json`;
+   pre-Linux backup at `..._pre_linux.json`). **Protocol correction disclosed**: the
+   earlier 5-seed Windows run had omitted FastTree2's `-nt` nucleotide flag
+   (protein-mode distances on DNA) — superseded and documented in Supplementary
+   Note S8. New results: L0=0.743±0.046, L1=0.583±0.044, L3=0.601±0.055 (all n=30);
+   **L1 vs L3: paired Wilcoxon p=0.024, paired d=−0.45, L1 wins 19/30** (borderline
+   after Bonferroni ×3, p_adj=0.071; L1 vs L0 paired d=3.82, replacing pooled-SD
+   d=3.55 per the manuscript's own paired-d convention). Story upgraded from
+   "preliminary n=5 numerical similarity" to "full 30-seed significant L1 advantage".
+   Timing corrected: L1 ~15s vs L3 ~31s per seed on Linux (old text: 175s Windows).
+   Table 5 caption now discloses L=1000 bp (coalescent protocol).
+2. **kmacs benchmark (reservation ②)**: original 2014 source recovered from Wayback
+   Machine (kmacs.gobics.de dead), compiled on WSL2 (`-Wno-narrowing`); k-scan
+   k∈{3,5,10} on 27 seeds (100–126). Best k=3: vs FT2 0.177±0.024, vs TRUE
+   0.168±0.022 — significantly worse than Fusang (p=5.6×10⁻⁶, paired d=2.54) but far
+   better than Co-phylog. Added to Methods comparison list, Table 7 (new row +
+   finding), Limitations, Supp Table S10 caption.
+3. **Skmer test (reservation ②)**: Skmer 3.3.0 (conda) structurally inapplicable at
+   gene length — ZeroDivisionError in coverage estimation on all 27 seeds at k=31
+   and k=21 (`skmer_inapplicability_record.md`). Documented in Results ("Regarding
+   Skmer") and Limitations; parallels andi.
+4. **Table 7 rebuilt on a single validated seed set**: forensic provenance check
+   revealed the v2.6 Table 7 was a chimera — Co-phylog/k5/k7/Fusang values came from
+   a `table8_definitive.log` run on seeds 227–253, the multi-k row was copied from
+   the Table 4 benchmark (seeds 230–259), while the caption claimed seed set 100–126.
+   All rows recomputed on seeds 100–126 (matching the caption and Supp Table S10) via
+   `recompute_table7_recovered.py` on recovered benchmark data: Co-phylog 0.408±0.021,
+   kmacs 0.177±0.024, k5 0.104±0.018, k7 0.107±0.019, Fusang 0.108±0.020, multi-k
+   0.111±0.018. Consequent narrative change: contiguous k=5 vs spaced is now
+   n.s. (p=0.26, d=−0.21) instead of "slightly outperforms (p=0.0002)" — more coherent
+   with the protein-domain result. Table 4 caption now states its seed set (230–259).
+5. **Benchmark data recovery (disk corruption)**: 5 FASTA (seeds 111/114/115/117/121)
+   + 16 tree files (FT2 109–126 range, TRUE 110/121/126, Fusang 114/115/120/125) were
+   UTF-16/binary garbage. Recovered via three independent validated paths
+   (`recover_benchmark_data.py`): ungap-reconstruction from aligned FASTA,
+   deterministic regeneration (`gen_test_data_indel.py`, byte-identical), FastTree
+   rerun on intact alignments. 53/54 per-seed nRF values match the master CSV
+   (only seed109 FT2 differs by 2 bipartitions: 0.0787→0.0838). Corrupted originals
+   quarantined in `corrupt_fasta_quarantine/`. Disclosed in Data Availability.
+6. **References renumbered**: Skmer [29] (now first cited in Results), PatternHunter
+   [30] (first cited in Discussion) — order-preserving swap; citation sequence
+   verified monotonic 1–31.
+7. **Self-checks**: Abstract 199 words (≤200); citations 1–31 monotonic; tables 1–11
+   monotonic; no residual old values (0.592/0.419/0.099/d=3.55/p=0.0002/preliminary).
+
 ## v2.6 (2026-10-09) — post-verification residual fixes
 
 Following the 4-reviewer verification round (`review_v3_verify_{phylo,stats,format,general}.md`),
