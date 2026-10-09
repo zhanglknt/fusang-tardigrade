@@ -1,0 +1,240 @@
+{
+ "genes": {
+  "ND1": {
+   "n_taxa": 25,
+   "len_mean_bp": 975.0,
+   "len_range_bp": [
+    975,
+    975
+   ],
+   "aln_len": 975,
+   "indel_gap_fraction": 0.0,
+   "fusang_multik_nrf_vs_ref": 0.5455,
+   "fusang_k5_nrf_vs_ref": 0.5909,
+   "fusang_k7_nrf_vs_ref": 0.5455,
+   "ft2_nrf_vs_ref": 0.3636,
+   "fusang_multik_vs_ft2_nrf": 0.4545
+  },
+  "ND2": {
+   "n_taxa": 25,
+   "len_mean_bp": 1045.8,
+   "len_range_bp": [
+    1045,
+    1047
+   ],
+   "aln_len": 1050,
+   "indel_gap_fraction": 0.004,
+   "fusang_multik_nrf_vs_ref": 0.4545,
+   "fusang_k5_nrf_vs_ref": 0.4545,
+   "fusang_k7_nrf_vs_ref": 0.4545,
+   "ft2_nrf_vs_ref": 0.2273,
+   "fusang_multik_vs_ft2_nrf": 0.3636
+  },
+  "ND3": {
+   "n_taxa": 25,
+   "len_mean_bp": 349.8,
+   "len_range_bp": [
+    349,
+    352
+   ],
+   "aln_len": 354,
+   "indel_gap_fraction": 0.0119,
+   "fusang_multik_nrf_vs_ref": 0.6818,
+   "fusang_k5_nrf_vs_ref": 0.7273,
+   "fusang_k7_nrf_vs_ref": 0.7273,
+   "ft2_nrf_vs_ref": 0.5909,
+   "fusang_multik_vs_ft2_nrf": 0.7273
+  },
+  "ND4": {
+   "n_taxa": 25,
+   "len_mean_bp": 1380.9,
+   "len_range_bp": [
+    1380,
+    1381
+   ],
+   "aln_len": 1381,
+   "indel_gap_fraction": 0.0001,
+   "fusang_multik_nrf_vs_ref": 0.5455,
+   "fusang_k5_nrf_vs_ref": 0.7273,
+   "fusang_k7_nrf_vs_ref": 0.5455,
+   "ft2_nrf_vs_ref": 0.1364,
+   "fusang_multik_vs_ft2_nrf": 0.4091
+  },
+  "ND4L": {
+   "n_taxa": 25,
+   "len_mean_bp": 297.0,
+   "len_range_bp": [
+    297,
+    297
+   ],
+   "aln_len": 297,
+   "indel_gap_fraction": 0.0,
+   "fusang_multik_nrf_vs_ref": 0.5,
+   "fusang_k5_nrf_vs_ref": 0.4091,
+   "fusang_k7_nrf_vs_ref": 0.5455,
+   "ft2_nrf_vs_ref": 0.3636,
+   "fusang_multik_vs_ft2_nrf": 0.4545
+  },
+  "ND5": {
+   "n_taxa": 25,
+   "len_mean_bp": 1840.0,
+   "len_range_bp": [
+    1837,
+    1866
+   ],
+   "aln_len": 1867,
+   "indel_gap_fraction": 0.0145,
+   "fusang_multik_nrf_vs_ref": 0.2727,
+   "fusang_k5_nrf_vs_ref": 0.4545,
+   "fusang_k7_nrf_vs_ref": 0.2727,
+   "ft2_nrf_vs_ref": 0.0455,
+   "fusang_multik_vs_ft2_nrf": 0.2273
+  },
+  "ND6": {
+   "n_taxa": 25,
+   "len_mean_bp": 522.1,
+   "len_range_bp": [
+    519,
+    531
+   ],
+   "aln_len": 531,
+   "indel_gap_fraction": 0.0167,
+   "fusang_multik_nrf_vs_ref": 0.5,
+   "fusang_k5_nrf_vs_ref": 0.5909,
+   "fusang_k7_nrf_vs_ref": 0.3182,
+   "ft2_nrf_vs_ref": 0.2727,
+   "fusang_multik_vs_ft2_nrf": 0.4545
+  },
+  "ATP6": {
+   "n_taxa": 25,
+   "len_mean_bp": 683.4,
+   "len_range_bp": [
+    683,
+    684
+   ],
+   "aln_len": 684,
+   "indel_gap_fraction": 0.0009,
+   "fusang_multik_nrf_vs_ref": 0.5909,
+   "fusang_k5_nrf_vs_ref": 0.6364,
+   "fusang_k7_nrf_vs_ref": 0.5455,
+   "ft2_nrf_vs_ref": 0.3182,
+   "fusang_multik_vs_ft2_nrf": 0.5455
+  },
+  "ATP8": {
+   "n_taxa": 25,
+   "len_mean_bp": 168.0,
+   "len_range_bp": [
+    168,
+    168
+   ],
+   "aln_len": 168,
+   "indel_gap_fraction": 0.0,
+   "fusang_multik_nrf_vs_ref": 0.6818,
+   "fusang_k5_nrf_vs_ref": 0.7273,
+   "fusang_k7_nrf_vs_ref": 0.6818,
+   "ft2_nrf_vs_ref": 0.6364,
+   "fusang_multik_vs_ft2_nrf": 0.5909
+  },
+  "COX1": {
+   "n_taxa": 25,
+   "len_mean_bp": 1574.2,
+   "len_range_bp": [
+    1548,
+    1596
+   ],
+   "aln_len": 1596,
+   "indel_gap_fraction": 0.0137,
+   "fusang_multik_nrf_vs_ref": 0.4091,
+   "fusang_k5_nrf_vs_ref": 0.5909,
+   "fusang_k7_nrf_vs_ref": 0.4091,
+   "ft2_nrf_vs_ref": 0.1818,
+   "fusang_multik_vs_ft2_nrf": 0.3636
+  },
+  "COX2": {
+   "n_taxa": 25,
+   "len_mean_bp": 691.0,
+   "len_range_bp": [
+    691,
+    691
+   ],
+   "aln_len": 691,
+   "indel_gap_fraction": 0.0,
+   "fusang_multik_nrf_vs_ref": 0.5455,
+   "fusang_k5_nrf_vs_ref": 0.5909,
+   "fusang_k7_nrf_vs_ref": 0.5909,
+   "ft2_nrf_vs_ref": 0.2727,
+   "fusang_multik_vs_ft2_nrf": 0.4545
+  },
+  "COX3": {
+   "n_taxa": 25,
+   "len_mean_bp": 784.6,
+   "len_range_bp": [
+    784,
+    786
+   ],
+   "aln_len": 786,
+   "indel_gap_fraction": 0.0018,
+   "fusang_multik_nrf_vs_ref": 0.6364,
+   "fusang_k5_nrf_vs_ref": 0.6818,
+   "fusang_k7_nrf_vs_ref": 0.6364,
+   "ft2_nrf_vs_ref": 0.5455,
+   "fusang_multik_vs_ft2_nrf": 0.3182
+  },
+  "CYTB": {
+   "n_taxa": 25,
+   "len_mean_bp": 1140.4,
+   "len_range_bp": [
+    1131,
+    1142
+   ],
+   "aln_len": 1142,
+   "indel_gap_fraction": 0.0014,
+   "fusang_multik_nrf_vs_ref": 0.5909,
+   "fusang_k5_nrf_vs_ref": 0.6364,
+   "fusang_k7_nrf_vs_ref": 0.6364,
+   "ft2_nrf_vs_ref": 0.3636,
+   "fusang_multik_vs_ft2_nrf": 0.5
+  }
+ },
+ "summary": {
+  "fusang_multik_nrf_vs_ref": {
+   "mean": 0.535,
+   "sd": 0.1131,
+   "median": 0.5455,
+   "min": 0.2727,
+   "max": 0.6818
+  },
+  "fusang_k5_nrf_vs_ref": {
+   "mean": 0.6014,
+   "sd": 0.1069,
+   "median": 0.5909,
+   "min": 0.4091,
+   "max": 0.7273
+  },
+  "fusang_k7_nrf_vs_ref": {
+   "mean": 0.5315,
+   "sd": 0.1356,
+   "median": 0.5455,
+   "min": 0.2727,
+   "max": 0.7273
+  },
+  "ft2_nrf_vs_ref": {
+   "mean": 0.3322,
+   "sd": 0.1754,
+   "median": 0.3182,
+   "min": 0.0455,
+   "max": 0.6364
+  },
+  "fusang_multik_vs_ft2_nrf": {
+   "mean": 0.451,
+   "sd": 0.1265,
+   "median": 0.4545,
+   "min": 0.2273,
+   "max": 0.7273
+  }
+ },
+ "n_genes": 13,
+ "n_taxa_per_gene": 25,
+ "reference": "Fischer et al. 2013 whole-mitogenome tree (AFproject fish_mito)",
+ "scoring": "ete3 Tree.compare unrooted=True, norm_rf (max_rf=2(n-3))"
+}

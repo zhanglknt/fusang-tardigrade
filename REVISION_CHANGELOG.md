@@ -1,5 +1,79 @@
 # Revision Changelog (internal record, not for submission)
 
+## v3.0 (2026-10-09) — tool-paper reframing + gene-length DNA benchmark + code-doc consistency
+
+Three NAR chance-raising actions executed (user directive "1/2/3都做"), plus
+code-vs-manuscript mismatches discovered by the docs pass and fixed.
+
+### 1. Narrative reframing: evaluation paper -> tool paper (done in v2.9+ session)
+
+- Abstract restructured tool-first (capabilities lead: automatic parameter
+  selection, multi-k ensemble without k choice, boundary classifier domain
+  map, pre-compiled Windows/Linux binaries); 237 words <= 250 limit.
+- Introduction contributions recast as twofold: (i) systematic evaluation,
+  (ii) delivery as a ready-to-use open-source tool.
+- Discussion opening tool-framed; Keywords += "phylogenetic software".
+- Zero quantitative claims changed.
+
+### 2. NEW: gene-length real-DNA benchmark (closes the declared Limitations gap)
+
+- 13 mitochondrial protein-coding genes (ND1-6, ND4L, COX1-3, ATP6/8, CYTB;
+  168-1,866 bp, 5/13 in the 500-1,000 bp band) extracted from the same 25
+  fish genomes (NCBI eutils GenBank fetch, Biopython CDS extraction, 13/13
+  genes x 25/25 genomes, no missing data).
+- Methods: Fusang k-mer cosine (k=5, k=7, multi-k mean of k=5,7,9; BioPython
+  NJ) vs MAFFT --auto + FastTree2 -nt -gtr -nosupport anchor; ETE3 unrooted
+  nRF scored vs Fischer et al. 2013 reference AND Fusang-vs-FT2 agreement.
+- Results (gene_dna_results.json, independently recomputed from per-gene
+  rows): multik vs FT2 = 0.451+-0.127 (key methodological evidence);
+  FT2 vs ref = 0.332+-0.175 (gene-tree discordance dominates); multik vs
+  ref = 0.535+-0.113, k=7 = 0.532+-0.136, k=5 = 0.601+-0.107.
+- Length dependence: >=1 kb loci Fusang-vs-FT2 mean 0.37 (n=5); three
+  shortest loci (ATP8 168, ND4L 297, ND3 350 bp) mean 0.59, poor for both
+  method families. Per-locus gap fractions 0-1.7% (low-indel regime,
+  complementary to Table 12).
+- Manuscript: new Results subsection "Gene-length validation on real DNA:
+  13 mitochondrial loci" + Supplementary Table S17 entry + Limitations gap
+  closure + future-work item (2) updated.
+- CROSS-VALIDATION NOTE: worker's initial summary numbers (0.462/0.480/
+  0.556/0.562 for "k=5,gap2" and "k5cont" variants, "9 of 13 in band",
+  "multi-k best variant") were NOT supported by the archived JSON (actual
+  saved variants: k=5, k=7, multi-k; 5/13 in band; k=7 marginally better
+  than multi-k vs ref). Manuscript cites only artifact-verified numbers;
+  GENE_DNA_BENCHMARK.md interpretation point 3 and band count corrected.
+
+### 3. Online documentation (docs-worker)
+
+- README.md rewritten (old README had fabricated CLI flags `-k 5 -g 2`;
+  verified real params: `--kmer_k --kmer_gap {none,gap1..gap4}
+  --tree_method {nj,fastme}`).
+- docs/TUTORIAL.md + docs/EXAMPLES.md created; multi-k usage documented as
+  `python fusang_v4_dahp_v1.py sequences.fasta --v3 --output tree.nwk`.
+
+### 4. Code-vs-manuscript consistency fixes (discovered by docs pass, verified)
+
+1. **SIMPLE_THRESHOLD=500 (code) vs 1000 (manuscript)**: fusang_v2.py:1263
+   `SIMPLE_THRESHOLD = 500  # Reverted - 2000 caused regression (0.0878 ->
+   0.1073)`; code comment records empirical basis (seeds 401-405, n=1000:
+   DCM nRF=0.084 vs simplified 0.092). Manuscript corrected in 6 places:
+   Methods heading + adaptive paragraph, Results adaptive paragraph, Table
+   11 caption ("simplified pipeline for all n<=1000 timing runs, DCM at
+   n=10,000"), Discussion recommendation, Limitations threshold note
+   (removes stale "derived from DCM degradation analysis; transition-zone
+   comparison not performed" — a direct n=1000 comparison DOES exist).
+2. **GitHub repo URL**: manuscript Data Availability + CITATION.cff +
+   submission/README.md said `fusang-dev/fusang-tardigrade`; actual remote
+   (git remote -v) is `zhanglknt/fusang-tardigrade`. All three fixed.
+   (Legacy/backup manuscript copies retain the old URL — superseded.)
+3. **CITATION.cff authors**: were Zhang Li / Wang Xiaowo / Li Yixue (v1
+   paper authors); corrected to manuscript authors Lei Kong (first) +
+   Li Zhang (corresponding) with manuscript affiliations; title updated to
+   k-mer-frequency-vector framing.
+
+### Footer
+
+- Word count updated: ~11,400 -> ~12,000 (main text, excl tables/legends).
+
 ## v2.9 (2026-10-09) — v4 expert-panel review fixes (4 reviewers, all Minor Revision)
 
 Resolves all Major and Minor items from the fourth blind-review round

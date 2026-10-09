@@ -1,0 +1,93 @@
+{
+ "ND1": {
+  "n": 25,
+  "len_min": 975,
+  "len_max": 975,
+  "len_mean": 975.0,
+  "missing": []
+ },
+ "ND2": {
+  "n": 25,
+  "len_min": 1045,
+  "len_max": 1047,
+  "len_mean": 1045.8,
+  "missing": []
+ },
+ "ND3": {
+  "n": 25,
+  "len_min": 349,
+  "len_max": 352,
+  "len_mean": 349.8,
+  "missing": []
+ },
+ "ND4": {
+  "n": 25,
+  "len_min": 1380,
+  "len_max": 1381,
+  "len_mean": 1380.9,
+  "missing": []
+ },
+ "ND4L": {
+  "n": 25,
+  "len_min": 297,
+  "len_max": 297,
+  "len_mean": 297.0,
+  "missing": []
+ },
+ "ND5": {
+  "n": 25,
+  "len_min": 1837,
+  "len_max": 1866,
+  "len_mean": 1840.0,
+  "missing": []
+ },
+ "ND6": {
+  "n": 25,
+  "len_min": 519,
+  "len_max": 531,
+  "len_mean": 522.1,
+  "missing": []
+ },
+ "ATP6": {
+  "n": 25,
+  "len_min": 683,
+  "len_max": 684,
+  "len_mean": 683.4,
+  "missing": []
+ },
+ "ATP8": {
+  "n": 25,
+  "len_min": 168,
+  "len_max": 168,
+  "len_mean": 168.0,
+  "missing": []
+ },
+ "COX1": {
+  "n": 25,
+  "len_min": 1548,
+  "len_max": 1596,
+  "len_mean": 1574.2,
+  "missing": []
+ },
+ "COX2": {
+  "n": 25,
+  "len_min": 691,
+  "len_max": 691,
+  "len_mean": 691.0,
+  "missing": []
+ },
+ "COX3": {
+  "n": 25,
+  "len_min": 784,
+  "len_max": 786,
+  "len_mean": 784.6,
+  "missing": []
+ },
+ "CYTB": {
+  "n": 25,
+  "len_min": 1131,
+  "len_max": 1142,
+  "len_mean": 1140.4,
+  "missing": []
+ }
+}

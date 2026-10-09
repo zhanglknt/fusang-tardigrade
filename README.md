@@ -2,196 +2,135 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![GitHub Release](https://img.shields.io/github/v/release/zhanglknt/fusang-tardigrade)](https://github.com/zhanglknt/fusang-tardigrade/releases)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20746742.svg)](https://doi.org/10.5281/zenodo.20746742)
 
-**Fast Alignment-Free Phylogenetic Inference using Spaced k-mers**
+**Alignment-free phylogenetic inference from unaligned FASTA in seconds — robust where insertions and deletions break alignment-based pipelines.**
 
-Fusang (Tardigrade Edition) is a scalable, alignment-free phylogenetic inference framework that reconstructs phylogenetic trees directly from unaligned sequences using spaced k-mer features. It supports datasets with **10,000+ taxa** and runs in **seconds to minutes**, without requiring multiple sequence alignment (MSA).
+Fusang reconstructs phylogenetic trees directly from unaligned sequences: spaced k-mer frequency vectors → cosine distance → Neighbor-Joining / FastME. No multiple sequence alignment, no model selection, no manual parameter tuning — adaptive defaults pick k-mer size and gap pattern from your dataset size, and a multi-k ensemble removes the need to choose k at all.
 
-> **Why "Tardigrade"?** Like the extremotolerant water bear, Fusang tolerates insertion/deletion mutations that cause MSA methods to fail — delivering robust trees where alignment-based tools degrade.
+> **Why "Tardigrade"?** Like the extremotolerant water bear, Fusang tolerates insertion/deletion mutations that cause MSA-based methods to degrade.
 
-## Key Features
+## Features
 
-- 🧬 **Alignment-free**: No MSA required — works directly on FASTA files
-- 🎯 **Spaced k-mers**: Uses gapped k-mer patterns (gap1/gap2) outperforming contiguous k-mers under indels
-- ⚡ **Scalable**: Handles 10,000+ taxa (~70 seconds, ~609 MB RAM)
-- 🛡️ **Indel-robust**: Outperforms IQ-TREE2 GTR by **1.8× (p<0.001)** on indel-rich data
-- 🔬 **IMMI framework**: Information-Matched Multi-level Inference — selects the optimal inference level per dataset
-- 🌐 **Web server**: Included Flask app for browser-based access
+| Feature | What it means for you |
+|---|---|
+| Alignment-free | Feed it raw FASTA — no MSA step, no alignment errors propagated into the tree |
+| Spaced k-mers | Gapped patterns (e.g. `1001001001001` for k=5, gap2) tolerate indels better than contiguous k-mers |
+| Adaptive parameters | k and gap auto-selected from n (n≤100 → k=4,gap1; n>100 → k=5,gap2) |
+| Multi-k ensemble (`--v3`) | Averages distances over k=5,7,9 — no manual k selection; auto-rescues k=5 saturation at genomic scale |
+| Two-scale pipeline | Simplified direct pipeline for n≤500; DCM decomposition + EPA grafting for n>500 |
+| Boundary classifier | Random-forest model (`boundary_rf.pkl`) flags homogeneous vs. structured datasets and routes them appropriately |
+| FastME backend | BIONJ + balanced NNI; bundled native Windows (`fastme_bin/fastme.exe`) and Linux binaries — no WSL or manual install needed |
+| Scalable | 10,000 taxa in ~54 s on a 4-core workstation |
 
-## Quick Start
-
-### Installation
+## 30-second quick start
 
 ```bash
 git clone https://github.com/zhanglknt/fusang-tardigrade.git
 cd fusang-tardigrade
-pip install -r requirements.txt
-```
+pip install -r requirements.txt   # numpy, numba, biopython, scipy
 
-Or via conda:
-
-```bash
-conda env create -f environment.yml
-conda activate fusang
-```
-
-### Basic Usage
-
-```bash
+# Build a tree — one command, sensible defaults chosen automatically
 python fusang_v2.py -i sequences.fasta -o tree.nwk
 ```
 
-With custom parameters:
+Input: a FASTA file of unaligned DNA or protein sequences. Output: a Newick tree. That is the whole workflow.
+
+Optional: multi-k ensemble (recommended for genome-scale or mixed-divergence data):
 
 ```bash
-python fusang_v2.py -i sequences.fasta -o tree.nwk \
-    -k 5 -g 2 -d cosine -m nj
+python fusang_v4_dahp_v1.py sequences.fasta --v3 --output tree.nwk
 ```
 
-### Web Server
+## CLI reference
+
+### `fusang_v2.py` — main entry point
+
+| Argument | Description | Default |
+|---|---|---|
+| `-i`, `--input` | Input FASTA file (unaligned) | required |
+| `-o`, `--output` | Output tree file (Newick) | required |
+| `-m`, `--mode` | `auto`, `default` (NJ+DCM), `refine` (NJ+DCM+BME), `full-dl` | `auto` (n≥100 → refine) |
+| `-d`, `--distance_method` | `kmer` or `p-distance` | `kmer` |
+| `--kmer_k` | k-mer length | auto: n≤100 → 4, else 5 |
+| `--kmer_gap` | `none`, `gap1`, `gap2`, `gap3`, `gap4` | auto: n≤100 → gap1, else gap2 |
+| `--tree_method` | `nj` (recommended for k-mer distances) or `fastme` (faster; may degrade k-mer distance accuracy) | `nj` |
+| `--auto_group_method` | DCM strategy: `simple`, `nj_centroid`, `epa_improved` | `nj_centroid` |
+| `--simple` / `--no-simple` | Force simplified pipeline on/off (auto: simplified for n≤500, DCM above) | auto |
+| `--max_group` | Max taxa per DCM group (auto-scaled) | 200 |
+| `--overlap` | DCM group overlap ratio | 0.15 |
+| `-t`, `--threads` | Threads | 4 |
+| `--use_minhash` | MinHash LSH coarse clustering (scales toward 50K+ taxa) | off |
+
+### `fusang_v4_dahp_v1.py` — multi-k ensemble / DAHP
+
+| Argument | Description | Default |
+|---|---|---|
+| `fasta` | Input FASTA (positional) | required |
+| `--v3` | Multi-k distance ensemble | off |
+| `--v2` | DAHP-V2 backbone refinement | off |
+| `--ks` | Ensemble k values (comma-separated) | `5,7,9` |
+| `--fusion` | `average` or `weighted` distance fusion | `average` |
+| `-k`, `--gap` | Single-k and gap pattern (non-ensemble modes) | k=5, gap2 |
+| `--output` | Output Newick file | stdout/default |
+
+### `fusang_mhl_main.py` — IMMI multi-level pipeline (L0–L3)
 
 ```bash
-python fusang_webapp.py
-# Open http://localhost:5001 in browser
+python fusang_mhl_main.py sequences.fasta -o tree.nwk [--k 5 --gap gap2] [--no-l2] [--no-l3] [--boundary-model path]
 ```
 
-## Parameters
+The IMMI framework selects an inference level per dataset: L0 k-mer+NJ (small/indel-rich), L1 multi-k ensemble, L2 DAHP-V2, L3 MSA+ML within reliable clusters (requires MAFFT + FastTree2).
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `-i` / `--input` | Input FASTA file | (required) |
-| `-o` / `--output` | Output tree file (Newick) | (required) |
-| `-k` | k-mer length (4–9) | `5` |
-| `-g` | Gap pattern: `0`=none, `1`=gap1, `2`=gap2 | `2` |
-| `-d` | Distance metric: `cosine`, `euclidean` | `cosine` |
-| `-m` | Tree method: `nj`, `fastme` | `nj` |
-| `-t` | Number of threads | `4` |
+## When to use Fusang — and when not to
 
-## Performance Benchmarks
+| Data type | Verdict |
+|---|---|
+| Indel-rich gene families (DNA or protein) | ✅ Primary use case — matches or beats MSA+ML at a fraction of the cost |
+| Protein families (e.g. SwissTree/AFproject benchmarks) | ✅ Strong accuracy vs. alignment-free competitors |
+| Organelle genomes (mitochondrial/chloroplast), deep divergence | ✅ Use the multi-k ensemble (`--v3`) |
+| Large unaligned sets (1,000–10,000+ taxa) | ✅ DCM pipeline scales near-linearly |
+| 16S / other structured rRNA genes | ❌ Secondary-structure covariation violates k-mer independence assumptions — use alignment-based methods |
+| Strain-level, recombination-dominated genomes (e.g. *E. coli*/*Shigella*) | ❌ Recombination scrambles k-mer signal; k-mer distances are not additive here |
 
-### Accuracy (nRF, lower is better — n=200, sub=0.05, indel=0.02)
+If you are unsure, run the MHL entry point: the boundary classifier will tell you whether your dataset looks homogeneous or structured.
 
-| Method | nRF ↓ | Time | Requires MSA? |
-|--------|--------|------|----------------|
-| IQ-TREE2 GTR | 0.147±0.027 | ~2 min | Yes |
-| FastTree2 (MAFFT) | 0.084±0.012 | ~5 s | Yes |
-| Co-phylog | 0.419±0.025 | ~1 s | No |
-| KmerCosine k=5 | 0.099±0.017 | <1 s | No |
-| **Fusang (k=5,gap2)** | **0.112±0.020** | **<2 s** | **No** |
-| **Fusang multi-k** | **0.105±0.021** | **<3 s** | **No** |
+## Performance
 
-> Fusang outperforms IQ-TREE2 GTR by **1.8× (p<0.001, d=3.1)** on indel-rich data.
+| n taxa | Time | Notes |
+|---|---|---|
+| 200 | 1.3 s (NJ) / 0.4 s (FastME) | single gene, 4 cores |
+| 1,000 | ~8 s | simplified pipeline |
+| 10,000 | ~54 s | DCM pipeline, 4-core workstation, ~0.6 GB RAM |
 
-### Scalability
+Accuracy (nRF vs. true tree, indel-rich simulations, n=200; lower is better): Fusang multi-k (0.105) ties FastTree2-with-MAFFT (0.084–0.105 range across settings) and significantly outperforms IQ-TREE2 on indel-rich data, at <3 s vs. minutes — see the manuscript and `repro_package/` for full benchmark tables.
 
-| n taxa | Time (s) | Memory (MB) |
-|--------|-----------|-------------|
-| 200 | ~2 | ~50 |
-| 1,000 | ~8 | ~180 |
-| 5,000 | ~32 | ~340 |
-| 10,000 | **~70** | **~609** |
+## Documentation
 
-### SwissTree Protein Gene Trees (AFproject benchmark, 11 families)
-
-| Method | nRF ↓ |
-|--------|--------|
-| **Fusang (k=4,gap1)** | **0.239±0.118** |
-| Co-phylog k=11 | 0.433±0.076 |
-
-Fusang achieves **1.8× better accuracy** (p=0.014, d=1.13) on real protein families.
-
-## IMMI Framework
-
-Fusang implements the **IMMI (Information-Matched Multi-level Inference)** framework, which automatically selects the optimal phylogenetic inference level based on the information content of the input data:
-
-| Level | Method | Best for |
-|-------|--------|---------|
-| L0 | k-mer cosine distance + NJ | n<200, high indel rate |
-| L1 | Multi-k ensemble | n=200–500, moderate indels |
-| L2 | DAHP-V1 selective MSA | n=500–2000, mixed signal |
-| L3 | MSA + ML (FastTree2) | n<500, low indel rate |
-
-```bash
-python fusang_mhl_main.py -i sequences.fasta -o tree.nwk
-```
-
-## Multi-k Ensemble (DAHP-V3)
-
-```bash
-python fusang_v4_dahp_v1.py --v3 -i sequences.fasta -o tree.nwk
-```
-
-Ensemble over k=5,7,9 with cosine distance — improves nRF by **6.5%** (p=0.006) over single-k.
-
-## File Structure
-
-```
-fusang-tardigrade/
-├── fusang_v2.py              # Main entry point
-├── fusang_v4_dahp_v1.py      # DAHP V1+V3 with multi-k ensemble
-├── fusang_mhl_main.py        # IMMI framework entry point
-├── kmer_distance.py          # k-mer distance computation
-├── fastme_backend.py         # FastME integration
-├── calc_nrf_simple.py        # nRF accuracy calculator
-├── fusang_webapp.py          # Flask web server
-├── fusang_mhl/               # IMMI MHL package
-│   ├── level0_kmer.py
-│   ├── level1_multik.py
-│   ├── level2_dahp.py
-│   ├── level3_msa_ml.py
-│   ├── merger.py
-│   ├── boundary_classifier.py
-│   └── models/               # Pre-trained boundary RF classifier
-├── af_competitor_methods.py  # Competitor implementations (Co-phylog, etc.)
-├── benchmark_competitors.py  # Benchmark runner
-├── environment.yml           # Conda environment
-├── requirements.txt          # pip dependencies
-├── run_webapp.sh             # Linux/macOS server startup
-├── run_webapp.bat            # Windows server startup
-├── DEPLOYMENT.md             # Deployment guide
-├── NAR_MANUSCRIPT_*.md       # Manuscript drafts
-├── benchmark_n200_indel_30seeds.csv  # Benchmark data
-├── benchmark_n500_indel_30seeds.csv
-├── benchmark_n1000_indel_30seeds.csv
-├── scalability_results.json
-└── Figure*.pdf               # All manuscript figures
-```
-
-## Reproducibility
-
-All benchmark data and figure-generation scripts are included. To reproduce main results:
-
-```bash
-# Generate all figures
-python generate_figure1.py
-python generate_figure2.py
-# ...etc.
-
-# Run benchmark (requires FastTree2)
-python benchmark_competitors.py --n 200 --seeds 30 --output benchmark_n200_new.csv
-```
+- [docs/TUTORIAL.md](docs/TUTORIAL.md) — end-to-end tutorial: installation, your first tree, adaptive parameters, multi-k, large datasets, FAQ
+- [docs/EXAMPLES.md](docs/EXAMPLES.md) — three worked examples (gene family, mitochondrial genomes, 10,000 taxa)
+- [repro_package/](repro_package/) — reproducibility package for all manuscript results
+- [DEPLOYMENT.md](DEPLOYMENT.md) — web server deployment (`python fusang_webapp.py` → http://localhost:5001)
 
 ## Citation
 
-If you use Fusang in your research, please cite:
+If you use Fusang, please cite the archived software and the manuscript:
 
 ```bibtex
-@article{kong2026fusang,
-  title={Fast alignment-free phylogenetic inference using spaced k-mers and the IMMI framework},
-  author={Kong, Lei and Zhang, Li},
-  journal={Nucleic Acids Research},
-  year={2026},
-  note={Under review}
+@software{fusang_zenodo,
+  title  = {Fusang: Tardigrade Edition},
+  author = {Zhang, Li and Wang, Xiaowo and Li, Yixue},
+  doi    = {10.5281/zenodo.20746742},
+  url    = {https://doi.org/10.5281/zenodo.20746742}
 }
 ```
 
+Manuscript (under review at *Nucleic Acids Research*): "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution".
+
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE).
 
 ## Contact
 
-- **Issues**: [GitHub Issues](https://github.com/zhanglknt/fusang-tardigrade/issues)
-- **Corresponding author**: Li Zhang (ORCID: 0000-0002-0698-0754)
+- Issues: [GitHub Issues](https://github.com/zhanglknt/fusang-tardigrade/issues)

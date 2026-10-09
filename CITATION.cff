@@ -1,39 +1,34 @@
 cff-version: 1.2.0
 message: "If you use Fusang: Tardigrade Edition in your research, please cite the following paper."
-title: "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
+title: "Fusang: Tardigrade Edition — K-mer Frequency Vector Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
 authors:
+  - family-names: Kong
+    given-names: Lei
+    affiliation: "School of Life Sciences, Peking University, Beijing, China"
   - family-names: Zhang
     given-names: Li
-    affiliation: "Chinese Academy of Medical Sciences & Peking Union Medical College; Chinese Institute for Brain Research (CIBR), Beijing"
-    orcid: ""
-  - family-names: Wang
-    given-names: Xiaowo
-    affiliation: "Tsinghua University"
-  - family-names: Li
-    given-names: Yixue
-    affiliation: "Chinese Academy of Sciences"
-repository-code: "https://github.com/fusang-dev/fusang-tardigrade"
-url: "https://github.com/fusang-dev/fusang-tardigrade"
-abstract: "Fusang is an alignment-free phylogenetic inference framework leveraging spaced k-mer features for indel-robust tree construction."
+    affiliation: "Institute of Blood Transfusion, Chinese Academy of Medical Sciences and Peking Union Medical College, Chengdu, China; Chinese Institute for Brain Research, Beijing, China"
+repository-code: "https://github.com/zhanglknt/fusang-tardigrade"
+url: "https://github.com/zhanglknt/fusang-tardigrade"
+abstract: "Fusang is an alignment-free phylogenetic inference framework leveraging k-mer frequency vector cosine distances for indel-robust tree construction."
 keywords:
   - phylogenetics
   - alignment-free
-  - spaced-kmer
+  - k-mer frequency vector
+  - cosine distance
   - indel-robust
-  - fastme
+  - multi-k ensemble
 license: MIT
 version: "2.0.0"
 date-released: "2026-06-06"
 preferred-citation:
   type: article
-  title: "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
+  title: "Fusang: Tardigrade Edition — K-mer Frequency Vector Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution"
   authors:
+    - family-names: Kong
+      given-names: Lei
     - family-names: Zhang
       given-names: Li
-    - family-names: Wang
-      given-names: Xiaowo
-    - family-names: Li
-      given-names: Yixue
   journal: Nucleic Acids Research
   year: 2026
   status: under-review

@@ -39,4 +39,4 @@ repro_package_v1.3.zip. See DATA_SOURCES.json for complete data provenance mappi
 ## Contact
 
 Corresponding author: [to be filled]
-GitHub: https://github.com/fusang-dev/fusang-tardigrade
+GitHub: https://github.com/zhanglknt/fusang-tardigrade
