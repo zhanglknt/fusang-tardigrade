@@ -89,24 +89,40 @@ ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'C')
 
-# ---------- D: deployment panel ----------
+# ---------- D: binary discovery cascade schematic ----------
 ax = axes[1][1]
 ax.set_xlim(0, 10); ax.set_ylim(0, 10); ax.axis('off')
-ax.set_title('Cross-platform deployment', fontsize=10.5, color=INK, pad=6)
+ax.set_title('FastME binary discovery cascade', fontsize=10.5, color=INK, pad=6)
 panel_label(ax, 'D')
-rows = [
-    ('Bundled binaries', 'fastme.exe (Windows, 725 KB) + fastme_linux ship with the repo — no compilation'),
-    ('Zero WSL dependency', 'Windows-native FastME (PE32+ x86-64) gives single-command operation on native Windows'),
-    ('Bit-identical results', 'Windows-native binary produces bit-identical trees to the Linux build (FastME v2.1.6.4)'),
-    ('Auto discovery', 'binary search cascade: bundled native exe > WSL install > system PATH'),
-    ('Light stack', 'Python 3.9+ with NumPy / SciPy / Biopython / scikit-learn; MIT license + Zenodo DOI'),
-]
-y = 8.9
-for head, body in rows:
-    ax.text(0.35, y, '\u2713', fontsize=11, color=GREEN, fontweight='bold', va='center')
-    ax.text(0.95, y, head, fontsize=9.5, color=INK, fontweight='bold', va='center')
-    ax.text(0.95, y - 0.62, body, fontsize=8, color=GREY, va='center')
-    y -= 1.75
+
+def node(x, y, w, h, text, fc, tc='white', fs=8.5, ec='none', bold=True):
+    ax.add_patch(FancyBboxPatch((x - w/2, y - h/2), w, h,
+                                boxstyle='round,pad=0.08,rounding_size=0.15', fc=fc, ec=ec, lw=1.5))
+    ax.text(x, y, text, fontsize=fs, color=tc, ha='center', va='center',
+            fontweight='bold' if bold else 'normal')
+
+def arrow(x0, y0, x1, y1, label='', color=INK, ls='-'):
+    ax.annotate('', xy=(x1, y1), xytext=(x0, y0),
+                arrowprops=dict(arrowstyle='-|>', color=color, lw=1.6, linestyle=ls))
+    if label:
+        ax.text((x0 + x1)/2 + 0.35, (y0 + y1)/2, label, fontsize=7.5, color=color,
+                ha='left', va='center')
+
+node(5.0, 9.0, 5.4, 1.0, 'fusang run (Windows or Linux)', INK, fs=9.5)
+node(2.6, 6.9, 4.3, 1.1, '1. bundled native exe?\nfastme.exe / fastme_linux', TEAL, fs=7.8)
+node(7.4, 6.9, 3.2, 1.1, '2. WSL install?\n/usr/local/bin/fastme', BLUE, fs=7.8)
+node(7.4, 4.6, 3.2, 1.1, '3. system PATH?', GREY, fs=8.2)
+node(2.6, 4.6, 3.6, 1.1, 'FastME BIONJ+BNNI\nv2.1.6.4', AMBER, fs=8.5)
+node(2.6, 2.2, 4.4, 1.1, 'bit-identical tree\nWindows = Linux (verified)', GREEN, fs=8.5)
+node(7.4, 2.2, 3.2, 1.1, 'error: install or\nuse --nj fallback', '#dc2626', fs=7.8)
+arrow(4.0, 8.5, 2.9, 7.5)
+arrow(4.4, 6.9, 5.8, 6.9, 'no', GREY, ls='--')
+arrow(7.4, 6.3, 7.4, 5.25, 'no', GREY, ls='--')
+arrow(2.6, 6.3, 2.6, 5.25, 'yes', TEAL)
+arrow(6.2, 6.5, 4.0, 5.0, 'yes', BLUE)
+arrow(6.6, 4.6, 4.5, 4.6, 'yes', GREY)
+arrow(2.6, 4.0, 2.6, 2.85)
+arrow(7.4, 4.0, 7.4, 2.85, 'no', GREY, ls='--')
 
 fig.suptitle('Figure 5. Scalability and cross-platform deployment',
              fontsize=13.5, fontweight='bold', color=INK, y=0.985)

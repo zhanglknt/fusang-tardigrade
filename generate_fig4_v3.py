@@ -75,19 +75,29 @@ ax.text(5.0, 3.55, 'genome scale (>>1 kb): multi-k ensemble', fontsize=9.5, colo
 ax.text(5.0, 2.45, 'k=5 saturates (1,024 possible 5-mers);\nensemble of k=5,7,9 rescues signal — no manual k choice',
         fontsize=8.5, color=INK, ha='center', va='center')
 
-# ---------- C: stability summary ----------
+# ---------- C: adaptive selection step plot (5-repeat stability) ----------
 ax = axes[1][0]
-ax.set_xlim(0, 10); ax.set_ylim(0, 10); ax.axis('off')
-ax.set_title('5-repeat stability validation (Suppl. Table S5)', fontsize=10.5, color=INK, pad=6)
-panel_label(ax, 'C')
 scales = [20, 50, 100, 200, 500]
-for i, n in enumerate(scales):
-    y = 8.2 - i * 1.45
-    ax.text(1.0, y, f'n={n}', fontsize=10, color=INK, fontweight='bold', va='center')
-    ax.text(4.4, y, '5/5 repeats: identical k,gap selection', fontsize=9, color=INK, va='center')
-    ax.text(9.3, y, '\u2713', fontsize=13, color=GREEN, fontweight='bold', ha='center', va='center')
-ax.text(5.0, 0.6, 'nRF deviation across repeats < 0.005 at every scale (100% reproducible)',
-        fontsize=9, color=GREY, ha='center', style='italic')
+sel_k   = [4, 4, 4, 5, 5]   # 5/5 repeats identical at every scale
+sel_gap = [1, 1, 1, 2, 2]
+ax.step(scales, sel_k, where='mid', color=TEAL, lw=2.4, label='selected k')
+ax.plot(scales, sel_k, 'o', color=TEAL, ms=7, mfc='white', mew=2)
+ax.step(scales, sel_gap, where='mid', color=AMBER, lw=2.4, ls='--', label='selected gap')
+ax.plot(scales, sel_gap, 's', color=AMBER, ms=6.5, mfc='white', mew=2)
+for n, k, g in zip(scales, sel_k, sel_gap):
+    ax.annotate(f'k={k},gap{g}', (n, k), textcoords='offset points', xytext=(0, 8),
+                ha='center', fontsize=7.5, color=INK)
+ax.set_xscale('log'); ax.set_xticks(scales)
+ax.set_xticklabels([str(s) for s in scales], fontsize=9)
+ax.set_xlabel('Dataset size n (log scale)', fontsize=9.5, color=INK)
+ax.set_ylabel('Selected parameter value', fontsize=9.5, color=INK)
+ax.set_yticks([1, 2, 3, 4, 5]); ax.set_ylim(0.4, 5.9)
+ax.legend(fontsize=8.5, frameon=False, loc='center right')
+ax.set_title('Adaptive k,gap selection vs n\n5/5 repeats identical; nRF deviation < 0.005',
+             fontsize=10, color=INK, pad=6)
+ax.grid(alpha=0.25)
+for s in ('top', 'right'): ax.spines[s].set_visible(False)
+panel_label(ax, 'C')
 
 # ---------- D: multi-k across seed sets ----------
 ax = axes[1][1]

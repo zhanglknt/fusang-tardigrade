@@ -101,31 +101,45 @@ ax.text(0.02, 0.03, 'Verification rerun on archived tree (73/74 taxa): order 7.3
         transform=ax.transAxes, fontsize=6.8, color=GREY, style='italic')
 panel_label(ax, 'B')
 
-# ---------- C: v1 vs Tardigrade ----------
+# ---------- C: v1 vs Tardigrade architecture evolution (schematic + mini plot) ----------
 ax = fig.add_subplot(gs[1, 0])
 ax.set_xlim(0, 10); ax.set_ylim(0, 10); ax.axis('off')
-ax.set_title('Fusang v1 (2023) vs Tardigrade Edition', fontsize=10.5, color=INK, pad=6)
+ax.set_title('Fusang v1 (2023) \u2192 Tardigrade Edition', fontsize=10.5, color=INK, pad=6)
 panel_label(ax, 'C')
-ax.add_patch(FancyBboxPatch((3.55, 8.6), 2.9, 0.95, boxstyle='round,pad=0.06,rounding_size=0.12',
-                            fc='#e5e7eb', ec='none'))
-ax.text(5.0, 9.07, 'Fusang v1', fontsize=9.5, fontweight='bold', color=GREY, ha='center', va='center')
-ax.add_patch(FancyBboxPatch((6.65, 8.6), 3.2, 0.95, boxstyle='round,pad=0.06,rounding_size=0.12',
-                            fc=TEAL, ec='none'))
-ax.text(8.25, 9.07, 'Tardigrade', fontsize=9.5, fontweight='bold', color='white', ha='center', va='center')
-rows = [
-    ('Representation', 'neural net features', 'k-mer frequency vectors'),
-    ('Scalability', '4-40 taxa', '10,000+ taxa'),
-    ('Speed', 'GPU-dependent', 'CPU-only; 10k taxa < 1 min'),
-    ('Deployment', 'Docker / cloud', 'single script + bundled binary'),
-    ('Indel handling', 'not modelled', 'spaced k-mer sampling'),
-]
-y = 7.7
-for name, v1, v2 in rows:
-    ax.text(0.15, y, name, fontsize=8.5, fontweight='bold', color=INK, va='center')
-    ax.text(3.7, y, v1, fontsize=8.2, color=GREY, va='center')
-    ax.text(6.8, y, v2, fontsize=8.2, color=INK, va='center', fontweight='bold')
-    ax.plot([0.1, 9.9], [y - 0.75, y - 0.75], color='#e5e7eb', lw=0.8)
-    y -= 1.45
+
+def pipe(y0, title, tcol, steps, scol):
+    ax.text(0.35, y0 + 1.55, title, fontsize=9, fontweight='bold', color=tcol, va='center')
+    w = 2.05
+    for i, s in enumerate(steps):
+        x = 0.4 + i * (w + 0.42)
+        ax.add_patch(FancyBboxPatch((x, y0), w, 1.15,
+                                    boxstyle='round,pad=0.06,rounding_size=0.12',
+                                    fc=scol, ec='none'))
+        ax.text(x + w/2, y0 + 0.57, s, fontsize=6.8, color='white', ha='center',
+                va='center', fontweight='bold')
+        if i < len(steps) - 1:
+            ax.annotate('', xy=(x + w + 0.38, y0 + 0.57), xytext=(x + w + 0.04, y0 + 0.57),
+                        arrowprops=dict(arrowstyle='-|>', color=INK, lw=1.3))
+
+pipe(7.9, 'v1: deep learning', GREY,
+     ['unaligned\nsequences', 'CNN feature\nextractor\n(pre-trained)', 'distance\ninference', 'tree\n(\u226440 taxa)'], '#9ca3af')
+pipe(5.1, 'Tardigrade: k-mer frequency vectors', TEAL,
+     ['unaligned\nsequences', 'spaced k-mer\nfrequency\nvectors', 'cosine\ndistance', 'NJ / FastME\n(10,000+ taxa)'], TEAL)
+ax.annotate('', xy=(5.0, 7.15), xytext=(5.0, 7.75),
+            arrowprops=dict(arrowstyle='-|>', color=AMBER, lw=2.2))
+ax.text(9.75, 7.45, 're-architecture:\nno GPU, no training, no Docker', fontsize=7.5,
+        color=AMBER, va='center', ha='right', fontweight='bold')
+
+# mini bar plot: scalability ceiling (log scale)
+axb = ax.inset_axes([0.16, 0.02, 0.5, 0.32])
+axb.bar([0, 1], [40, 10000], color=['#9ca3af', TEAL], width=0.5)
+axb.set_xticks([0, 1]); axb.set_xticklabels(['v1', 'Tardigrade'], fontsize=7.5)
+axb.set_yscale('log'); axb.set_ylim(10, 60000)
+for i, v in enumerate([40, 10000]):
+    axb.text(i, v * 1.6, f'{v:,}', ha='center', fontsize=7.5, color=INK, fontweight='bold')
+axb.set_title('max dataset size (taxa, log scale)', fontsize=7.5, color=INK)
+axb.tick_params(labelsize=7)
+for s in ('top', 'right'): axb.spines[s].set_visible(False)
 
 # ---------- D: gene-length scatter ----------
 ax = fig.add_subplot(gs[1, 1])
