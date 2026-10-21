@@ -256,16 +256,16 @@ Three findings emerge from the multi-seed Mash benchmark (n=30, Mash v2.3, k=21,
 
 The accuracy ranking between Fusang and MSA-based methods changes under indels (Figure 1). On clean data, MSA methods hold a marginal advantage. As indel rate increases, MSA accuracy degrades systematically while Fusang's alignment-free distances remain more robust. The Fusang advantage grows monotonically with indel rate: from tie at 0.005 to a 13.2% advantage at indel=0.05 (Table 3). At the biologically realistic indel rate of 0.02, Fusang significantly outperforms FastTree2 (TRUE-relative nRF: Fusang 0.122 ± 0.024 vs FastTree2 0.134 ± 0.022, 130 seeds, paired Wilcoxon p=3.5×10⁻⁷).
 
-**Table 3. Indel rate scan: Fusang vs FastTree2 (n=200, L=500 bp; indel rates 0.005, 0.01 and 0.02 use 130 seeds 100–229, 0.05 uses 30 seeds pending completion of the 130-seed scan). All nRF values are TRUE-relative (vs simulated ground-truth tree).**
+**Table 3. Indel rate scan: Fusang vs FastTree2 (n=200, L=500 bp; all four indel rates use 130 seeds 100–229). All nRF values are TRUE-relative (vs simulated ground-truth tree).**
 
 | Indel Rate | Fusang nRF ↓ (TRUE-rel) | FastTree2 nRF ↓ (TRUE-rel) |
 |------------|------------------------|----------------------------|
-| 0.005 | 0.137 | 0.141 |
+| 0.005 | 0.138 | 0.141 |
 | 0.01 | 0.133 | 0.138 |
 | 0.02 | **0.122** | 0.134 |
-| 0.05 | **0.066** | 0.076 |
+| 0.05 | **0.112** | 0.131 |
 
-Both columns are TRUE-relative and directly comparable per seed. The Fusang advantage over FastTree2 grows monotonically in magnitude with indel rate — +2.3% at 0.005 (129 valid seeds, Wilcoxon p=0.222, n.s.), +3.3% at 0.01 (130 seeds, p=0.052, borderline), +9.0% at 0.02 (130 seeds, p=3.5×10⁻⁷, significant) and +13.2% at 0.05 (30 seeds) — becoming statistically significant only from indel rate 0.02 upward (calculated as (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%). An independent pipeline-level validation under a coalescent simulation protocol is reported below (single-k NJ: nRF=0.743, multi-k NJ: nRF=0.583), where absolute nRF values are higher for all methods.
+Both columns are TRUE-relative and directly comparable per seed. The Fusang advantage over FastTree2 grows monotonically in magnitude with indel rate — +2.2% at 0.005 (Wilcoxon p=0.253, n.s.), +3.3% at 0.01 (p=0.052, borderline), +9.0% at 0.02 (p=3.5×10⁻⁷) and +14.4% at 0.05 (p=3.8×10⁻¹², Fusang better in 98/130 seeds) — becoming statistically significant from indel rate 0.02 upward (calculated as (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%). All four rows use 130/130 valid seeds (no outlier exclusions). An independent pipeline-level validation under a coalescent simulation protocol is reported below (single-k NJ: nRF=0.743, multi-k NJ: nRF=0.583), where absolute nRF values are higher for all methods.
 
 The Fusang advantage increases with indel rate across the tested range (0.005–0.05). At indel=0.05, Fusang achieves a 13.2% relative advantage (nRF 0.066 vs 0.076), while at biologically typical rates (0.01–0.02) the advantage is modest (+4.5–5.9%). Real biological indel rates typically fall in the 0.01–0.05 range [27,28] — a regime where Fusang's robustness provides measurable benefit. The monotonic trend suggests Fusang's advantage may further increase at higher indel rates (>0.05), though phylogenetic signal eventually degrades for all methods.
 
@@ -768,7 +768,7 @@ Email: knightz@pumc.edu.cn
 
 ## FIGURE LEGENDS
 
-**Figure 1.** Indel robustness advantage. (A) nRF vs indel rate for Fusang (simplified pipeline, k=5,gap2) and FastTree2 at n=200 (Table 3 values). (B) Relative Fusang advantage over FastTree2, growing monotonically from tie at indel=0.005 to 13.2% at indel=0.05. (C) Conceptual illustration: spaced k-mers (green) skip over small indels while contiguous k-mers (red) are disrupted by length variation. (D) Method comparison at indel rate=0.02 (nRF vs true simulated tree, mean ± SD): Fusang (0.122±0.024, 130 seeds), FastTree2 (0.134±0.022, 130 seeds), IQ-TREE2 GTR (0.231±0.032, 130 seeds), Mash (0.762±0.036, 30 seeds).
+**Figure 1.** Indel robustness advantage. (A) nRF vs indel rate for Fusang (simplified pipeline, k=5,gap2) and FastTree2 at n=200 (Table 3 values). (B) Relative Fusang advantage over FastTree2, growing monotonically from +2.2% at indel=0.005 to +14.4% at indel=0.05 (130 seeds per rate, Table 3). (C) Conceptual illustration: spaced k-mers (green) skip over small indels while contiguous k-mers (red) are disrupted by length variation. (D) Method comparison at indel rate=0.02 (nRF vs true simulated tree, mean ± SD): Fusang (0.122±0.024, 130 seeds), FastTree2 (0.134±0.022, 130 seeds), IQ-TREE2 GTR (0.231±0.032, 130 seeds), Mash (0.762±0.036, 30 seeds).
 
 **Figure 2.** 130-seed statistical benchmark. (A) Violin plots of nRF distributions for the Fusang simplified pipeline and FastTree2 on n=200 indel data (indel rate=0.02; all 130 seeds valid, none exceeding the nRF>0.3 threshold), with per-seed points overlaid. (B) Sorted per-seed paired differences (FT2 − Fusang; positive = Fusang better); observed range [−0.038, 0.069], Fusang better in 91/130 seeds. (C) Cumulative win rate across the seed set, converging to 91/130 (70.0%). (D) Histogram of paired differences (FT2 − Fusang); Wilcoxon p=3.5×10⁻⁷, paired Cohen's d=+0.51.
 
