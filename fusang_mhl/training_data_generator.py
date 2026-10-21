@@ -368,6 +368,7 @@ def generate_training_sample(
     verbose: bool = False,
     is_structured: bool = False,
     clade_threshold: float = 0.01,
+    max_sub: int = 15,
 ) -> List[Dict]:
     """Generate training samples from one simulated tree.
 
@@ -468,10 +469,10 @@ def generate_training_sample(
                 print(f"  [train] Cluster sampling error: {e}", file=sys.stderr)
             continue
 
-    # V4 FIX: Limit sub-cluster samples to 15 per tree (was unlimited)
+    # V4 FIX: Limit sub-cluster samples to `max_sub` per tree (was unlimited)
     # This makes whole-tree samples ~6% → ~30% of total
-    if len(all_cluster_samples) > 15:
-        idx = rng.choice(len(all_cluster_samples), size=15, replace=False)
+    if len(all_cluster_samples) > max_sub:
+        idx = rng.choice(len(all_cluster_samples), size=max_sub, replace=False)
         all_cluster_samples = [all_cluster_samples[i] for i in idx]
 
     samples.extend(all_cluster_samples)
@@ -516,6 +517,7 @@ def generate_training_data(
     indelible_dir: Optional[str] = None,
     failures: Optional[List[Dict]] = None,
     config_indices: Optional[List[int]] = None,
+    max_sub: int = 15,
 ) -> List[Dict]:
     """Generate training data for boundary classifier.
 
@@ -596,6 +598,7 @@ def generate_training_data(
                     verbose=False,
                     is_structured=is_structured,
                     clade_threshold=clade_threshold,
+                    max_sub=max_sub,
                 )
                 all_samples.extend(samples)
 

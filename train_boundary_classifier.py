@@ -10,7 +10,10 @@ import sys
 import os
 import argparse
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# The repo root (this file's directory), NOT its parent -- the parent does not
+# contain the `fusang_mhl` package, which made `import fusang_mhl` fail when the
+# script was run directly.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
