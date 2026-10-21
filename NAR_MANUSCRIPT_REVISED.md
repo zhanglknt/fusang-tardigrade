@@ -395,14 +395,14 @@ Systematic parameter scanning (k=3–8, gap=0–4, n=20–1000) revealed a robus
 
 | n | Adaptive (k,gap) | Fusang nRF (clean) | FT2 nRF (clean) | Notes |
 |---|:---:|------------|----------|-------|
-| 50 | 4,gap1 | 0.102 ± 0.020 | 0.095 ± 0.018 | Comparable |
+| 50 | 4,gap1 | 0.167 ± 0.046 | 0.167 ± 0.046 | Comparable (clean, p=0.935) § |
 | 100 | 5,gap2 | 0.115 ± 0.022 | 0.098 ± 0.016 | FT2 better |
 | 200 | 5,gap2 | 0.144 ± 0.025 | 0.146 ± 0.025 | Comparable (clean, p=0.242) |
 | 200 | 5,gap2 | **0.122 ± 0.024** | 0.134 ± 0.022 | Fusang better (indel, p=3.5×10⁻⁷) ‡ |
 | 500 | 5,gap2 | 0.147 ± 0.014 | **0.139 ± 0.011** | FT2 better (clean, p=0.004) |
 | 1000 | 5,gap2 | 0.115 ± 0.011 | **0.091 ± 0.010** | FT2 better (clean) |
 
-**Notes**: For n<1000, Notes column indicates which method performs better and the p-value when significant. For n=1000, "Simplified" indicates that the simplified pipeline (k-mer→cosine→NJ plus BME-scored NNI refinement for n≥100) was used rather than DCM+EPA; the winner is still FastTree2 on clean data. See Supplementary Table S6 for complete n=1000 benchmark results (30 seeds, both clean and indel conditions). ‡ Row values are from the 130-seed benchmark (seeds 100–229; all seeds valid, no outlier exclusion), paired Wilcoxon p=3.5×10⁻⁷ (Table 3).
+**Notes**: For n<1000, Notes column indicates which method performs better and the p-value when significant. For n=1000, "Simplified" indicates that the simplified pipeline (k-mer→cosine→NJ plus BME-scored NNI refinement for n≥100) was used rather than DCM+EPA; the winner is still FastTree2 on clean data. See Supplementary Table S6 for complete n=1000 benchmark results (30 seeds, both clean and indel conditions). ‡ Row values are from the 130-seed benchmark (seeds 100–229; all seeds valid, no outlier exclusion), paired Wilcoxon p=3.5×10⁻⁷ (Table 3). § n=50 row: 130-seed INDELible clean benchmark (seeds 100–229) measured at the benchmark configuration k=5,gap2 (the Adaptive column shows what the parameter selector would choose); 3/130 seeds exceeded the symmetric nRF>0.3 outlier threshold (seeds 126, 175, 185) and were excluded (n=127; inclusion of all 130 seeds does not change the conclusion, p=0.947).
 
 On indel-rich data (indel rate=0.02), the optimal gap shifts slightly: gap3 provides a modest 10.5% improvement over gap2 at n=200 (nRF=0.043 vs 0.048, Supplementary Table S2), attributed to wider spacing better tolerating indel-induced length variation. However, the absolute improvement is small, and k=5,gap2 remains a robust default within 10% of the empirical optimum across all tested conditions.
 
