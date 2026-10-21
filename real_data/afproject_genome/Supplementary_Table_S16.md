@@ -58,6 +58,7 @@
 | K-mer cosine | k=11 contiguous | 0.5000 | 24/48 |  |
 | K-mer cosine | k=13 contiguous | 0.5000 | 24/48 |  |
 | Mash | k=21, s=10000 | 0.2083 | 10/48 | 0.12 |
+| kmacs | k=3 | 0.5417 | 26/48 |  |
 | andi | published | — | — | 0.08 |
 | Co-phylog (original binary) | published | — | — | 0.08 |
 | phylonium | published | — | — | 0.08 |
@@ -78,4 +79,6 @@ E. coli/Shigella: NC_011742, NC_007779, NC_011750, NC_008563, NC_010468, NC_0117
 - kmacs and Mash are original binaries; Co-phylog is the Python reimplementation used throughout this work (Supplementary Note S4).
 - k-mer cosine on E. coli/Shigella used forward-strand k-mers (consistent with all other benchmarks in this work), computed via 64-bit rolling hashes.
 - MAFFT+FastTree2 on WSL2 Ubuntu-24.04. Gap fractions measured on MAFFT --auto alignments.
-- Data generated 2026-10-09; scripts: real_data/afproject_genome/{fish_mito_suite,ecoli_shigella_suite,ete3_scoring}.py, run logs and distance matrices included in the reproducibility package.- kmacs (k=3) on E. coli/Shigella (27 x ~4.6 Mb, single-threaded) did not complete within our compute budget (>40 min without output) and is therefore not reported for that dataset.
+- Data generated 2026-10-09; scripts: real_data/afproject_genome/{fish_mito_suite,ecoli_shigella_suite,ete3_scoring}.py, run logs and distance matrices included in the reproducibility package.
+
+- kmacs (k=3) on E. coli/Shigella (27 x ~4.6 Mb, single-threaded) is reported above (nRF=0.5417, 26/48 splits). An earlier attempt produced no output after >40 min; the run that ultimately produced `wsl_out/ecoli_kmacs_k3.dmat` / `ecoli_kmacs_k3.nwk` was left running overnight and was **not instrumented**, so no precise wall-clock timing is claimed for it. The same applies to the Mash k=21 run (~10 s), for which no separate log entry exists.

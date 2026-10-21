@@ -90,14 +90,24 @@ def generate_simulated_tree(
     indel: float,
     seed: int,
     verbose: bool = False,
+    indelible_dir: Optional[str] = None,
+    tag: Optional[str] = None,
 ) -> Tuple[str, List[str], List[str]]:
     """Generate one simulated coalescent tree + aligned sequences.
+
+    When ``indelible_dir`` is given the dataset is read from a pre-generated
+    INDELible run (``<dir>/seed{seed}_{tag}.fasta`` + ``..._true.nwk``)
+    instead of being produced by the built-in JC69 simulator.
 
     Returns:
         newick_str: str (true tree in Newick)
         sequences: List[str]
         taxon_names: List[str]
     """
+    if indelible_dir is not None:
+        from .indelible_adapter import load_indelible_tree
+        return load_indelible_tree(indelible_dir, tag, seed)
+
     from tree_simulation import make_coalescent_tree, simulate_seqs
     root_node, leaves = make_coalescent_tree(n, seed=seed)
 
@@ -124,8 +134,14 @@ def generate_structured_tree(
     indel: float,
     seed: int,
     n_clades: int = 2,
+    indelible_dir: Optional[str] = None,
+    clade_jobs: Optional[List[Tuple[str, int]]] = None,
 ) -> Tuple[str, List[str], List[str]]:
     """Generate a tree with 2-3 clear clades.
+
+    When ``indelible_dir`` is given, each clade is read from its own
+    pre-generated INDELible run listed in ``clade_jobs`` as (tag, seed) pairs,
+    and the clades are concatenated exactly as below.
 
     Each clade is evolved independently under a coalescent process
     with slightly different substitution parameters, creating detectable
@@ -139,6 +155,10 @@ def generate_structured_tree(
         sequences: List[str]
         taxon_names: List[str]
     """
+    if indelible_dir is not None:
+        from .indelible_adapter import load_indelible_structured
+        return load_indelible_structured(indelible_dir, clade_jobs)
+
     from tree_simulation import make_coalescent_tree, simulate_seqs
 
     rng = np.random.RandomState(seed)
@@ -347,6 +367,7 @@ def generate_training_sample(
     n_samples_per_tree: int = 20,
     verbose: bool = False,
     is_structured: bool = False,
+    clade_threshold: float = 0.01,
 ) -> List[Dict]:
     """Generate training samples from one simulated tree.
 
@@ -364,6 +385,14 @@ def generate_training_sample(
         is_structured: Whether the tree has known clade structure.
                       If True, whole-tree label = 1 (ground truth).
                       If False, whole-tree label = 0 (coalescent = no structure).
+        clade_threshold: Branch-length cut used by get_true_clades() to define
+                      "natural clades".  The old JC69 simulator used branch
+                      lengths with mean 0.1, so 0.01 == 10% of the mean branch
+                      length.  INDELible trees are rescaled per configuration
+                      (mean branch length == sub_scale), so callers must pass a
+                      scale-matched threshold (0.1 * sub_scale), otherwise every
+                      internal node qualifies and all sub-cluster labels collapse
+                      to SPLIT.
 
     Returns:
         List of dicts: {features: List[float], label: int, meta: dict}
@@ -378,7 +407,8 @@ def generate_training_sample(
         D = compute_l0_distance(sequences, taxon_names)
 
     # Get true clades
-    true_clades = get_true_clades(newick_str, taxon_names)
+    true_clades = get_true_clades(newick_str, taxon_names,
+                                  threshold=clade_threshold)
 
     # Run hierarchical clustering at multiple cut points
     from scipy.cluster.hierarchy import linkage, fcluster
@@ -483,6 +513,9 @@ def generate_training_data(
     n_samples_target: int = 20000,
     verbose: bool = True,
     structured_ratio: float = 0.5,
+    indelible_dir: Optional[str] = None,
+    failures: Optional[List[Dict]] = None,
+    config_indices: Optional[List[int]] = None,
 ) -> List[Dict]:
     """Generate training data for boundary classifier.
 
@@ -509,7 +542,11 @@ def generate_training_data(
         print(f"[train_gen] Generating data from {total_trees} trees "
               f"({structured_ratio*100:.0f}% structured)...", file=sys.stderr)
 
-    for ci, (n, L, sub, indel, n_trees) in enumerate(configs):
+    # `ci` must index DEFAULT_SIM_CONFIGS (it is part of the INDELible job tag),
+    # so when only a subset of configs is generated the original indices are
+    # supplied explicitly.
+    indices = config_indices if config_indices is not None else list(range(len(configs)))
+    for ci, (n, L, sub, indel, n_trees) in zip(indices, configs):
         if verbose:
             print(f"\n[train_gen] Config {ci+1}/{len(configs)}: "
                   f"n={n}, L={L}, sub={sub}, indel={indel}, trees={n_trees}",
@@ -522,29 +559,59 @@ def generate_training_data(
             rng_local = np.random.RandomState(seed)
             is_structured = rng_local.uniform() < structured_ratio
 
+            n_clades = int(rng_local.randint(2, 4))  # 2 or 3 clades
             try:
                 if is_structured and n >= 8:
+                    clade_jobs = None
+                    if indelible_dir is not None:
+                        from .indelible_adapter import tag_for
+                        clade_jobs = [
+                            (tag_for(ci, ti, k), seed + k * 10000 + 7)
+                            for k in range(n_clades)
+                        ]
                     true_nwk, seqs, names = generate_structured_tree(
                         n, L, sub, indel, seed,
-                        n_clades=rng_local.randint(2, 4),  # 2 or 3 clades
+                        n_clades=n_clades,
+                        indelible_dir=indelible_dir,
+                        clade_jobs=clade_jobs,
                     )
                 else:
+                    tag = None
+                    if indelible_dir is not None:
+                        from .indelible_adapter import tag_for
+                        tag = tag_for(ci, ti)
                     true_nwk, seqs, names = generate_simulated_tree(
                         n, L, sub, indel, seed, verbose=False,
+                        indelible_dir=indelible_dir, tag=tag,
                     )
 
+                # INDELible trees are rescaled so that the mean branch length
+                # equals sub_scale = sub * 0.1; keep the clade cut at 10% of the
+                # mean branch length, i.e. the old simulator's 0.01 / 0.1 ratio.
+                clade_threshold = (sub * 0.01 if indelible_dir is not None
+                                   else 0.01)
                 samples = generate_training_sample(
                     true_nwk, seqs, names,
                     n_samples_per_tree=20,
                     verbose=False,
                     is_structured=is_structured,
+                    clade_threshold=clade_threshold,
                 )
                 all_samples.extend(samples)
 
             except Exception as e:
+                import traceback
+                # Record the failure instead of silently skipping it.
+                if failures is not None:
+                    failures.append({
+                        "ci": ci, "ti": ti, "n": n, "L": L, "sub": sub,
+                        "indel": indel, "is_structured": bool(is_structured),
+                        "error": "%s: %s" % (type(e).__name__, e),
+                        "traceback": traceback.format_exc()[-1500:],
+                    })
                 if verbose:
-                    print(f"  [train_gen] Tree {ti+1} FAILED: {e}",
-                          file=sys.stderr)
+                    print(f"  [train_gen] Tree {ti+1} FAILED: "
+                          f"{type(e).__name__}: {e}", file=sys.stderr)
                 continue
 
         if verbose:

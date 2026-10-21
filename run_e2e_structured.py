@@ -23,6 +23,10 @@ PARAM_COMBOS = [
     (0.03, 0.01, 500, "short_lowindel"),
 ]
 
+# Set to a directory of pre-generated INDELible datasets to replace the
+# built-in JC69 simulator.
+INDELIBLE_DIR = None
+
 
 def wilson_ci(n_success, n_total, alpha=0.05):
     if n_total == 0:
@@ -35,7 +39,12 @@ def wilson_ci(n_success, n_total, alpha=0.05):
     return (max(0, center - margin), min(1, center + margin))
 
 
-def generate_structured_data(n, L, sub, indel, seed):
+def generate_structured_data(n, L, sub, indel, seed,
+                             indelible_dir=None, clade_jobs=None):
+    if indelible_dir is not None:
+        from fusang_mhl.indelible_adapter import load_indelible_structured
+        _nwk, seqs, names = load_indelible_structured(indelible_dir, clade_jobs)
+        return seqs, names
     from tree_simulation import make_coalescent_tree, simulate_seqs
     np.random.seed(seed)
     n_clades = 2 if n <= 200 else 3
@@ -101,8 +110,17 @@ def main():
 
             for seed_i in range(N_SEEDS_PER):
                 seed = seed_i * 100 + 1  # same seeding as original (+1 for structured)
+                kwargs = {}
+                if INDELIBLE_DIR is not None:
+                    from fusang_mhl.indelible_adapter import tag_for_e2e
+                    nc = 2 if n <= 200 else 3
+                    kwargs = dict(
+                        indelible_dir=INDELIBLE_DIR,
+                        clade_jobs=[(tag_for_e2e("structured", n, label, seed_i, ci),
+                                      seed + ci * 1000) for ci in range(nc)])
                 try:
-                    sequences, taxon_names = generate_structured_data(n, L, sub, indel, seed)
+                    sequences, taxon_names = generate_structured_data(
+                        n, L, sub, indel, seed, **kwargs)
                     t0 = time.time()
                     D = compute_l0_distance(sequences, taxon_names)
                     decision = ml_split_decision(D, sequences, taxon_names, verbose=False)
