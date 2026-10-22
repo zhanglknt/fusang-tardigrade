@@ -18,6 +18,68 @@ MUST_PRESENT = ["0.0507", "2.07\u00d710\u207b\u00b9\u2074", "0.669", "0.2617",
 WATCH = ["p=0.049", "2.3\u00d710\u207b\u00b9\u2074", "0.709", "0.083 \u00b1 0.005",
          "regardless of scale", "indel rates above 0.01"]
 
+# p-value metric switch (float nRF -> integer RF), applied by stats-align
+P_NEW = ["2.22\u00d710\u207b\u00b9\u00b2", "9.21\u00d710\u207b\u2075",
+         "0.00206", "0.00247"]
+P_OLD = ["2.68\u00d710\u207b\u00b9\u00b2", "7.95\u00d710\u207b\u2075",
+         "0.0018", "0.0024"]
+
+SECTIONS = ["ABSTRACT", "INTRODUCTION", "MATERIALS AND METHODS", "RESULTS",
+            "DISCUSSION", "SUPPLEMENTARY MATERIAL", "DATA AVAILABILITY",
+            "FUNDING", "COMPETING INTERESTS", "ACKNOWLEDGEMENTS",
+            "AUTHOR CONTRIBUTIONS", "CORRESPONDING AUTHOR", "FIGURE LEGENDS",
+            "REFERENCES"]
+
+
+def count_exact(text, value):
+    """Count occurrences that are not part of a longer number
+    (so that 0.0024 does not match inside 0.00247)."""
+    return len(re.findall(re.escape(value) + r"(?![0-9])", text))
+
+
+def table_blocks(doc):
+    """For each table: its cell text plus the footnote paragraphs that follow it
+    (up to the next table or the next section heading)."""
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
+
+    items = []
+    for child in doc.element.body.iterchildren():
+        tag = child.tag.split("}")[-1]
+        if tag == "p":
+            items.append(("p", Paragraph(child, doc)))
+        elif tag == "tbl":
+            items.append(("t", Table(child, doc)))
+
+    blocks = []
+    for k, (kind, obj) in enumerate(items):
+        if kind != "t":
+            continue
+        parts = ["\n".join(c.text for r in obj.rows for c in r.cells)]
+        for kind2, obj2 in items[k + 1:]:
+            if kind2 == "t":
+                break
+            txt = obj2.text.strip()
+            if txt in SECTIONS:
+                break
+            if txt:
+                parts.append(txt)
+            if len(parts) > 6:
+                break
+        blocks.append("\n".join(parts))
+    return blocks
+
+
+def section_text(doc, name):
+    """Text of a top-level section (heading paragraph up to the next heading)."""
+    idx = [i for i, p in enumerate(doc.paragraphs) if p.text.strip() in SECTIONS]
+    pos = [i for i in idx if doc.paragraphs[i].text.strip() == name]
+    if not pos:
+        return ""
+    start = pos[0]
+    end = next((i for i in idx if i > start), len(doc.paragraphs))
+    return "\n".join(p.text for p in doc.paragraphs[start:end])
+
 
 def full_text(doc):
     parts = []
@@ -129,6 +191,52 @@ def main():
     print("numbering 1..N in order   :",
           refs == [str(k) for k in range(1, len(refs) + 1)])
     print("numbers                   :", refs)
+
+    print()
+    print("=" * 68)
+    print("P-VALUE SWITCH (integer-RF restatement by stats-align)")
+    print("=" * 68)
+    for v in P_NEW:
+        print(f"  NEW {v!r}: {count_exact(text, v)} occurrence(s)")
+    for v in P_OLD:
+        hits = [m.start() for m in
+                re.finditer(re.escape(v) + r"(?![0-9])", text)]
+        print(f"\n  OLD {v!r}: {len(hits)} hit(s)")
+        for h in hits:
+            print("     ..." + text[max(0, h - 150):h + 150].replace("\n", " ") + "...")
+
+    print()
+    print("=" * 68)
+    print("TARGETED CHECK 1: Table 4 / Table 5 cells + their footnotes")
+    print("=" * 68)
+    blocks = table_blocks(doc)  # cells + paragraphs trailing each table
+    for ti in (3, 4):  # 0-based: Table 4 -> idx 3, Table 5 -> idx 4
+        if ti >= len(blocks):
+            continue
+        blob = blocks[ti]
+        print(f"  table index {ti} (Table {ti + 1}):")
+        found = False
+        for v in P_NEW + P_OLD:
+            c = count_exact(blob, v)
+            if c:
+                found = True
+                print(f"     {v!r}: {c}")
+                h = re.search(re.escape(v) + r"(?![0-9])", blob).start()
+                print("        ..." + blob[max(0, h - 120):h + 120].replace("\n", " ") + "...")
+        if not found:
+            print("     (no p-value switch values present)")
+
+    print()
+    print("=" * 68)
+    print("TARGETED CHECK 2: ABSTRACT section")
+    print("=" * 68)
+    abst = section_text(doc, "ABSTRACT")
+    print(f"  ABSTRACT length: {len(abst)} chars")
+    for v in P_NEW + P_OLD:
+        c = count_exact(abst, v)
+        if c:
+            h = re.search(re.escape(v) + r"(?![0-9])", abst).start()
+            print(f"  {v!r}: {c} -> ..." + abst[max(0, h - 110):h + 110] + "...")
 
     print()
     print("=" * 68)
