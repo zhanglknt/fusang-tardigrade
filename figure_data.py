@@ -406,26 +406,36 @@ def ensemble_pairwise():
         if col == 'multik_ensemble':
             continue
         st = paired(ref, e[col]['true'], N200_NORM, orientation='b_minus_a')
-        # b_minus_a with a=ensemble gives positive when the *other* method is worse,
-        # i.e. when the ensemble wins.
+        # b_minus_a with a=ensemble: d = other - ensemble, so a positive difference means
+        # the *other* method is worse, i.e. the ensemble wins.  d is therefore already in
+        # the 'positive = ensemble better' orientation used by the manuscript.
         res[col] = dict(label=e[col]['label'], mean=e[col]['mean'], sd=e[col]['sd'],
-                        ensemble_wins=st['wins_b'], other_wins=st['wins_a'],
-                        ties=st['ties'], d=-st['d'], p=st['p'])
-    # The manuscript's headline p-values (Table 4 / S7 legend) are authoritative, now all
-    # on the unified Wilcoxon protocol (integer RF counts + zsplit; manuscript commits
-    # c337787 and 80b294e): k=5 2.22e-12, k=9 9.04e-8, k=7 0.669 (n.s.).
+                        ensemble_wins=st['wins_a'], other_wins=st['wins_b'],
+                        ties=st['ties'], d=st['d'], p=st['p'])
+    # Win counts, Cohen's d and (where the manuscript still quotes a float-input p-value)
+    # the p-value itself come from the manuscript's Table 4 / S7 legend. They are guarded
+    # against the recomputation above, so a future change to either side cannot silently
+    # desynchronise figure and text.
+    #   k=9 and the NJ-only / full-pipeline rows: the manuscript p-values predate the
+    #   integer-RF unification (they were computed on float nRF) -> guarded constants,
+    #   5% relative tolerance.
+    #   k=5 and k=7: the manuscript now quotes the integer-RF + zsplit value
+    #   (commits c337787 / 80b294e), so the recomputed number is used directly and guarded
+    #   at 2%.
     headline = {
-        'cosine_k5': (2.22e-12, 93, 24, 13, 0.755),
         'cosine_k9': (9.04e-8, 81, 32, 17, 0.517),
-        'cosine_k7': (0.669, 48, 51, 31, 0.020),
         'fusang_spaced_k5': (7.7e-3, 72, 46, 12, 0.246),
         'fusang_spaced_k5_nj': (1.16e-3, 74, 41, 15, 0.317),
     }
     for col, (p, w, l, t, d) in headline.items():
+        assert abs(res[col]['p'] - p) / p < 0.05, (col, res[col]['p'], p)
+        assert res[col]['ensemble_wins'] == w and res[col]['ties'] == t
         res[col]['p'] = p
         res[col]['ensemble_wins'], res[col]['other_wins'] = w, l
         res[col]['ties'], res[col]['d'] = t, d
-        assert res[col]['ensemble_wins'] == w
+    for col, target in (('cosine_k5', 2.22e-12), ('cosine_k7', 0.669)):
+        assert abs(res[col]['p'] - target) / target < 0.02, (col, res[col]['p'], target)
+        assert res[col]['ensemble_wins'] == (93 if col == 'cosine_k5' else 48)
     return res
 
 
@@ -524,10 +534,16 @@ def competitor_effect_sizes():
     rows = _read_csv(_p('indelible_iqtree2', 'iqtree2_n200_indel_nrfstandard.csv'))
     iq, fus = _f(rows, 'nrf_iqtree2_std'), _f(rows, 'nrf_fusang_std')
     st = paired(fus, iq, N200_NORM, orientation='b_minus_a')
+    # guard against the manuscript value (Methods / Supplementary Note S10, commit 80b294e)
+    assert abs(st['p'] - 9.21e-5) / 9.21e-5 < 0.02, st['p']
+    assert st['wins_a'] == 77 and st['wins_b'] == 46 and st['ties'] == 7
     out.append(('IQ-TREE2 GTR\n(DNA indel)', st['d'], st['p'], 'n=%d' % st['n']))
     l3 = _read_csv(_p('bench_l3_coalescent_indelible_30seeds_nrfstandard.csv'))
     l0, l1 = _f(l3, 'l0_true_std'), _f(l3, 'l1_true_std')   # *_std = standard unrooted RF
     st1 = paired(l1, l0, N200_NORM, orientation='b_minus_a')   # positive = L1 better
+    # guard against the manuscript value (Table 5 protocol, commit 80b294e)
+    assert abs(st1['p'] - 0.00206) / 0.00206 < 0.02, st1['p']
+    assert st1['wins_a'] == 19 and st1['wins_b'] == 5 and st1['ties'] == 6
     out.append(('multi-k L1 vs L0\n(Table 5 protocol)', st1['d'], st1['p'],
                 'n=%d' % st1['n']))
     # swisstree rows carry their own orientation: d is computed as (a - b), so a negative
@@ -538,6 +554,27 @@ def competitor_effect_sizes():
     out.append(('SwissTree protein\n(11011 vs Co-phylog)',
                 -float(row['cohens_d']), float(row['p_intRF_zsplit']),
                 'n=%s' % row['n_families']))
+    return out
+
+
+@lru_cache(maxsize=1)
+def coalescent_l3_vs_l1():
+    """MAFFT+FastTree2 (L3) vs the multi-k ensemble (L1), 30 seeds (Table 5 protocol).
+
+    Source: bench_l3_coalescent_indelible_30seeds_nrfstandard.csv, columns ``l1_true_std``
+    and ``l3_true_std`` (standard unrooted RF; the bare ``l*_true`` columns are the
+    superseded root-dependent nRF).  Positive d means L3 (MAFFT+FastTree2) is better.
+    Guarded against the manuscript value p=0.00247 (integer RF + zsplit, 22/7/1).
+    """
+    rows = _read_csv(_p('bench_l3_coalescent_indelible_30seeds_nrfstandard.csv'))
+    l1, l3v = _f(rows, 'l1_true_std'), _f(rows, 'l3_true_std')
+    st = paired(l3v, l1, N200_NORM, orientation='b_minus_a')     # positive = L3 better
+    assert abs(st['p'] - 0.00247) / 0.00247 < 0.02, st['p']
+    assert st['wins_a'] == 22 and st['wins_b'] == 7 and st['ties'] == 1
+    return dict(p=st['p'], d=st['d'], wins_l3=st['wins_a'], wins_l1=st['wins_b'],
+                ties=st['ties'], n=st['n'], mean_l1=float(l1.mean()),
+                mean_l3=float(l3v.mean()), sd_l1=float(l1.std(ddof=1)),
+                sd_l3=float(l3v.std(ddof=1)))
     return out
 
 
@@ -589,6 +626,11 @@ if __name__ == '__main__':
               % (n, v['mean_a'], v['mean_b'], v['d'], np.round(v['ci'], 3).tolist(), v['p']))
     for lab, d_, p, n_ in competitor_effect_sizes():
         print('S6B   %-30s d=%+.3f p=%.4g %s' % (lab.replace('\n', ' '), d_, p, n_))
+    cl = coalescent_l3_vs_l1()
+    print('Table5 L3 vs L1 (30 seeds): MAFFT+FT2 %.4f vs ensemble %.4f, L3 better %d/%d/%d '
+          'p=%.4g d=%+.3f'
+          % (cl['mean_l3'], cl['mean_l1'], cl['wins_l3'], cl['wins_l1'], cl['ties'],
+             cl['p'], cl['d']))
     bb = balibase_families()
     print('S6C   BAliBASE n=%d median %.3f mean %.3f below0.5 %d'
           % (bb['n'], bb['median'], bb['mean'], bb['n_below']))
