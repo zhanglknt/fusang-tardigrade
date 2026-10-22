@@ -242,6 +242,13 @@ def build():
             i += 1
             continue
 
+        # the correspondence line is written as "* To whom ..." in the source;
+        # render it as an ordinary paragraph, not a list item
+        if stripped.startswith("* ") and "To whom correspondence should be addressed" in stripped:
+            add_body(doc, stripped[2:])
+            i += 1
+            continue
+
         # bullet list
         m = re.match(r"^[-*]\s+(.*)$", stripped)
         if m:
