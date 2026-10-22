@@ -27,17 +27,17 @@ ax = axes[0][0]
 # Fusang, NJ tree builder (Table 11)
 n_nj  = [20, 50, 100, 200]; t_nj = [4.9, 13.9, 24.5, 46.1]
 # Fusang, FastME simplified + DCM (Table 11)
-n_fm  = [500, 1000, 10000]; t_fm = [3.8, 5.2, 54.4]
+n_fm  = [500, 1000, 10000]; t_fm = [3.8, 5.2, 69.8]
 # RAxML-NG (raxml_bench_results.csv; includes MAFFT)
 n_rx  = [20, 50, 100, 200]; t_rx = [4.8, 39.8, 56.8, 244.1]
 ax.plot(n_rx, t_rx, 'o--', color=GREY, lw=1.8, ms=6, label='MAFFT + RAxML-NG')
 ax.plot(n_nj, t_nj, 's-', color=BLUE, lw=2, ms=6, label='Fusang (NJ builder)')
 ax.plot(n_fm, t_fm, 's-', color=TEAL, lw=2.2, ms=6.5, label='Fusang (FastME / DCM)')
-# O(n^2 log n) reference anchored at (10000, 54.4)
+# O(n^2 log n) reference anchored at (10000, 69.8)
 nn = np.array(n_fm, dtype=float)
-ref = 54.4 * (nn**2 * np.log(nn)) / (10000.0**2 * np.log(10000.0))
+ref = 69.8 * (nn**2 * np.log(nn)) / (10000.0**2 * np.log(10000.0))
 ax.plot(nn, ref, ':', color=INK, lw=1.4, label='O(n$^2$ log n) reference')
-ax.annotate('10,000 taxa\nin 54.4 s', xy=(10000, 54.4), xytext=(1400, 120),
+ax.annotate('10,000 taxa\nin 69.8 s', xy=(10000, 69.8), xytext=(1400, 160),
             fontsize=8.5, color=TEAL, fontweight='bold',
             arrowprops=dict(arrowstyle='->', color=TEAL, lw=1.2))
 ax.set_xscale('log'); ax.set_yscale('log')

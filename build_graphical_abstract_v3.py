@@ -1,9 +1,17 @@
-"""Fusang v3.0 Graphical Abstract - card-style, design-system colors."""
+"""Fusang v3.0 Graphical Abstract - card-style, design-system colors.
+
+All accuracy values are read through figure_data.py from the standard unrooted RF
+artefacts (130-seed INDELible benchmark, IQ-TREE2 rerun); the withdrawn figures
+(Fusang 0.080 vs FastTree2 0.085, IQ-TREE2 1.8x, 54.4 s at n=10,000, SwissTree 0.239,
+88/88 classifier) are replaced by the current manuscript values.
+"""
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 import matplotlib.font_manager as fm
+
+import figure_data as FD
 
 # ---- design system ----
 INK    = "#1a2332"
@@ -69,18 +77,19 @@ card(x1, ey, ew, eh, CARD, BLUE, 1.8)
 txt(x1 + ew/2, ey + eh - 2.6, "Indel-rich accuracy", 12, BLUE, "bold")
 txt(x1 + ew/2, ey + eh - 5.2, "n=200, indel rate 0.02, vs true tree (nRF \u2193)", 8, GREY)
 axbar = fig.add_axes([(x1+6.5)/132, (ey+8.5)/66, (ew-13)/132, 16/66])
-methods = ["Fusang", "FastTree2", "IQ-TREE2"]
-vals    = [0.080, 0.085, 0.147]
+_mc = FD.method_comparison_indel002()[:3]              # Fusang, FastTree2, IQ-TREE2
+methods = [m["key"] for m in _mc]
+vals    = [m["mean"] for m in _mc]
 colors  = [TEAL, GREY, GREY]
 bars = axbar.barh(methods[::-1], vals[::-1], color=colors[::-1], height=0.62)
 for b, v in zip(bars, vals[::-1]):
     axbar.text(v + 0.004, b.get_y() + b.get_height()/2, f"{v:.3f}", va="center", fontsize=7.5, color=INK)
-axbar.set_xlim(0, 0.175); axbar.tick_params(labelsize=8, length=0, pad=2)
+axbar.set_xlim(0, max(vals) * 1.22); axbar.tick_params(labelsize=8, length=0, pad=2)
 for s in ["top", "right", "bottom"]: axbar.spines[s].set_visible(False)
 axbar.spines["left"].set_color("#cbd5e1")
 axbar.set_xticks([])
-txt(x1 + ew/2, ey + 5.6, "matches FastTree2 (p=0.052, n.s.-borderline)", 8.5, INK)
-txt(x1 + ew/2, ey + 3.2, "1.8\u00d7 more accurate than IQ-TREE2 GTR (p<0.001)", 8.5, INK, "bold")
+txt(x1 + ew/2, ey + 5.6, "marginally better than FastTree2 (p=0.0507, borderline n.s.)", 8.5, INK)
+txt(x1 + ew/2, ey + 3.2, "5% more accurate than IQ-TREE2 GTR (p=7.9\u00d710\u207b\u2075)", 8.5, INK, "bold")
 
 # (ii) real data
 x2 = 2*gap + ew
@@ -90,7 +99,7 @@ txt(x2 + ew/2, ey + eh - 5.2, "AFproject community benchmark, ETE3 nRF \u2193", 
 rows = [
     ("Fish mitogenomes (n=25, ~17 kb)", "0.045", "community-benchmark ceiling \u2014 ties MSA+ML"),
     ("13 mtDNA genes (168\u20131,866 bp)",  "0.451", "Fusang\u2013FastTree2 agreement (13 loci)"),
-    ("SwissTree proteins (11 families)", "0.239", "k-mer cosine vs Co-phylog 0.361 (p=0.006)"),
+    ("SwissTree proteins (11 families)", "0.329", "k-mer cosine vs Co-phylog 0.727 (p=0.0010)"),
 ]
 ry = ey + eh - 9.5
 for name, v, note in rows:
@@ -105,9 +114,9 @@ x3 = 3*gap + 2*ew
 card(x3, ey, ew, eh, CARD, AMBER, 1.8)
 txt(x3 + ew/2, ey + eh - 2.6, "Fast, scalable, ready to use", 12, AMBER, "bold")
 stats = [
-    ("10,000 taxa", "54.4 s", "single CPU core"),
+    ("10,000 taxa", "69.8 s", "single CPU core"),
     ("1,000 taxa",  "5.2 s",  "simplified pipeline"),
-    ("boundary classifier", "88/88", "E2E scenario routing"),
+    ("boundary classifier", "150/150", "E2E scenario routing"),
 ]
 sy = ey + eh - 9.5
 for name, v, note in stats:
@@ -122,4 +131,6 @@ txt(66, 1.6, "github.com/zhanglknt/fusang-tardigrade", 9.5, BLUE, "bold")
 
 fig.savefig("GraphicalAbstract_v3.png", dpi=300, facecolor=WHITE)
 fig.savefig("GraphicalAbstract_v3.pdf", facecolor=WHITE)
-print("saved GraphicalAbstract_v3.png / .pdf")
+fig.savefig("GraphicalAbstract.png", dpi=300, facecolor=WHITE)
+fig.savefig("GraphicalAbstract.pdf", facecolor=WHITE)
+print("saved GraphicalAbstract_v3 + GraphicalAbstract .png / .pdf")

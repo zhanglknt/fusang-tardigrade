@@ -1,8 +1,14 @@
-"""Supplementary Figure S7 (v3): multi-k ensemble detail — 4 panels.
-A: per-seed scatter, default spaced vs ensemble (seed set B, 30 seeds)
-B: accuracy comparison across configurations (seed set B, mean +/- SD)
-C: sorted per-seed differences, set B (d=+0.53, p=0.006)
-D: sorted per-seed differences, set A (27 seeds, d=-0.22, p=0.30) — instability
+"""Supplementary Figure S7 (v3): multi-k ensemble per-seed analysis — 4 panels.
+
+All panels read the 130-seed INDELible benchmark (n=200, indel=0.02, TRUE-relative,
+standard root-independent unrooted RF) via ``figure_data.ensemble_130seeds()`` and
+``figure_data.ensemble_pairwise()``; the earlier two seed-set inputs (27/30 seeds, FT2-
+relative, superseded scorer) are no longer used.
+
+A: per-seed scatter, NJ-only spaced k=5,gap2 vs the multi-k ensemble
+B: configuration comparison (k=7, ensemble, full pipeline, NJ-only, k=9, k=5)
+C: sorted per-seed differences, ensemble vs contiguous k=5
+D: sorted per-seed differences, ensemble vs the full pipeline
 """
 import os
 os.environ['MPLCONFIGDIR'] = 'matplotlib_cache'
@@ -10,43 +16,20 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import csv, json
-from scipy.stats import wilcoxon
+
+import figure_data as FD
 
 INK, GREY = '#1a2332', '#64748b'
 BLUE, TEAL, AMBER, RED = '#2563eb', '#0d9488', '#d97706', '#dc2626'
+GREEN = '#16a34a'
 
-rows = list(csv.DictReader(open('benchmark_multik_ensemble_n200_indel.csv')))
-defB = np.array([float(r['nrf_fusang_original']) for r in rows])
-mulB = np.array([float(r['nrf_multik_ensemble']) for r in rows])
-k5 = np.array([float(r['nrf_k5_contig']) for r in rows])
-k7 = np.array([float(r['nrf_k7_contig']) for r in rows])
-k9 = np.array([float(r['nrf_k9_contig']) for r in rows])
-
-d7 = json.load(open('table7_recomputed_recovered.json'))
-resA = d7['results'] if isinstance(d7, dict) and 'results' in d7 else d7
-if isinstance(resA, dict):
-    seedsA = list(resA.keys())
-    first = resA[seedsA[0]]
-    fk = [k for k in first if 'fusang' in k.lower() or 'default' in k.lower() or 'spaced' in k.lower()][0]
-    mk = [k for k in first if 'multi' in k.lower() or 'ensemble' in k.lower()][0]
-    defA = np.array([resA[s][fk] for s in seedsA], dtype=float)
-    mulA = np.array([resA[s][mk] for s in seedsA], dtype=float)
-else:
-    defA = np.array([r['fusang'] for r in resA], dtype=float)
-    mulA = np.array([r['multik'] for r in resA], dtype=float)
-
-def paired_d(a, b):
-    dd = a - b
-    return dd.mean() / dd.std(ddof=1)
-
-dB, pB = paired_d(defB, mulB), wilcoxon(defB, mulB).pvalue
-dA, pA = paired_d(defA, mulA), wilcoxon(defA, mulA).pvalue
-impr = (defB > mulB).sum()
-print(f'B: n=30 d={dB:+.3f} p={pB:.4f} improved {impr}/30 | '
-      f'means orig {defB.mean():.3f} ens {mulB.mean():.3f} '
-      f'k5 {k5.mean():.3f} k7 {k7.mean():.3f} k9 {k9.mean():.3f}')
-print(f'A: n=27 d={dA:+.3f} p={pA:.4f}')
+e = FD.ensemble_130seeds()
+pw = FD.ensemble_pairwise()
+ens = e['multik_ensemble']['true']
+njonly = e['fusang_spaced_k5_nj']['true']
+full = e['fusang_spaced_k5']['true']
+k5 = e['cosine_k5']['true']
+n = len(ens)
 
 fig, axes = plt.subplots(2, 2, figsize=(10.4, 7.6))
 fig.patch.set_facecolor('white')
@@ -55,63 +38,87 @@ def panel_label(ax, s):
     ax.text(-0.14, 1.06, s, transform=ax.transAxes, fontsize=14,
             fontweight='bold', color=INK, va='top')
 
-# ---------- A: scatter ----------
+def fmt_p(p):
+    if p < 1e-3:
+        return '%.2g' % p
+    return '%.3g' % p
+
+# ---------- A: scatter, NJ-only spaced vs ensemble ----------
 ax = axes[0][0]
-lim = [0.045, 0.155]
-ax.plot(lim, lim, '--', color=RED, lw=1.2, alpha=0.7, label='y = x (no change)')
-ax.scatter(defB, mulB, s=30, color=TEAL, edgecolor=INK, lw=0.5, zorder=3)
-below = (mulB < defB).sum()
-ax.text(0.052, 0.135, f'ensemble better: {below}/30 seeds\nmean improvement '
-        f'{np.mean(defB - mulB):+.3f}', fontsize=8.5, color=INK,
+lo = min(njonly.min(), ens.min()) * 0.94
+hi = max(njonly.max(), ens.max()) * 1.05
+ax.plot([lo, hi], [lo, hi], '--', color=RED, lw=1.2, alpha=0.7, label='y = x (no change)')
+ax.scatter(njonly, ens, s=20, color=TEAL, edgecolor=INK, lw=0.4, alpha=0.75, zorder=3)
+v = pw['fusang_spaced_k5_nj']
+ax.text(lo + 0.006, hi * 0.93,
+        f'ensemble better: {v["ensemble_wins"]}/{n} seeds\n'
+        f'p={fmt_p(v["p"])}, paired d={v["d"]:+.3f}', fontsize=8.5, color=INK,
         bbox=dict(boxstyle='round,pad=0.3', fc='#f4f7fa', ec=GREY, lw=0.6))
-ax.set_xlim(lim); ax.set_ylim(lim)
-ax.set_xlabel('Default spaced k=5,gap2 nRF', fontsize=9.5, color=INK)
+ax.set_xlim(lo, hi); ax.set_ylim(lo, hi)
+ax.set_xlabel('Spaced k=5,gap2 NJ-only nRF', fontsize=9.5, color=INK)
 ax.set_ylabel('Multi-k ensemble (k=5,7,9) nRF', fontsize=9, color=INK)
-ax.set_title('Per-seed comparison (seed set B, n=30)', fontsize=10.5, color=INK, pad=6)
+ax.set_title(f'Per-seed comparison (n={n} seeds)', fontsize=10.5, color=INK, pad=6)
 ax.legend(fontsize=8, frameon=False, loc='lower right')
 ax.grid(alpha=0.25)
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'A')
 
-# ---------- B: config bars ----------
+# ---------- B: configuration bars ----------
 ax = axes[0][1]
-names = ['default\nspaced\nk=5,gap2', 'ensemble\n(k=5,7,9)', 'k=5\ncontig', 'k=7\ncontig', 'k=9\ncontig']
-vals = [defB, mulB, k5, k7, k9]
-means = [v.mean() for v in vals]; sds = [v.std(ddof=1) for v in vals]
-cols = [GREY, TEAL, BLUE, BLUE, BLUE]
-bars = ax.bar(names, means, yerr=sds, capsize=4, color=cols, width=0.62,
+order = FD.ensemble_vs_ensemble_names()
+names = [e[c]['label'] for c in order]
+means = [e[c]['mean'] for c in order]
+sds = [e[c]['sd'] for c in order]
+cols = [GREEN if c == 'multik_ensemble' else (TEAL if c == 'cosine_k7' else GREY)
+        for c in order]
+bars = ax.bar(range(len(order)), means, yerr=sds, capsize=4, color=cols, width=0.62,
               error_kw=dict(lw=1.1, ecolor=INK))
-for b, m in zip(bars, means):
-    ax.text(b.get_x() + b.get_width()/2, b.get_height() + 0.012, f'{m:.3f}',
-            ha='center', fontsize=8.5, fontweight='bold', color=INK)
+for i, c in enumerate(order):
+    ax.text(i, means[i] + sds[i] + 0.008, f'{means[i]:.4f}', ha='center',
+            fontsize=7.6, fontweight='bold', color=INK)
+ax.set_xticks(range(len(order)))
+ax.set_xticklabels(names, fontsize=7.2, rotation=24, ha='right')
 ax.set_ylabel('nRF vs true tree (mean \u00b1 SD)', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.16)
-ax.set_title('Configuration comparison (seed set B)', fontsize=10.5, color=INK, pad=6)
-ax.tick_params(axis='x', labelsize=7.5)
+ax.set_ylim(0, 0.27)
+ax.set_title(f'Configuration comparison ({n} seeds, TRUE-relative)', fontsize=10.5,
+             color=INK, pad=6)
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'B')
 
-# ---------- C/D: sorted diffs ----------
-for ax, dd, d, p, lab, n in ((axes[1][0], defB - mulB, dB, pB, 'seed set B', 30),
-                             (axes[1][1], defA - mulA, dA, pA, 'seed set A', 27)):
-    order = np.argsort(dd)
+# ---------- C/D: sorted per-seed differences ----------
+def diff_panel(ax, other_col):
+    dd = e[other_col]['true'] - ens      # positive = ensemble better
+    v = pw[other_col]
+    order_d = np.argsort(dd)
     x = np.arange(1, len(dd) + 1)
-    cols = [TEAL if v > 0 else RED for v in dd[order]]
-    ax.bar(x, dd[order], width=1.0, color=cols, edgecolor='none')
+    cols = [TEAL if val > 0 else RED for val in dd[order_d]]
+    ax.bar(x, dd[order_d], width=1.0, color=cols, edgecolor='none')
     ax.axhline(0, color=INK, lw=0.8)
-    wins = (dd > 0).sum()
     ax.set_xlabel('Seed (sorted)', fontsize=9.5, color=INK)
-    ax.set_ylabel('nRF difference (default \u2212 ensemble)', fontsize=9, color=INK)
-    ax.set_title(f'{lab} (n={n}): d={d:+.2f}, Wilcoxon p={p:.3f}\n'
-                 f'ensemble better in {wins}/{n} seeds', fontsize=9.5, color=INK, pad=6)
+    ax.set_ylabel('nRF difference (other − ensemble)', fontsize=9, color=INK)
+    ax.set_title(f'ensemble vs {v["label"]}\n'
+                 f'p={fmt_p(v["p"])}, d={v["d"]:+.3f}; ensemble better '
+                 f'{v["ensemble_wins"]}/{n} (other {v["other_wins"]}, ties {v["ties"]})',
+                 fontsize=8.8, color=INK, pad=6)
     ax.grid(alpha=0.25, axis='y')
     for s in ('top', 'right'): ax.spines[s].set_visible(False)
+
+diff_panel(axes[1][0], 'cosine_k5')
 panel_label(axes[1][0], 'C')
+diff_panel(axes[1][1], 'fusang_spaced_k5')
+axes[1][1].text(0.03, 0.80,
+                'under the standard RF the ensemble now *does*\nexceed the default pipeline '
+                '(earlier ordering reversed)', transform=axes[1][1].transAxes,
+                fontsize=7.2, color=GREY, style='italic', va='top')
 panel_label(axes[1][1], 'D')
 
-fig.suptitle('Supplementary Figure S7. Multi-k distance ensemble: per-seed analysis',
+fig.suptitle('Supplementary Figure S7. Multi-k distance ensemble: per-seed analysis (130 seeds)',
              fontsize=13, fontweight='bold', color=INK, y=0.985)
 fig.tight_layout(rect=[0, 0, 1, 0.955])
 fig.savefig('Supplementary_Figure_S7.pdf'); fig.savefig('Supplementary_Figure_S7.png', dpi=300)
-print('S7 done')
+print('S7 done |', ' '.join('%s %.4f' % (c, e[c]['mean']) for c in order))
+for c in ('cosine_k5', 'fusang_spaced_k5'):
+    v = pw[c]
+    print('         ensemble vs %-20s wins %d/%d ties %d p=%s d=%+.3f'
+          % (c, v['ensemble_wins'], n, v['ties'], fmt_p(v['p']), v['d']))

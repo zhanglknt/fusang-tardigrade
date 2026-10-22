@@ -73,6 +73,10 @@ panel_label(ax, 'F')
 
 fig.suptitle('Supplementary Figure S2. Dimensionality vs phylogenetic accuracy',
              fontsize=12.5, fontweight='bold', color=INK, y=0.99)
+# same superseded grid-search input as Figure S1 — shape only, see data provenance note
+fig.text(0.5, 0.005, 'values from the superseded root-dependent nRF implementation '
+                     '(trees not retained; shown for shape only)',
+         fontsize=7.5, color=GREY, style='italic', ha='center')
 fig.tight_layout(rect=[0, 0, 1, 0.96])
 fig.savefig('Supplementary_Figure_S2.pdf'); fig.savefig('Supplementary_Figure_S2.png', dpi=300)
 print('S2 done')

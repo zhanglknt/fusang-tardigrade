@@ -1,8 +1,15 @@
 """Figure 3 (v3): Pipeline ablation and DCM degradation — 4 panels.
-A: step-by-step nRF through pipeline stages (manuscript ablation values)
+
+A: step-by-step nRF through pipeline stages (seed 42, n=200, indel rate=0.02)
 B: schematic — simplified vs DCM+EPA architectures
 C: schematic — why EPA grafting fails for subtrees
 D: adaptive threshold empirics (SIMPLE_THRESHOLD=500 basis)
+
+Panel A values come from ``figure_data.ablation_seed42_indel()``
+(repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json, standard unrooted RF).
+Panel D quotes the superseded-metric n=1000 comparison (0.083±0.005 vs 0.102); the true
+trees for seeds 401-409 are no longer in the working tree, so the panel carries the
+disclosure required by the manuscript's provenance note (see Results and Figure 3 legend).
 """
 import os
 os.environ['MPLCONFIGDIR'] = 'matplotlib_cache'
@@ -11,6 +18,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+
+import figure_data as FD
 
 INK, GREY = '#1a2332', '#64748b'
 BLUE, TEAL, AMBER, RED, PURPLE = '#2563eb', '#0d9488', '#d97706', '#dc2626', '#7c3aed'
@@ -22,20 +31,22 @@ def panel_label(ax, s):
     ax.text(-0.14, 1.06, s, transform=ax.transAxes, fontsize=14,
             fontweight='bold', color=INK, va='top')
 
-# ---------- A: ablation steps ----------
+# ---------- A: ablation steps (n=200, indel rate=0.02, seed 42) ----------
+abl = FD.ablation_seed42_indel()
 ax = axes[0][0]
-steps = ['Simplified\nk-mer\u2192cosine\u2192NJ', '+TF-IDF\ntransform', '+DCM\n(NJ subtrees)', '+EPA\ngrafting']
-vals  = [0.005, 0.030, 0.005, 0.388]
-cols  = [TEAL, AMBER, TEAL, RED]
+steps = [c[0] for c in abl['chain']]
+vals = [c[1] for c in abl['chain']]
+cols = [dict(green=TEAL, amber=AMBER, red=RED)[c[2]] for c in abl['chain']]
 bars = ax.bar(steps, vals, color=cols, width=0.58)
 for b, v in zip(bars, vals):
-    ax.text(b.get_x() + b.get_width()/2, v + 0.012, f'{v:.3f}', ha='center',
-            fontsize=10, fontweight='bold', color=INK)
-ax.set_ylabel('nRF vs true tree (n=200, clean)', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.45)
-ax.set_title('Ablation: EPA grafting is the error source\n(illustrative single seed 42; multi-seed mean 0.014±0.003)',
+    ax.text(b.get_x() + b.get_width()/2, v + 0.014, f'{v:.3f}', ha='center',
+            fontsize=9.5, fontweight='bold', color=INK)
+ax.set_ylabel('nRF vs true tree (n=200, indel rate=0.02)', fontsize=9, color=INK)
+ax.set_ylim(0, 0.62)
+ax.set_title('Ablation chain, seed 42: EPA grafting is the error source\n'
+             f'(11 DCM configs mg=10–150 span {abl["sweep_min"]:.3f}–{abl["sweep_max"]:.3f})',
              fontsize=9.5, color=INK, pad=6)
-ax.tick_params(axis='x', labelsize=8.5)
+ax.tick_params(axis='x', labelsize=7.6)
 ax.spines[['top', 'right']].set_visible(False)
 panel_label(ax, 'A')
 
@@ -99,25 +110,35 @@ ax.text(5.0, 0.9, 'single-seed illustration: grafting entire structured subtrees
 
 # ---------- D: threshold empirics ----------
 ax = axes[1][1]
-x = np.arange(2)
-dcm  = [0.084, 0.088]
-simp = [0.092, 0.107]
-w = 0.34
-b1 = ax.bar(x - w/2, dcm, w, color=BLUE, label='DCM+EPA pipeline')
-b2 = ax.bar(x + w/2, simp, w, color=TEAL, label='simplified pipeline')
-for bars in (b1, b2):
-    for b in bars:
-        ax.text(b.get_x() + b.get_width()/2, b.get_height() + 0.003,
-                f'{b.get_height():.3f}', ha='center', fontsize=8.5, color=INK)
+# n=1000 (seeds 401-409): DCM 0.083 +/- 0.005 vs simplified 0.102 on seed 401.
+# These values were computed under the superseded root-dependent nRF implementation and
+# cannot be rescored (the seed 401-409 true trees are no longer in the working tree);
+# they are shown here only to document the scalability decision, per the manuscript's
+# provenance note (Results, "simplified pipeline" section, and Figure 3 legend).
+x = [0]
+w = 0.32
+b1 = ax.bar([x[0] - w/2], [0.083], w, yerr=[0.005], capsize=3, color=BLUE,
+            label='DCM+EPA (9 seeds 401\u2013409)', error_kw=dict(lw=1.1, ecolor=INK))
+b2 = ax.bar([x[0] + w/2], [0.102], w, color=TEAL,
+            label='simplified (seed 401 only)')
+ax.text(x[0] - w/2, 0.083 + 0.008, '0.083\n±0.005', ha='center', fontsize=8.5,
+        color=INK, fontweight='bold')
+ax.text(x[0] + w/2, 0.102 + 0.006, '0.102', ha='center', fontsize=8.5,
+        color=INK, fontweight='bold')
 ax.set_xticks(x)
-ax.set_xticklabels(['n=1000, 5 seeds 401\u2013405\n(DCM better \u2192 DCM for n>500)',
-                    'threshold=2000 trial\n(regression \u2192 reverted)'], fontsize=8.5)
-ax.set_xlim(-0.6, 1.6)
-ax.set_ylim(0, 0.13)
+ax.set_xticklabels(['n=1000, indel (seed set 401\u2013409)'], fontsize=8.5)
+ax.set_xlim(-0.7, 0.7)
+ax.set_ylim(0, 0.20)
 ax.set_ylabel('nRF vs true tree', fontsize=9.5, color=INK)
-ax.legend(fontsize=8.5, frameon=False, loc='upper left')
-ax.set_title('Threshold evidence: DCM wins at n=1000;\nthreshold 2000 caused regression \u2192 reverted to 500',
+ax.legend(fontsize=8.2, frameon=False, loc='upper left', handlelength=1.4)
+ax.set_title('Empirical basis of SIMPLE_THRESHOLD=500:\nDCM+EPA adopted at n=1000 scale',
              fontsize=9.5, color=INK, pad=6)
+ax.text(0.5, 0.82, 'superseded nRF implementation (seed 401\u2013409 true trees\n'
+                   'no longer in the working tree); shown to document scalability,\n'
+                   'not as an accuracy result. threshold=2000 trial degraded\n'
+                   'accuracy at n=1000 and was reverted to 500.',
+        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic',
+        va='top', ha='center')
 ax.spines[['top', 'right']].set_visible(False)
 panel_label(ax, 'D')
 
@@ -126,4 +147,8 @@ fig.suptitle('Figure 3. Pipeline ablation and DCM degradation', fontsize=14,
 fig.tight_layout(rect=[0, 0, 1, 0.955])
 fig.savefig('Figure3.pdf')
 fig.savefig('Figure3.png', dpi=300)
-print('Figure3 done')
+print('Figure3 done | chain:',
+      ' -> '.join('%.3f' % v for v in vals),
+      '| sweep %.3f-%.3f (mean %.3f +- %.3f, n=%d configs)'
+      % (abl['sweep_min'], abl['sweep_max'], abl['sweep_mean'], abl['sweep_sd'],
+         abl['sweep_n']))

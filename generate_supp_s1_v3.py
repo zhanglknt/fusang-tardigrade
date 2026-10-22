@@ -77,6 +77,12 @@ panel_label(ax, 'F')
 
 fig.suptitle('Supplementary Figure S1. Full k-mer parameter grid search (* = best per panel)',
              fontsize=12.5, fontweight='bold', color=INK, y=0.99)
+# data/S1_grid_search_results.csv was written by the superseded root-dependent nRF
+# implementation and the per-configuration trees are not retained, so the grid cannot be
+# rescored; panels are shown for shape only.
+fig.text(0.5, 0.005, 'values from the superseded root-dependent nRF implementation '
+                     '(trees not retained; shown for shape only)',
+         fontsize=7.5, color=GREY, style='italic', ha='center')
 fig.tight_layout(rect=[0, 0, 1, 0.96])
 fig.savefig('Supplementary_Figure_S1.pdf'); fig.savefig('Supplementary_Figure_S1.png', dpi=300)
 print('S1 done')

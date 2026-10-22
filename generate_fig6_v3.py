@@ -1,6 +1,6 @@
 """Figure 6 (v3): Real-data validation — 4 panels.
 A: 16S rRNA tree (73 taxa, archived k=5,gap2 tree), tip labels coloured by phylum
-B: taxonomic-rank signal (Table 9 displayed values + archived-rerun note)
+B: taxonomic-rank signal (real_data/real_16S_ranksignal.json; Table 9 values)
 C: Fusang v1 vs Tardigrade Edition comparison
 D: gene-length DNA benchmark: locus length vs Fusang-FT2 agreement (gene_dna_results.json)
 """
@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 import numpy as np
 import json
+
+import figure_data as FD
 
 INK, GREY = '#1a2332', '#64748b'
 BLUE, TEAL, AMBER, RED, GREEN = '#2563eb', '#0d9488', '#d97706', '#dc2626', '#16a34a'
@@ -68,7 +70,7 @@ for a, b, lab in pairs:
 ax.set_xlim(-0.5, maxd + 6.5)
 ax.set_ylim(-1, len(tip_y))
 ax.axis('off')
-ax.set_title('16S rRNA tree, 73 taxa (k=5,gap2; 1.2 s, no alignment)',
+ax.set_title('16S rRNA tree, 73 taxa (k=5,gap2; 0.11 s, no alignment)',
              fontsize=10, color=INK, pad=6)
 handles = [plt.Line2D([0], [0], marker='o', color='none', markerfacecolor=PCOL[p],
                       markersize=5, label=p) for p in TOP_PHYLA]
@@ -79,26 +81,32 @@ ax.legend(handles=handles, fontsize=5.8, frameon=False, loc='lower right',
           labelspacing=0.28)
 panel_label(ax, 'A')
 
-# ---------- B: taxonomic-rank signal ----------
+# ---------- B: taxonomic-rank signal (corrected annotation) ----------
+# Source: real_data/real_16S_ranksignal.json (10,000-label permutations per rank);
+# supersedes the archived-tree rerun values printed on earlier versions of this panel.
 ax = fig.add_subplot(gs[0, 1])
-ranks  = ['Order', 'Phylum', 'Family']
-vals   = [12.6, 4.6, -14.2]
-notes  = ['p < 0.01', 'p < 0.05', 'n.s.']
-cols   = [TEAL, TEAL, GREY]
-bars = ax.bar(ranks, vals, color=cols, width=0.55)
-for b, v, nt in zip(bars, vals, notes):
-    yy = v + 1.2 if v >= 0 else v - 3.4
-    ax.text(b.get_x() + b.get_width()/2, yy, f'{v:+.1f}%\n{nt}', ha='center',
-            fontsize=8.5, color=INK, fontweight='bold')
-ax.axhline(0, color=INK, lw=0.8)
+rs = FD.rank_signal_16s()
+ranks = ['phylum', 'order', 'family', 'genus']
+fus = [rs['Fusang_k5_gap2'][r]['reduction_pct'] for r in ranks]
+ft2 = [rs['FastTree2_MAFFT'][r]['reduction_pct'] for r in ranks]
+x = np.arange(len(ranks)); w = 0.36
+b1 = ax.bar(x - w/2, fus, w, color=TEAL, label='Fusang (k=5,gap2)')
+b2 = ax.bar(x + w/2, ft2, w, color=GREY, label='rebuilt FastTree2 (MAFFT)')
+for b, v in zip(b1, fus):
+    ax.text(b.get_x() + b.get_width()/2, v + 1.5, f'{v:.1f}', ha='center',
+            fontsize=8.3, fontweight='bold', color=TEAL)
+for b, v in zip(b2, ft2):
+    ax.text(b.get_x() + b.get_width()/2, v + 1.5, f'{v:.1f}', ha='center',
+            fontsize=8.3, fontweight='bold', color=INK)
+ax.set_xticks(x)
+ax.set_xticklabels([r.capitalize() for r in ranks], fontsize=9.5)
 ax.set_ylabel('Same-rank distance reduction (%)', fontsize=9.5, color=INK)
-ax.set_ylim(-22, 22)
-ax.set_title('Phylogenetic signal by taxonomic rank', fontsize=10.5, color=INK, pad=6)
+ax.set_ylim(0, 112)
+ax.legend(fontsize=8, frameon=False, loc='upper left')
+ax.set_title('Phylogenetic signal by taxonomic rank\n(all p < 1\u00d710\u207b\u2074; corrected NCBI annotation)',
+             fontsize=9.8, color=INK, pad=6)
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
-ax.text(0.02, 0.03, 'Verification rerun on archived tree (73/74 taxa): order 7.3% (p=0.027),\n'
-        'phylum 3.8% (p=0.003); family labels not retained in archive (original analysis).',
-        transform=ax.transAxes, fontsize=6.8, color=GREY, style='italic')
 panel_label(ax, 'B')
 
 # ---------- C: v1 vs Tardigrade architecture evolution (schematic + mini plot) ----------

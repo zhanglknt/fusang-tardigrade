@@ -1,8 +1,17 @@
 """Figure 4 (v3): Spaced k-mer parameter optimization — 4 panels.
-A: k x gap heatmap at n=200 (S1_grid_search_results.csv)
+
+A: k x gap heatmap at n=200 (data/S1_grid_search_results.csv)
 B: adaptive parameter selection logic (schematic)
 C: 5-repeat stability validation summary (Supplementary Table S5)
-D: multi-k ensemble vs default across two independent seed sets
+D: multi-k ensemble vs single-k configurations and the full pipeline (130 seeds)
+
+Panel A note: ``data/S1_grid_search_results.csv`` was produced by the superseded
+root-dependent nRF scorer and cannot be rescored (the per-configuration trees are not
+retained); the panel is therefore drawn as a shape illustration and explicitly labelled.
+Panel D reads the standard unrooted RF 130-seed benchmark via ``figure_data``:
+``indelible_n200_indel/competitors_n200_indel_130seeds_stdrf.csv`` plus the paired
+p-values/wins recorded in ``competitors_n200_indel_130seeds_stdrf_summary.json`` and
+printed in manuscript Table 4.
 """
 import os
 os.environ['MPLCONFIGDIR'] = 'matplotlib_cache'
@@ -10,9 +19,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import csv, json
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
-from scipy.stats import wilcoxon
+import csv
+from matplotlib.patches import FancyBboxPatch
+
+import figure_data as FD
 
 INK, GREY = '#1a2332', '#64748b'
 BLUE, TEAL, AMBER, RED, GREEN = '#2563eb', '#0d9488', '#d97706', '#dc2626', '#16a34a'
@@ -47,8 +57,9 @@ fig.colorbar(im, ax=ax, label='nRF (lower = better)', shrink=0.85)
 if 5 in ks:
     j = ks.index(5); i = gs.index('gap2')
     ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, ec=RED, lw=2.4))
-ax.set_title('Grid search at n=200 (red box = default k=5,gap2)',
-             fontsize=10, color=INK, pad=6)
+ax.set_title('Grid search at n=200 (red box = default k=5,gap2)', fontsize=10, color=INK, pad=6)
+ax.text(0.5, -0.16, 'superseded root-dependent nRF implementation\n(trees not retained; shown for shape only)',
+        transform=ax.transAxes, fontsize=6.4, color=GREY, style='italic', ha='center')
 panel_label(ax, 'A')
 
 # ---------- B: adaptive logic schematic ----------
@@ -99,55 +110,44 @@ ax.grid(alpha=0.25)
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'C')
 
-# ---------- D: multi-k across seed sets ----------
+# ---------- D: multi-k ensemble vs configurations (130 seeds) ----------
 ax = axes[1][1]
-d7 = json.load(open('table7_recomputed_recovered.json'))
-resA = d7['results'] if isinstance(d7, dict) and 'results' in d7 else d7
-if isinstance(resA, dict):
-    seedsA = list(resA.keys())
-    def _getA(entry, key):
-        e = resA[entry]
-        return e.get(key) or e.get(key.replace('nrf_', ''))
-    # fall back: inspect structure
-    first = resA[seedsA[0]]
-    keysA = list(first.keys())
-    fk = [k for k in keysA if 'fusang' in k.lower() or 'default' in k.lower() or 'spaced' in k.lower()][0]
-    mk = [k for k in keysA if 'multi' in k.lower() or 'ensemble' in k.lower()][0]
-    defA = np.array([resA[s][fk] for s in seedsA], dtype=float)
-    mulA = np.array([resA[s][mk] for s in seedsA], dtype=float)
-else:
-    defA = np.array([r['fusang'] for r in resA], dtype=float)
-    mulA = np.array([r['multik'] for r in resA], dtype=float)
-rowsB = list(csv.DictReader(open('benchmark_multik_ensemble_n200_indel.csv')))
-defB = np.array([float(r['nrf_fusang_original']) for r in rowsB])
-mulB = np.array([float(r['nrf_multik_ensemble']) for r in rowsB])
+pw = FD.ensemble_pairwise()
+order = FD.ensemble_vs_ensemble_names()          # best-first ordering
+e = FD.ensemble_130seeds()
+means = [e[c]['mean'] for c in order]
+sds = [e[c]['sd'] for c in order]
+names = [e[c]['label'] for c in order]
+n_seeds = len(e['multik_ensemble']['true'])
 
-def paired_d(a, b):  # d of (default - multik): positive = ensemble better
-    dd = a - b
-    return dd.mean() / dd.std(ddof=1)
+def _fmt_p(p):
+    if p < 1e-3:
+        ex = int(np.floor(np.log10(p)))
+        mant = p / 10 ** ex
+        return 'p=%.2g' % p
+    return 'p=%.3g' % p
 
-pA = wilcoxon(defA, mulA).pvalue
-pB = wilcoxon(defB, mulB).pvalue
-x = np.arange(2)
-w = 0.34
-b1 = ax.bar(x - w/2, [defA.mean(), defB.mean()], w,
-            yerr=[defA.std(ddof=1), defB.std(ddof=1)], capsize=4,
-            color=GREY, label='default spaced k=5,gap2', error_kw=dict(lw=1.1, ecolor=INK))
-b2 = ax.bar(x + w/2, [mulA.mean(), mulB.mean()], w,
-            yerr=[mulA.std(ddof=1), mulB.std(ddof=1)], capsize=4,
-            color=TEAL, label='multi-k ensemble (k=5,7,9)', error_kw=dict(lw=1.1, ecolor=INK))
-for bars in (b1, b2):
-    for b in bars:
-        ax.text(b.get_x() + b.get_width()/2, b.get_height() + 0.012,
-                f'{b.get_height():.3f}', ha='center', fontsize=8.5, color=INK)
-ax.set_xticks(x)
-ax.set_xticklabels([f'seed set A (n=27)\nd={paired_d(defA, mulA):+.2f}, p={pA:.2f}',
-                    f'seed set B (n=30)\nd={paired_d(defB, mulB):+.2f}, p={pB:.3f}'],
-                   fontsize=8.5)
+bar_cols = []
+for c in order:
+    bar_cols.append(GREEN if c == 'multik_ensemble' else
+                    (TEAL if c == 'cosine_k7' else GREY))
+bars = ax.bar(range(len(order)), means, yerr=sds, capsize=3, width=0.62,
+              color=bar_cols, error_kw=dict(lw=1.0, ecolor=INK))
+for i, c in enumerate(order):
+    ax.text(i, means[i] + sds[i] + 0.010, f'{means[i]:.4f}', ha='center',
+            fontsize=8.2, fontweight='bold', color=INK)
+    if c != 'multik_ensemble':
+        v = pw[c]
+        note = f'{_fmt_p(v["p"])}\n{v["ensemble_wins"]}/130'
+        ax.text(i, 0.010, note, ha='center', va='bottom', fontsize=7.0, color='white')
+ax.text(order.index('multik_ensemble'), 0.010, 'reference\nmethod', ha='center',
+        va='bottom', fontsize=7.0, color='white', style='italic')
+ax.set_xticks(range(len(order)))
+ax.set_xticklabels(names, fontsize=7.4, rotation=24, ha='right')
 ax.set_ylabel('nRF vs true tree (mean ± SD)', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.16)
-ax.legend(fontsize=8, frameon=False, loc='upper right')
-ax.set_title('Ensemble effect is seed-set-dependent\n(pooled n=57: d=\u22120.17, p=0.19 — no general advantage at L=500 bp)',
+ax.set_ylim(0, 0.30)
+ax.set_title(f'Multi-k ensemble vs alternatives ({n_seeds} seeds, TRUE-relative)\n'
+             'beats k=5, k=9 and the full pipeline; ties k=7 (p=0.669)',
              fontsize=9, color=INK, pad=6)
 ax.spines[['top', 'right']].set_visible(False)
 panel_label(ax, 'D')
@@ -157,6 +157,5 @@ fig.suptitle('Figure 4. Spaced k-mer parameter optimization', fontsize=14,
 fig.tight_layout(rect=[0, 0, 1, 0.955])
 fig.savefig('Figure4.pdf')
 fig.savefig('Figure4.png', dpi=300)
-print('Figure4 done | A: %d/%d seeds d=%.3f p=%.3f | B: %d/%d seeds d=%.3f p=%.4f'
-      % (len(defA), len(defA), paired_d(defA, mulA), pA,
-         len(defB), len(defB), paired_d(defB, mulB), pB))
+print('Figure4 done |', ' '.join('%s %.4f+-%.4f' % (c, e[c]['mean'], e[c]['sd'])
+                                 for c in order))

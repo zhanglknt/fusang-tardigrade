@@ -24,17 +24,23 @@ def panel_label(ax, s):
             fontweight='bold', color=INK, va='top')
 
 # ---------- A: single-seed stage trace ----------
+# Standard root-independent unrooted RF, n=200 seed 42 clean. Values are those printed in
+# the Supplementary Figure S3 legend of NAR_MANUSCRIPT_REVISED.md
+# (0.000 / 0.030 / 0.000 / 0.010 / 0.457); no machine-readable standard-RF artefact for
+# this clean chain is retained (the superseded calc_nrf_simple trace lives in
+# repro_ablations/diag_dcm_loss_n200_s42.json), so they are transcribed from the legend.
 ax = axes[0][0]
 stages = ['Simplified\npipeline', 'TF-IDF\nweighting', 'DCM+NJ\nrecovery', 'DCM+FastME\nrecovery', 'DCM+EPA\ngrafting']
-vals = [0.005, 0.030, 0.005, 0.013, 0.388]
+vals = [0.000, 0.030, 0.000, 0.010, 0.457]
 cols = [GREEN, AMBER, GREEN, GREEN, RED]
 bars = ax.bar(stages, vals, color=cols, width=0.6)
 for b, v in zip(bars, vals):
     ax.text(b.get_x() + b.get_width()/2, v + 0.012, f'{v:.3f}', ha='center',
             fontsize=9, fontweight='bold', color=INK)
 ax.set_ylabel('nRF distance', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.46)
-ax.set_title('Stage-by-stage trace (n=200, seed=42, clean)', fontsize=10.5, color=INK, pad=6)
+ax.set_ylim(0, 0.55)
+ax.set_title('Stage-by-stage trace (n=200, seed=42, clean;\nstandard root-independent unrooted RF)',
+             fontsize=9.8, color=INK, pad=6)
 ax.tick_params(axis='x', labelsize=7.5)
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
@@ -42,8 +48,11 @@ panel_label(ax, 'A')
 
 # ---------- B: simplified multi-seed vs DCM ----------
 ax = axes[0][1]
-names = ['Simplified\nsingle seed', 'Simplified\n10-seed mean', 'Full DCM\n(single seed)']
-v = [0.005, 0.014, 0.388]
+# Single-seed values are the standard-RF clean seed-42 chain of panel A (0.000 / 0.457).
+# The 10-seed mean (0.014±0.003, seeds 42-51) was produced by the superseded
+# root-dependent nRF implementation and is retained for shape only (S3 legend).
+names = ['Simplified\nsingle seed\n(standard RF)', 'Simplified\n10-seed mean\n(superseded impl.)', 'Full DCM+EPA\nsingle seed\n(standard RF)']
+v = [0.000, 0.014, 0.457]
 e = [0, 0.003, 0]
 cols = [GREEN, TEAL, RED]
 bars = ax.bar(names, v, yerr=e, capsize=5, color=cols, width=0.52,
@@ -52,9 +61,15 @@ for b, vv in zip(bars, v):
     ax.text(b.get_x() + b.get_width()/2, vv + 0.014, f'{vv:.3f}', ha='center',
             fontsize=9.5, fontweight='bold', color=INK)
 ax.set_ylabel('nRF distance', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.46)
+ax.set_ylim(0, 0.55)
 ax.set_title('Simplified pipeline: multi-seed validation\n(seeds 42-51, n=200, clean)', fontsize=10, color=INK, pad=6)
-ax.tick_params(axis='x', labelsize=8)
+ax.tick_params(axis='x', labelsize=7.2)
+ax.text(0.02, 0.97, 'step-5 DCM uses max_group_size=10\n(chosen for continuity with the withdrawn\n'
+                    'old-scorer trace; all 11 settings exceed\nsimplified — see Results)',
+        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic', va='top')
+ax.text(0.5, -0.30, 'middle bar: superseded root-dependent nRF implementation,\n'
+                    'retained for shape only (not a validated accuracy value)',
+        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic', ha='center')
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'B')
@@ -80,7 +95,7 @@ for i, (t, c) in enumerate(steps):
         ax.annotate('', xy=(x + 1.22, 6.6), xytext=(x + 0.80, 6.6),
                     arrowprops=dict(arrowstyle='-|>', color=INK, lw=1.4))
     x += 2.0
-ax.text(9.0, 5.1, '\u2717 primary error source: grafting\nsubtrees with internal structure\n(nRF 0.005 \u2192 0.388)',
+ax.text(9.0, 5.1, '\u2717 primary error source: grafting\nsubtrees with internal structure\n(nRF 0.000 \u2192 0.457)',
         fontsize=7.5, color=RED, ha='center', va='top', fontweight='bold')
 # recovery path
 ax.annotate('', xy=(5.0, 3.1), xytext=(8.6, 5.7),
@@ -114,6 +129,8 @@ ax.set_xlabel('Dataset size n (log scale)', fontsize=9.5, color=INK)
 ax.set_ylabel('nRF vs true tree (mean \u00b1 SD, 5 seeds)', fontsize=9, color=INK)
 ax.set_ylim(0.26, 0.33)
 ax.set_title('DCM holds accuracy at scale\n(clean coalescent, vs true tree)', fontsize=10, color=INK, pad=6)
+ax.text(0.02, 0.02, 'legacy JC69 coalescent data + superseded nRF\nimplementation — shown for shape only',
+        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic', va='bottom')
 ax.grid(alpha=0.25)
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'D')
