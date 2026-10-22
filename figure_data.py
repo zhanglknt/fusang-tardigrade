@@ -276,6 +276,50 @@ def ablation_seed42_indel():
 
 
 # --------------------------------------------------------------------------------------
+# Figure 3(D): SIMPLE_THRESHOLD=500 accuracy re-test at n=1000 (clean, 10 paired seeds)
+# --------------------------------------------------------------------------------------
+
+@lru_cache(maxsize=1)
+def threshold_n1000():
+    """Simplified pipeline vs DCM+EPA at n=1000, standard unrooted RF, 10 paired seeds.
+
+    Source: table_threshold_n1000_nrfstandard.csv + table_threshold_n1000_summary.json
+    (INDELible n=1000 clean, seeds 1000-1009, nrf_standard.py).
+    This replaces the withdrawn panel (DCM 0.083 vs simplified 0.102, seeds 401-409),
+    which used the superseded root-dependent nRF and cannot be rescored: under the
+    standard metric the simplified pipeline is the more accurate one.
+    """
+    j = json_load(_p('table_threshold_n1000_summary.json'))
+    rows = _read_csv(_p('table_threshold_n1000_nrfstandard.csv'))
+    denom = float(j['denominator_2n_minus_6'])
+    per = j['per_seed_integer_rf']
+    seeds = np.array([int(r['seed']) for r in rows], dtype=int)
+    rf_s = np.array([p['rf_simple'] for p in per], dtype=float)
+    rf_d = np.array([p['rf_dcm'] for p in per], dtype=float)
+    # cross-check the CSV against the JSON's integer counts
+    assert seeds.tolist() == [p['seed'] for p in per]
+    assert np.allclose(rf_s, np.rint(_f(rows, 'nrf_simple') * denom))
+    assert np.allclose(rf_d, np.rint(_f(rows, 'nrf_dcm') * denom))
+    nrf_s, nrf_d = rf_s / denom, rf_d / denom
+    pj = j['paired_simple_minus_dcm']
+
+    def _rt(mode):
+        v = [r['seconds'] for r in j['runtime_records'][mode] if r.get('seconds')]
+        return float(np.mean(v))
+
+    return dict(
+        n=len(seeds), seeds=seeds, denom=denom, rf_simple=rf_s, rf_dcm=rf_d,
+        nrf_simple=nrf_s, nrf_dcm=nrf_d,
+        mean_simple=float(j['simple']['mean_nrf']), sd_simple=float(j['simple']['sd_nrf_sample']),
+        mean_dcm=float(j['dcm']['mean_nrf']), sd_dcm=float(j['dcm']['sd_nrf_sample']),
+        diff=float(pj['mean_nrf_difference']), p=float(pj['wilcoxon_p_two_sided']),
+        d=float(pj['paired_cohens_d']), ci=tuple(pj['bootstrap_mean_difference_95pct_ci_nrf']),
+        simple_wins=int(pj['simple_wins']), dcm_wins=int(pj['dcm_wins']), ties=int(pj['ties']),
+        rt_simple=_rt('simple'), rt_dcm=_rt('dcm'),
+        condition=j['condition'], n_taxa=1000)
+
+
+# --------------------------------------------------------------------------------------
 # Figure 4(D) / S7: multi-k ensemble on the 130-seed INDELible benchmark
 # --------------------------------------------------------------------------------------
 

@@ -3,13 +3,16 @@
 A: step-by-step nRF through pipeline stages (seed 42, n=200, indel rate=0.02)
 B: schematic — simplified vs DCM+EPA architectures
 C: schematic — why EPA grafting fails for subtrees
-D: adaptive threshold empirics (SIMPLE_THRESHOLD=500 basis)
+D: adaptive threshold empirics (SIMPLE_THRESHOLD=500) — reversed under the standard RF
 
 Panel A values come from ``figure_data.ablation_seed42_indel()``
 (repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json, standard unrooted RF).
-Panel D quotes the superseded-metric n=1000 comparison (0.083±0.005 vs 0.102); the true
-trees for seeds 401-409 are no longer in the working tree, so the panel carries the
-disclosure required by the manuscript's provenance note (see Results and Figure 3 legend).
+Panel D values come from ``figure_data.threshold_n1000()``
+(table_threshold_n1000_nrfstandard.csv + _summary.json): 10 paired seeds 1000-1009 at
+n=1000 clean, standard unrooted RF. It supersedes the withdrawn panel (DCM 0.083 vs
+simplified 0.102, seeds 401-409), which used the root-dependent nRF and cannot be
+rescored; under the standard metric the simplified pipeline is significantly better, so
+the threshold is retained on runtime grounds only.
 """
 import os
 os.environ['MPLCONFIGDIR'] = 'matplotlib_cache'
@@ -108,37 +111,45 @@ ax.text(5.0, 0.9, 'single-seed illustration: grafting entire structured subtrees
                   'introduces topological errors that dominate the k-mer signal',
         fontsize=8.5, color=GREY, ha='center', va='top')
 
-# ---------- D: threshold empirics ----------
+# ---------- D: threshold empirics (reversed under the standard RF) ----------
 ax = axes[1][1]
-# n=1000 (seeds 401-409): DCM 0.083 +/- 0.005 vs simplified 0.102 on seed 401.
-# These values were computed under the superseded root-dependent nRF implementation and
-# cannot be rescored (the seed 401-409 true trees are no longer in the working tree);
-# they are shown here only to document the scalability decision, per the manuscript's
-# provenance note (Results, "simplified pipeline" section, and Figure 3 legend).
-x = [0]
-w = 0.32
-b1 = ax.bar([x[0] - w/2], [0.083], w, yerr=[0.005], capsize=3, color=BLUE,
-            label='DCM+EPA (9 seeds 401\u2013409)', error_kw=dict(lw=1.1, ecolor=INK))
-b2 = ax.bar([x[0] + w/2], [0.102], w, color=TEAL,
-            label='simplified (seed 401 only)')
-ax.text(x[0] - w/2, 0.083 + 0.008, '0.083\n±0.005', ha='center', fontsize=8.5,
-        color=INK, fontweight='bold')
-ax.text(x[0] + w/2, 0.102 + 0.006, '0.102', ha='center', fontsize=8.5,
-        color=INK, fontweight='bold')
-ax.set_xticks(x)
-ax.set_xticklabels(['n=1000, indel (seed set 401\u2013409)'], fontsize=8.5)
-ax.set_xlim(-0.7, 0.7)
-ax.set_ylim(0, 0.20)
+th = FD.threshold_n1000()
+ax.set_xlim(0.55, 3.25)
+ax.set_ylim(0.205, 0.315)
+for s, d in zip(th['nrf_simple'], th['nrf_dcm']):
+    ax.plot([1, 2], [d, s], '-o', color=GREY, lw=0.9, ms=3.2, alpha=0.7, zorder=2)
+ax.errorbar([1], [th['mean_dcm']], yerr=[th['sd_dcm']], fmt='s', ms=8, color=BLUE,
+            capsize=4, lw=1.6, ecolor=BLUE, zorder=4)
+ax.errorbar([2], [th['mean_simple']], yerr=[th['sd_simple']], fmt='s', ms=8, color=TEAL,
+            capsize=4, lw=1.6, ecolor=TEAL, zorder=4)
+ax.text(1, 0.240, f"DCM+EPA\n{th['mean_dcm']:.4f} \u00b1 {th['sd_dcm']:.4f}",
+        ha='center', va='top', fontsize=8.0, color=BLUE, fontweight='bold')
+ax.text(2.07, th['mean_simple'],
+        f"simplified\n{th['mean_simple']:.4f} \u00b1 {th['sd_simple']:.4f}",
+        ha='left', va='center', fontsize=8.0, color=TEAL, fontweight='bold')
+ax.set_xticks([1, 2])
+ax.set_xticklabels(['DCM+EPA', 'simplified'], fontsize=9)
 ax.set_ylabel('nRF vs true tree', fontsize=9.5, color=INK)
-ax.legend(fontsize=8.2, frameon=False, loc='upper left', handlelength=1.4)
-ax.set_title('Empirical basis of SIMPLE_THRESHOLD=500:\nDCM+EPA adopted at n=1000 scale',
-             fontsize=9.5, color=INK, pad=6)
-ax.text(0.5, 0.82, 'superseded nRF implementation (seed 401\u2013409 true trees\n'
-                   'no longer in the working tree); shown to document scalability,\n'
-                   'not as an accuracy result. threshold=2000 trial degraded\n'
-                   'accuracy at n=1000 and was reverted to 500.',
-        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic',
-        va='top', ha='center')
+ax.set_title('SIMPLE_THRESHOLD=500: accuracy basis withdrawn and reversed\n'
+             f"n=1,000 clean, {th['n']} paired seeds \u2014 simplified "
+             f"{th['simple_wins']}/{th['n']} wins",
+             fontsize=9.2, color=INK, pad=6)
+ax.text(0.97, 0.97,
+        f"simplified {th['mean_simple']:.4f} \u00b1 {th['sd_simple']:.4f}\n"
+        f"DCM+EPA  {th['mean_dcm']:.4f} \u00b1 {th['sd_dcm']:.4f}\n"
+        f"\u0394 = {th['diff']:+.4f} nRF (simple \u2212 DCM)\n"
+        f"Wilcoxon p={th['p']:.4f} (integer RF, zsplit)\n"
+        f"paired d={th['d']:+.2f}, 95% CI [{th['ci'][0]:+.4f}, {th['ci'][1]:+.4f}]\n"
+        f"runtime: DCM {th['rt_dcm']:.0f} s vs simplified {th['rt_simple']:.0f} s / seed\n"
+        f"\u2192 threshold kept for ~{th['rt_simple'] / th['rt_dcm']:.1f}\u00d7 speed, "
+        "not accuracy",
+        transform=ax.transAxes, fontsize=6.9, color=INK, va='top', ha='right',
+        bbox=dict(boxstyle='round,pad=0.32', fc='#f4f7fa', ec=GREY, lw=0.6))
+ax.text(0.02, 0.015,
+        'supersedes the earlier panel (DCM 0.083 vs simplified 0.102, seeds 401\u2013409), '
+        'which\nused the root-dependent nRF and cannot be rescored',
+        transform=ax.transAxes, fontsize=6.3, color=GREY, style='italic', va='bottom')
+ax.grid(alpha=0.2, axis='y')
 ax.spines[['top', 'right']].set_visible(False)
 panel_label(ax, 'D')
 
@@ -152,3 +163,8 @@ print('Figure3 done | chain:',
       '| sweep %.3f-%.3f (mean %.3f +- %.3f, n=%d configs)'
       % (abl['sweep_min'], abl['sweep_max'], abl['sweep_mean'], abl['sweep_sd'],
          abl['sweep_n']))
+print('         D: n=1000 simplified %.4f+-%.4f vs DCM+EPA %.4f+-%.4f | %d/%d wins '
+      'p=%.4f d=%+.2f CI [%+.4f, %+.4f] | runtime DCM %.0f s vs simple %.0f s'
+      % (th['mean_simple'], th['sd_simple'], th['mean_dcm'], th['sd_dcm'],
+         th['simple_wins'], th['n'], th['p'], th['d'], th['ci'][0], th['ci'][1],
+         th['rt_dcm'], th['rt_simple']))
