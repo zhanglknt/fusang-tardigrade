@@ -67,12 +67,14 @@ def put_file(src, dst_rel, category):
     return dst
 
 
-def put_tree(src_dir, dst_rel, category, skip_dirs=()):
+def put_tree(src_dir, dst_rel, category, skip_dirs=(), skip_ext=()):
     """Copy a whole directory (files only, honouring skip_dirs) and record each file."""
     n = 0
     for dirpath, dirnames, filenames in os.walk(src_dir):
         dirnames[:] = [d for d in dirnames if d not in skip_dirs]
         for fn in sorted(filenames):
+            if os.path.splitext(fn)[1] in skip_ext:
+                continue
             src = os.path.join(dirpath, fn)
             rel = os.path.relpath(src, src_dir).replace(os.sep, "/")
             put_file(src, f"{dst_rel}/{rel}", category)
@@ -182,6 +184,35 @@ put_file("repro_ablations/skmer_probe_nrfstandard.py", "repro_ablations/skmer_pr
 put_file("repro_ablations/cosine_vs_jsd_n200_indel_30seeds_nrfstandard.json", "repro_ablations/cosine_vs_jsd_n200_indel_30seeds_nrfstandard.json", "rescore_output")
 put_file("repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json", "repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json", "rescore_output")
 put_file("repro_ablations/skmer_probe_nrfstandard.json", "repro_ablations/skmer_probe_nrfstandard.json", "rescore_output")
+# ----------------------------------------------------------------------
+# C3b. The Skmer probe evidence chain.  skmer_probe_nrfstandard.py above
+# rebuilds NJ trees from the two Skmer distance matrices and scores them
+# with nrf_standard.py, so it cannot run without its inputs.  v2.1 shipped
+# the script but NOT its inputs, NOT the reference trees it scores against,
+# and NOT the FINDINGS.md the manuscript cites as the audit trail -- the
+# chain was unrunnable as shipped.  `import fusang_v2` also failed because
+# the module only existed at fusang/fusang_v2.py; the root-level copy added
+# in C4 fixes that.
+#
+# The stale 2026-10-09 record (claiming a ZeroDivisionError crash that does
+# not reproduce on the current benchmark) is refreshed here too: the
+# 2026-10-22 re-verification -- skmer completes, the coverage model is
+# inoperative on every sequence, 45% of distances hit the 5.0 cap,
+# nRF 0.782/0.614 -- supersedes it, and the manuscript already describes
+# the corrected behaviour.
+# ----------------------------------------------------------------------
+# The *.msh mash sketches are omitted: they are bulky regenerable
+# intermediates, and the per-sequence *.hist files (a handful of bytes each,
+# showing the degenerate depth-1 spectra) are the actual evidence.
+n_probe = put_tree("repro_ablations/_skmer_probe", "repro_ablations/_skmer_probe",
+                   "skmer_probe", skip_ext=(".msh",))
+print(f"[C3b] {n_probe} skmer probe files added (.msh sketches omitted)")
+put_file("indelible_n200_indel/seed100_indel_true.nwk",
+         "indelible_n200_indel/seed100_indel_true.nwk", "skmer_probe")
+put_file("indelible_n200_indel/seed100_indel_fusang.nwk",
+         "indelible_n200_indel/seed100_indel_fusang.nwk", "skmer_probe")
+put_file("skmer_inapplicability_record.md",
+         "data/skmer_inapplicability_record.md", "skmer_probe")
 
 # Per-seed authoritative tables (paths mirror the repository, which is how the
 # manuscript cites them)
@@ -251,6 +282,28 @@ print(f"[C2/C3] {n_t1} Table-1/3 files, {n_thr} threshold-forensics files")
 # accurate, so the package must carry the fixed fusang_v2.py.
 # ----------------------------------------------------------------------
 put_file("fusang_v2.py", "fusang/fusang_v2.py", "code_fix")
+# The three ablation rescoring scripts (cosine_vs_jsd_nrfstandard.py,
+# ablation_dcm_seed42_indel_nrfstandard.py, skmer_probe_nrfstandard.py) each do
+# `sys.path.insert(0, ROOT); import fusang_v2`, i.e. they expect the module at
+# the package root -- which is where it lives in the repository.  Shipping the
+# modules only under fusang/ made all three die with ModuleNotFoundError
+# before doing any work.  The root copies are the same source files
+# (byte-identical, verified by sha256 in the manifest) and exist purely to
+# satisfy those imports; keeping the shipped scripts byte-identical to the
+# repository is what lets a reviewer diff them directly against the public
+# repo.
+#
+# The complete set is fusang_v2.py plus the three modules IT imports:
+#   kmer_distance   -- imported at module load (fusang_v2.py:21)
+#   fastme_backend  -- imported lazily on the --tree_method fastme path (:934)
+#   minhash_lsh     -- imported lazily on the DCM minhash path (:960, :989)
+# All three of those live at the repository root as well.  Copying only
+# fusang_v2.py would just move the ImportError one line down.
+for _mod in ("fusang_v2.py", "kmer_distance.py", "fastme_backend.py",
+             "minhash_lsh.py"):
+    put_file(_mod, _mod, "code_fix")
+    print("[C4] root-level copy: %s (satisfies 'import %s')"
+          % (_mod, _mod[:-3]))
 put_file("run_scalability_test_fixed.py", "scripts/run_scalability_test_fixed.py",
          "code_fix")
 
@@ -275,6 +328,22 @@ for i in range(1, 8):
         put_file(f"Supplementary_Figure_S{i}.{ext}",
                  f"figures/Supplementary_Figure_S{i}.{ext}", "figures")
 print(f"[C5] {n_fig} figure files added")
+
+# --------------------------------------------------------------------------
+# C6. Supplementary Tables S1-S17.  The manuscript cites 17 of them; until
+# v2.1 they existed as captions only, with no tabulated content, so the
+# per-seed evidence they are supposed to carry was unreachable.  They are
+# built from the same per-seed CSVs shipped in this package
+# (scripts/build_supp_tables.py), so a reviewer can regenerate them.
+# --------------------------------------------------------------------------
+_supp = "Supplementary_Tables.docx"
+if os.path.exists(_supp):
+    put_file(_supp, "tables/Supplementary_Tables.docx", "supp_tables")
+    put_file("build_supp_tables.py", "scripts/build_supp_tables.py",
+             "supp_tables")
+    print("[C6] Supplementary_Tables.docx + its build script added")
+else:
+    print("[C6] WARNING: Supplementary_Tables.docx not found; skipped")
 
 # The simulator that ACTUALLY generated the manuscript data
 put_file("gen_indelible_sim.py", "scripts/gen_indelible_sim.py", "simulator")
