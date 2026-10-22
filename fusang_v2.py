@@ -1144,9 +1144,9 @@ def parse_args():
                         default=None,
                         help="DCM strategy: simple (no DCM, direct NJ for n<500), nj_centroid (current DCM with NJ), epa_improved (DCM+NNI refinement after EPA grafting)")
     parser.add_argument("--simple", dest="force_simple", action="store_true", default=None,
-                        help="Force simplified pipeline (k-mer→dist→tree, no DCM/EPA). Auto-enabled for n≤500.")
+                        help="Force simplified pipeline (k-mer→dist→tree, no DCM/EPA). Auto-enabled for n≤500. Takes precedence over the n>500 auto-switch to DCM.")
     parser.add_argument("--no-simple", dest="force_simple", action="store_false", default=None,
-                        help="Force DCM pipeline even for n≤500 (for benchmarking only)")
+                        help="Force DCM pipeline even for n≤500 (for benchmarking only). Takes precedence over the n≤500 auto-switch to the simplified pipeline.")
     parser.add_argument("--use_minhash", dest="use_minhash", action="store_true", default=False,
                         help="Use MinHash LSH for coarse clustering (scales to 50K+ taxa, requires minhash_lsh.py)")
     parser.add_argument("--minhash_k", type=int, default=5,
@@ -1262,8 +1262,14 @@ def main():
     #   -> Keep DCM for n>500; use simplified for n<=500.
     SIMPLE_THRESHOLD = 500  # Reverted - 2000 caused regression (nRF 0.0878 → 0.1073)
     use_simple = args.force_simple
-    # Override based on auto_group_method
-    if epa_method == "simple":
+    # Override based on auto_group_method. An explicitly passed --simple /
+    # --no-simple (force_simple is not None) always takes precedence and is
+    # NOT overridden here; the auto-switch below only applies when the user
+    # left the flag unspecified.
+    if args.force_simple is not None:
+        print("[MAIN]   --simple/--no-simple explicitly given: user flag takes precedence "
+              "over auto_group_method=%s auto-switch" % epa_method)
+    elif epa_method == "simple":
         use_simple = True
         print("[MAIN]   auto_group_method=simple: forcing simplified pipeline (no DCM)")
     elif epa_method in ("nj_centroid", "epa_improved"):
@@ -1283,8 +1289,12 @@ def main():
     if use_simple:
         if args.max_group < n:
             args.max_group = n
-        print("[MAIN]   simplified pipeline: n=%d ≤ %d → direct tree (no DCM/EPA, %s)"
-              % (n, SIMPLE_THRESHOLD, args.tree_method))
+        if args.force_simple is not None:
+            print("[MAIN]   simplified pipeline (forced by --simple): n=%d → direct tree (no DCM/EPA, %s)"
+                  % (n, args.tree_method))
+        else:
+            print("[MAIN]   simplified pipeline: n=%d ≤ %d → direct tree (no DCM/EPA, %s)"
+                  % (n, SIMPLE_THRESHOLD, args.tree_method))
     # Step 2: divide-and-conquer tree building
     print("\n[MAIN] Step 2: building tree (build_mode=%s)..." % build_mode)
     gap_pattern = None
