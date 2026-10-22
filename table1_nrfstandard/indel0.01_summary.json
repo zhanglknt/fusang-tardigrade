@@ -19,10 +19,14 @@
  ],
  "wilcoxon_on_integer_rf": true,
  "wilcoxon_W": 2517.0,
+ "wilcoxon_p_normal_approx": 5.1988292269278946e-05,
+ "permutation_p_exact": null,
+ "unanimous_all_seeds": false,
  "wilcoxon_p": 5.1988292269278946e-05,
  "cohens_dz": 0.39048659280995535,
  "fusang_better": 44,
  "ft2_better": 82,
  "ties": 4,
- "metric": "nrf_standard (root-independent unrooted RF)"
+ "metric": "nrf_standard (root-independent unrooted RF)",
+ "relative_advantage_pct": -5.160736430411143
 }

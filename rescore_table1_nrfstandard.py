@@ -109,6 +109,19 @@ def main():
             W, p = wilcoxon(diff_int, zero_method='zsplit')
         else:
             W, p = float('nan'), float('nan')
+
+        # Exact sign-flip permutation p, for the degenerate case where every
+        # seed points the same way.  There the signed-rank statistic is pinned
+        # at its floor (W = 0, or W = max), only one of the 2**k sign
+        # assignments realises it, and the large-sample normal approximation
+        # badly overstates the p-value (it returns ~1.73e-6 where the exact
+        # value is 2/2**30 = 1.86e-9).  The |d| tie structure does not affect
+        # the count: W = 0 requires every sign to be negative, which is one
+        # assignment out of 2**k whatever the ranks are.
+        unanimous = bool(((nz > 0).all() or (nz < 0).all())) if len(nz) else False
+        perm_p = float(2.0 / (2 ** len(nz))) if unanimous else None
+        # The p-value the manuscript reports for this cell.
+        reported_p = perm_p if perm_p is not None else float(p)
         dz = float(np.mean(diff_int) / np.std(diff_int, ddof=1)) \
             if np.std(diff_int, ddof=1) > 0 else float('nan')
 
@@ -134,7 +147,10 @@ def main():
             'bootstrap_ci95_mean_diff': ci,
             'wilcoxon_on_integer_rf': True,
             'wilcoxon_W': float(W),
-            'wilcoxon_p': float(p),
+            'wilcoxon_p_normal_approx': float(p),
+            'permutation_p_exact': perm_p,
+            'unanimous_all_seeds': unanimous,
+            'wilcoxon_p': reported_p,
             'cohens_dz': dz,
             'fusang_better': int((diff_int < 0).sum()),
             'ft2_better': int((diff_int > 0).sum()),
@@ -142,6 +158,11 @@ def main():
             'metric': 'nrf_standard (root-independent unrooted RF)',
         }
         report[label] = summary
+
+        # computed here (not after the JSON write) so it lands in the per-cell
+        # summary file as well as the aggregate one
+        rel = (nt.mean() - nf.mean()) / nt.mean() * 100.0
+        summary['relative_advantage_pct'] = float(rel)
 
         csv_path = os.path.join(OUT_DIR, '%s_nrfstandard.csv' % label)
         with open(csv_path, 'w', encoding='utf-8') as fh:
@@ -155,9 +176,6 @@ def main():
                   encoding='utf-8') as fh:
             json.dump(summary, fh, indent=1)
 
-        rel = (nt.mean() - nf.mean()) / nt.mean() * 100.0
-        summary['relative_advantage_pct'] = float(rel)
-
         ms = MANUSCRIPT.get(label)
         flag = ''
         if ms:
@@ -165,10 +183,14 @@ def main():
                   and abs(rel - ms[2]) < 0.15)
             flag = ('  [MATCH]' if ok else
                     '  [DRIFT vs manuscript %.3f/%.3f/%.1f%%]' % (ms[0], ms[1], ms[2]))
-        print('%-12s n=%3d  Fusang %.4f+-%.4f  FT2 %.4f+-%.4f  p=%.3g  '
+        # print the value the MANUSCRIPT reports, not the raw normal
+        # approximation, so a reviewer running this script sees the numbers
+        # they are trying to check
+        tag = ' (exact perm, W=0)' if unanimous else ''
+        print('%-12s n=%3d  Fusang %.4f+-%.4f  FT2 %.4f+-%.4f  p=%.3g%s  '
               'd=%+.2f  wins %d/%d/%d%s'
               % (label, len(rows), nf.mean(), nf.std(ddof=1),
-                 nt.mean(), nt.std(ddof=1), p, dz,
+                 nt.mean(), nt.std(ddof=1), reported_p, tag, dz,
                  summary['fusang_better'], summary['ft2_better'],
                  summary['ties'], flag))
 
