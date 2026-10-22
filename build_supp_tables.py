@@ -160,6 +160,16 @@ for cond, fn in cond_files:
         rows.append([cond, r["seed"], r["n_taxa"], fmt(r["nrf_fusang"]), fmt(r["nrf_ft2"])])
 assert len(rows) == 120, len(rows)
 summ = json.load(open(p("table1_nrfstandard", "TABLE1_all_summary.json"), encoding="utf-8"))
+seed_ranges = {}
+for key in ["n500_clean", "n500_indel", "n1000_clean", "n1000_indel"]:
+    s = json.load(open(p("table1_nrfstandard", key + "_summary.json"), encoding="utf-8"))
+    assert s["seed_range"][1] - s["seed_range"][0] + 1 == s["n_seeds"] == 30
+    seed_ranges[key] = (s["seed_range"][0], s["seed_range"][1])
+s6_seeds = (f"n=500 clean (seeds {seed_ranges['n500_clean'][0]}–{seed_ranges['n500_clean'][1]}), "
+            f"n=500 indel (seeds {seed_ranges['n500_indel'][0]}–{seed_ranges['n500_indel'][1]}), "
+            f"n=1000 clean (seeds {seed_ranges['n1000_clean'][0]}–{seed_ranges['n1000_clean'][1]}), "
+            f"n=1000 indel (seeds {seed_ranges['n1000_indel'][0]}–{seed_ranges['n1000_indel'][1]}; "
+            "30 seeds each)")
 srows = []
 for key, cond in [("n500_clean", "n=500, clean"), ("n500_indel", "n=500, indel"),
                   ("n1000_clean", "n=1000, clean"), ("n1000_indel", "n=1000, indel")]:
@@ -169,9 +179,9 @@ for key, cond in [("n500_clean", "n=500, clean"), ("n500_indel", "n=500, indel")
                   fmt_p(s["wilcoxon_p"]), f"{s['cohens_dz']:.2f}",
                   f"{s['fusang_better']}/{s['ft2_better']}/{s['ties']}"])
 sections.append((
-    "**Supplementary Table S6.** Multi-seed benchmark at n=500 (30 seeds, seeds 500–529) "
-    "and n=1000 (30 seeds, seeds 1000–1029): all conditions complete including n=1000 "
-    "indel data (standard root-independent unrooted RF vs the true tree). All raw nRF "
+    "**Supplementary Table S6.** Multi-seed benchmark at n=500 (30 seeds) and n=1000 "
+    f"(30 seeds): all conditions complete including n=1000 indel data ({s6_seeds}; "
+    "standard root-independent unrooted RF vs the true tree). All raw nRF "
     "values and statistical tests are provided for reproducibility. "
     "Sources: `table1_nrfstandard/{n500_clean,n500_indel,n1000_clean,n1000_indel}_nrfstandard.csv`.",
     md_table(["condition", "seed", "n", "nRF Fusang", "nRF FastTree2"], rows)
@@ -311,7 +321,7 @@ sections.append((
 sw_rows = read_csv(p("swisstree_rf_recomputed", "swisstree_rf_standard.csv"))
 assert len(sw_rows) == 66, len(sw_rows)
 corrected = {r["family"]: r for r in read_csv(p("benchmark_swisstree_corrected.csv"))}
-gap_frac = {"ST001": ("98", "524", "0.362"), "ST002": ("54", "1127", "0.489"),
+gap_frac = {"ST001": ("49", "524", "0.362"), "ST002": ("54", "1127", "0.489"),
             "ST003": ("49", "563", "0.112"), "ST004": ("115", "930", "0.517"),
             "ST005": ("29", "488", "0.324"), "ST007": ("60", "687", "0.809"),
             "ST008": ("42", "860", "0.678"), "ST009": ("39", "259", "0.572"),
@@ -449,6 +459,14 @@ sections.append((
 # ---------------------------------------------------------------- S16
 s16_md = open(p("real_data", "afproject_genome", "Supplementary_Table_S16.md"), encoding="utf-8").read()
 s16_md = re.sub(r"^# Supplementary Table S16[^\n]*\n", "", s16_md).strip()
+# S16 content guards: ST001 counted by unique sequences (49), not FASTA records (98);
+# the remaining 10 families match the SwissTree scoring source on n.
+assert "| ST001 | 49 | 524 | 0.362 |" in s16_md
+assert "| ST001 | 98 |" not in s16_md
+for fam, n in [("ST002", "54"), ("ST003", "49"), ("ST004", "115"), ("ST005", "29"),
+               ("ST007", "60"), ("ST008", "42"), ("ST009", "39"), ("ST010", "34"),
+               ("ST011", "159"), ("ST012", "21")]:
+    assert re.search(rf"\| {fam} \| {n} \|", s16_md), fam
 sections.append((
     "**Supplementary Table S16.** Real genome benchmarks (AFproject community datasets): "
     "complete per-method results for fish mtDNA (25 mitochondrial genomes, Fischer et al. "

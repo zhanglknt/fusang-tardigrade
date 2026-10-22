@@ -12,7 +12,7 @@
 
 | Family | n | Aligned length | Gap fraction |
 |---------|---|----------------|--------------|
-| ST001 | 98 | 524 | 0.362 |
+| ST001 | 49 | 524 | 0.362 |
 | ST002 | 54 | 1127 | 0.489 |
 | ST003 | 49 | 563 | 0.112 |
 | ST004 | 115 | 930 | 0.517 |
@@ -23,6 +23,8 @@
 | ST010 | 34 | 428 | 0.502 |
 | ST011 | 159 | 1707 | 0.682 |
 | ST012 | 21 | 732 | 0.451 |
+
+Note: n is the number of unique sequences. The ST001 source data store each sequence twice (98 FASTA records vs 49 unique sequences); n is counted as unique sequences, so ST001 is 49, not 98.
 
 ## Per-method results (ETE3 Tree.compare, unrooted nRF, max_rf = 2(n-3))
 
