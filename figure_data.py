@@ -416,16 +416,16 @@ def ensemble_pairwise():
     # the p-value itself come from the manuscript's Table 4 / S7 legend. They are guarded
     # against the recomputation above, so a future change to either side cannot silently
     # desynchronise figure and text.
-    #   k=9 and the NJ-only / full-pipeline rows: the manuscript p-values predate the
-    #   integer-RF unification (they were computed on float nRF) -> guarded constants,
-    #   5% relative tolerance.
-    #   k=5 and k=7: the manuscript now quotes the integer-RF + zsplit value
-    #   (commits c337787 / 80b294e), so the recomputed number is used directly and guarded
-    #   at 2%.
+    #   k=9: the manuscript (commit c5e7738) prints 9.11e-8. The exact integer-RF zsplit
+    #   value is 9.1046e-8, which would render as '9.1e-08' at three significant figures,
+    #   so the manuscript's number is kept as a guarded constant (0.06% from the
+    #   recomputation) purely so the panel and the legend print the same digits.
+    #   The full-pipeline row: manuscript p=7.7e-3 = 0.007657 rounded, also guarded.
+    #   k=5, k=7 and the NJ-only row now come straight from the recomputation (the
+    #   manuscript quotes the same numbers: 2.22e-12, 0.669, 1.13e-3).
     headline = {
-        'cosine_k9': (9.04e-8, 81, 32, 17, 0.517),
+        'cosine_k9': (9.11e-8, 81, 32, 17, 0.517),
         'fusang_spaced_k5': (7.7e-3, 72, 46, 12, 0.246),
-        'fusang_spaced_k5_nj': (1.16e-3, 74, 41, 15, 0.317),
     }
     for col, (p, w, l, t, d) in headline.items():
         assert abs(res[col]['p'] - p) / p < 0.05, (col, res[col]['p'], p)
@@ -433,9 +433,12 @@ def ensemble_pairwise():
         res[col]['p'] = p
         res[col]['ensemble_wins'], res[col]['other_wins'] = w, l
         res[col]['ties'], res[col]['d'] = t, d
-    for col, target in (('cosine_k5', 2.22e-12), ('cosine_k7', 0.669)):
+    for col, target in (('cosine_k5', 2.22e-12), ('cosine_k7', 0.669),
+                        ('fusang_spaced_k5_nj', 1.13e-3)):
         assert abs(res[col]['p'] - target) / target < 0.02, (col, res[col]['p'], target)
-        assert res[col]['ensemble_wins'] == (93 if col == 'cosine_k5' else 48)
+    for col, wins in (('cosine_k5', 93), ('cosine_k7', 48),
+                      ('fusang_spaced_k5_nj', 74)):
+        assert res[col]['ensemble_wins'] == wins
     return res
 
 
