@@ -121,7 +121,12 @@ names = [e[c]['label'] for c in order]
 n_seeds = len(e['multik_ensemble']['true'])
 
 def _fmt_p(p):
-    # three significant figures, matching how the manuscript prints these p-values
+    # three significant figures, matching the manuscript (p=9.10e-8, p=2.22e-12, ...).
+    # Small p-values are printed as mantissa x 10^exponent so that a trailing zero in the
+    # mantissa is preserved (9.1046e-8 -> 9.10e-8, not 9.1e-8).
+    if p < 1e-3:
+        ex = int(np.floor(np.log10(p)))
+        return 'p=%.2fe%d' % (p / 10 ** ex, ex)
     return 'p=%.3g' % p
 
 bar_cols = []

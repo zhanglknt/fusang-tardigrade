@@ -39,7 +39,11 @@ def panel_label(ax, s):
             fontweight='bold', color=INK, va='top')
 
 def fmt_p(p):
-    # three significant figures, matching how the manuscript prints these p-values
+    # three significant figures, matching the manuscript; small p-values keep a trailing
+    # zero in the mantissa (9.1046e-8 -> 9.10e-8, not 9.1e-8)
+    if p < 1e-3:
+        ex = int(np.floor(np.log10(p)))
+        return '%.2fe%d' % (p / 10 ** ex, ex)
     return '%.3g' % p
 
 # ---------- A: scatter, NJ-only spaced vs ensemble ----------
