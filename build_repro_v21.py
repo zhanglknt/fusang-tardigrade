@@ -886,6 +886,16 @@ n=200, 30 seeds for n=500/1000)**
 > the working tree: they hold the superseded root-dependent nRF (e.g. 0.147 /
 > 0.137 for n=1000 clean, against the correct 0.257 / 0.212).
 
+> **Why the two clean rows share the p-value 1.86×10⁻⁹ (this is not a
+> transcription error).** In both cells all 30 seeds favour FastTree2 (0 for
+> Fusang, 0 ties), so the signed-rank statistic sits at its floor, W = 0. The
+> exact two-sided sign-flip permutation p is then 2/2³⁰ = 1.86×10⁻⁹ for *any*
+> 30-sample contrast that is unanimous, regardless of the effect magnitudes —
+> which is why n=500 and n=1000, whose mean differences differ (0.031 vs
+> 0.045), still share it. We report the exact value because the large-sample
+> normal approximation is badly in error in this extreme tail: it returns
+> 1.73×10⁻⁶ here, roughly 900× too conservative. See §10.4.
+
 > **The n=1,000 rows come from DCM+EPA, not the simplified pipeline.**
 > `scripts/run_bench_indelible.py` appends `--auto_group_method nj_centroid`
 > whenever n > 500, and with `SIMPLE_THRESHOLD = 500` this routes n=1,000
@@ -901,8 +911,10 @@ n=200, 30 seeds for n=500/1000)**
 | Fusang (k=5, gap2 → `1110011`, cosine, NJ) | **0.2364 ± 0.0336** | **0.1926 ± 0.0272** | **0.827 ± 0.144** (improves, p=6.2×10⁻⁶) |
 | Mash (MinHash k=21, s=10,000, NJ) | 0.3486 ± 0.0351 | 0.4034 ± 0.0844 | 1.164 ± 0.244 (degrades, p=3.0×10⁻³) |
 
-Paired Mash − Fusang: clean +0.1122 (p=1.73×10⁻⁶, Fusang better 30/30);
-indel +0.2108 (p=1.86×10⁻⁹, 30/30). 130-seed sensitivity run: Fusang
+Paired Mash − Fusang: clean +0.1122 (p=1.86×10⁻⁹, Fusang better 30/30);
+indel +0.2108 (p=1.86×10⁻⁹, 30/30). Both contrasts are unanimous across the
+30 seeds (W = 0), so both report the exact sign-flip permutation p = 2/2³⁰
+(§10.4). 130-seed sensitivity run: Fusang
 0.2343/0.1990, Mash 0.3529/0.4075, Fusang better 130/130 in both conditions.
 Mash v2.3, `mash triangle -i -k 21 -s 10000` (`-i` is required or a multi-FASTA
 is treated as one genome).
@@ -986,6 +998,13 @@ Fusang `11011` vs Co-phylog h11: p=0.0010 (d=−3.47); vs h5: p=0.0020
 | 16S rRNA (n=73) vs rebuilt FastTree2 | 0.371; vs taxonomy 0.414 (Fusang) / 0.343 (FT2), RF/(2n−6) |
 | Real genomes (AFproject, ETE3 nRF) | fish mtDNA multi-k 0.045; E. coli/Shigella cosine 0.500 |
 
+> **Table 12: the fish-mtDNA 0.045 is a ceiling, not a margin.** Every top
+> method on that dataset — multi-k cosine, kmacs, Mash, Co-phylog and
+> MAFFT+FastTree2 — returns exactly nRF = 0.045, so the benchmark is saturated.
+> Read it as "Fusang reaches the community-benchmark ceiling" on this single
+> 25-genome dataset, not as a lead over those methods; the discriminating column
+> is E. coli/Shigella (cosine 0.500 vs Mash 0.208).
+
 **Figures.** `figures/` carries the six main figures (Figure 1–6), the
 graphical abstract and Supplementary Figures S1–S7, rebuilt under the standard
 unrooted RF and the integer-RF/zsplit Wilcoxon convention. Each panel is
@@ -1015,9 +1034,27 @@ The integer `RF` column is present in the per-seed CSVs
 that the tests can be re-run on the correct input.
 
 **Rounding.** All p-values are quoted to three significant figures, matching
-`table1_nrfstandard/{cell}_summary.json`. Note that two genuinely different
-comparisons happen to share the value 1.73×10⁻⁶ (Mash vs Fusang on clean data,
-and Fusang vs FastTree2 at n=500/n=1000 clean); they are unrelated.
+`table1_nrfstandard/{cell}_summary.json`.
+
+**Unanimous 30-seed contrasts are reported as exact permutation p-values.**
+Four contrasts in the manuscript have all 30 seeds pointing the same way
+(Fusang vs FastTree2 at n=500 and n=1000 on clean data; Mash vs Fusang on
+clean and on indel data). In each of them the signed-rank statistic is pinned
+at its floor, W = 0, and the exact two-sided sign-flip permutation p is
+2/2³⁰ = 1.86×10⁻⁹ — the same number in all four cases, because the
+permutation distribution depends only on n and unanimity, not on the effect
+magnitudes. We report that exact value rather than the normal approximation,
+which at this tail returns ≈1.73×10⁻⁶, about 900× too conservative. The
+shared value is a property of the discrete statistic, not a transcription
+error. All other contrasts reported in the manuscript have discordant seeds,
+so their W is not at the floor and the tie-corrected normal approximation is
+accurate for them.
+
+To recompute: `2 / 2**30 == 1.8626451e-09`. The identity is easy to check on
+a small sample by brute force — at n=10 an all-negative sample enumerates to
+0.001953125 = 2/2¹⁰ — and the |d| tie structure does not affect the count,
+since W = 0 requires every sign to be negative, which is one assignment out
+of 2ⁿ whatever the ranks.
 
 ### 10.5 Pinned environment and the n=1,000 pipeline forensics
 
