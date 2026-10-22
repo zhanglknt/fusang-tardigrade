@@ -143,7 +143,9 @@ sections.append((
     "auto-selected k,gap across n=20/50/100/200/500. All 5 stability repeats at every "
     "scale returned identical k,gap selections and nRF within 0.005 units of each other "
     "(see Results, 'Parameter stability and reproducibility'; selection rule: k=4,gap1 "
-    "for n≤100, k=5,gap2 for n>100).",
+    "for n≤100, k=5,gap2 for n>100). These five rows are the auto-selection outcomes "
+    "recorded in the figure generator (`generate_fig4_v3.py`, panel C); no per-repeat "
+    "raw records are archived for this check.",
     md_table(["n", "selected k", "selected gap", "repeats with identical selection",
               "max nRF deviation across repeats"], rows)))
 
