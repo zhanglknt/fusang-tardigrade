@@ -153,10 +153,12 @@ All statistical analyses were performed in Python using scipy.stats. We note tha
 
 #### Accuracy metric
 
-Normalized Robinson-Foulds distance (nRF):
-nRF = (FP + FN) / (2n − 6)
+Normalized Robinson-Foulds distance (nRF, root-independent / unrooted):
+nRF = RF / (2(n − 3)) = (|S₁ \ S₂| + |S₂ \ S₁|) / (2(n − 3))
 
-where FP and FN are false positive and false negative bipartition counts. nRF=0: perfect match; nRF=1: complete disagreement.
+where S₁ and S₂ are the sets of **non-trivial splits (bipartitions)** of the two trees on their shared leaf set of size n. Each split is canonicalised by keeping the side that does **not** contain the lexicographically smallest leaf, so the measure is independent of rooting position. For a fully resolved unrooted binary tree the number of non-trivial splits is exactly n − 3, making 2(n − 3) the maximum attainable RF between two fully resolved trees; nRF=0 is a perfect match and nRF=1 complete disagreement. Partially resolved trees (e.g. trees containing polytomies or zero-length branches that collapse to multifurcations) contribute fewer than n − 3 splits, which correspondingly increases their RF against a fully resolved reference — we report this because FastTree2 output occasionally contains collapsed branches.
+
+Computation: `nrf_standard.py` in the reproduction package. We verified the implementation against DendroPy 5.0.8 (`treecompare.symmetric_difference` with `rooting='force-unrooted'`) on five independent tree pairs spanning both conditions and three dataset scales, obtaining bit-identical values (e.g. 0.274112, 0.220812, 0.228426, 0.213198, 0.221328). An earlier in-house metric (`calc_nrf_simple.py`), which retained only the smaller child clade of each internal node, captured only 64 of the 197 non-trivial splits of an n=200 reference tree and systematically distorted comparisons in Fusang's favour; **all nRF values reported here use the root-independent definition above**, and every value from the earlier metric has been recomputed.
 
 #### Comparison methods
 
@@ -213,17 +215,17 @@ On clean substitution-only data, Fusang's accuracy varies by dataset size (Table
 
 **Table 1. Accuracy on clean and indel-rich data (L=500 bp, INDELible birth–death trees; 130 seeds for n=200, 30 seeds for n=500/1000). All nRF values are TRUE-relative (vs simulated ground-truth tree) except where noted.**
 
-| n | Data Type | Fusang nRF ↓ (30 seeds) | FastTree2 nRF ↓ (30 seeds) | Winner |
-|---|-----------|---------------------------|----------------------------|--------|
-| 200 | Clean | 0.144 ± 0.025 (k=5,gap2) | 0.146 ± 0.025 | Tie (n.s., p=0.242) |
-| 200 | Indel (0.02) | **0.122 ± 0.024** (k=5,gap2) | 0.134 ± 0.022 | **Fusang** (p=1.9×10⁻⁷) |
-| 500 | Clean | 0.147 ± 0.014 (k=5,gap2) | **0.139 ± 0.011** | FT2 (p=0.004) |
-| 500 | Indel (0.02) | **0.125 ± 0.015** (k=5,gap2) | 0.131 ± 0.012 | Fusang (n.s., p=0.056) |
-| 1000 | Clean | 0.147 ± 0.015 (k=5,gap2) | **0.137 ± 0.013** | FT2 (p=3.2×10⁻⁴) |
-| 1000 | Indel (0.02) | 0.133 ± 0.010 (k=5,gap2) | 0.131 ± 0.009 | Tie (n.s., p=0.38) |
+| n | Data Type | Fusang nRF ↓ | FastTree2 nRF ↓ | Winner |
+|---|-----------|-------------------|----------------------|--------|
+| 200 | Clean | 0.234 ± 0.035 (k=5,gap2) | **0.210 ± 0.034** | FT2 (p=2.3×10⁻¹⁴) |
+| 200 | Indel (0.02) | **0.199 ± 0.030** (k=5,gap2) | 0.205 ± 0.030 | Fusang (p=0.049, borderline) |
+| 500 | Clean | 0.244 ± 0.019 (k=5,gap2) | **0.213 ± 0.017** | FT2 (p=1.7×10⁻⁶) |
+| 500 | Indel (0.02) | 0.208 ± 0.019 (k=5,gap2) | 0.209 ± 0.017 | Tie (n.s., p=0.29) |
+| 1000 | Clean | 0.257 ± 0.019 (k=5,gap2) | **0.212 ± 0.016** | FT2 (p=1.7×10⁻⁶) |
+| 1000 | Indel (0.02) | 0.226 ± 0.015 (k=5,gap2) | **0.212 ± 0.014** | FT2 (p=1.5×10⁻⁴) |
 
-nRF=0: perfect match. Best result in **bold**. Values are mean ± standard deviation. Seed counts differ by condition: 130 seeds for n=200 (clean: seeds 100–229; indel: seeds 100–229), 30 seeds for n=500 and n=1000. All nRF values are TRUE-relative (vs the simulated ground-truth tree) except where noted.
-† The Abstract reports the same 130-seed benchmark (nRF=0.122, seeds 100–229) for the n=200 indel condition that underlies this table row. That benchmark achieved p=1.9×10⁻⁷ (paired Wilcoxon signed-rank test on TRUE-relative nRF). After Bonferroni correction across the 6 ground-truth datasets (α≈0.008), the significant comparisons are reported in Supplementary Table S8.
+nRF=0: perfect match. Best result in **bold**. Values are mean ± standard deviation, computed with the root-independent (unrooted) RF definition given in the Methods. Seed counts differ by condition: 130 seeds for n=200 (clean: seeds 100–229; indel: seeds 100–229), 30 seeds for n=500 and n=1000. All nRF values are TRUE-relative (vs the simulated ground-truth tree).
+† After Bonferroni correction across the 6 ground-truth datasets (α≈0.008), the significant comparisons are reported in Supplementary Table S8. Note that under the root-independent RF definition used here, the direction of the clean-data comparisons is unchanged (FT2 better) while the n=200 indel comparison is borderline (p=0.049); an earlier metric (`calc_nrf_simple.py`) biased comparisons in Fusang's favour and is no longer used (see Methods).
 
 Importantly, Fusang achieves competitive accuracy with **zero sequence alignment**, operating directly on raw FASTA sequences. The multi-k ensemble variant (see below) provides accuracy comparable to the best single-k configuration without manual k selection (its improvement over the default spaced configuration is seed-set-dependent; see the Multi-k section). On clean data at n≥500, MSA-based methods retain a clear advantage (p<0.001 after correction), indicating that full positional information from alignment benefits ML inference when indels are absent.
 
@@ -260,14 +262,14 @@ The accuracy ranking between Fusang and MSA-based methods changes under indels (
 
 | Indel Rate | Fusang nRF ↓ (TRUE-rel) | FastTree2 nRF ↓ (TRUE-rel) |
 |------------|------------------------|----------------------------|
-| 0.005 | 0.138 | 0.141 |
-| 0.01 | 0.133 | 0.138 |
-| 0.02 | **0.122** | 0.134 |
-| 0.05 | **0.112** | 0.131 |
+| 0.005 | 0.224 | **0.206** |
+| 0.01 | 0.215 | **0.205** |
+| 0.02 | **0.199** | 0.205 |
+| 0.05 | **0.180** | 0.202 |
 
-Both columns are TRUE-relative and directly comparable per seed. The Fusang advantage over FastTree2 grows monotonically in magnitude with indel rate — +2.2% at 0.005 (Wilcoxon p=0.253, n.s.), +3.3% at 0.01 (p=0.052, borderline), +9.0% at 0.02 (p=1.9×10⁻⁷) and +14.4% at 0.05 (p=3.8×10⁻¹², Fusang better in 98/130 seeds) — becoming statistically significant from indel rate 0.02 upward (calculated as (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%). All four rows use 130/130 valid seeds (no outlier exclusions). An independent pipeline-level validation under a coalescent simulation protocol is reported below (single-k NJ: nRF=0.743, multi-k NJ: nRF=0.583), where absolute nRF values are higher for all methods.
+Both columns are TRUE-relative and directly comparable per seed. Fusang's accuracy relative to FastTree2 improves monotonically with indel rate and crosses over: Fusang is significantly *worse* at the two lowest rates (−8.9% at 0.005, Wilcoxon p=1.9×10⁻¹¹; −5.1% at 0.01, p=5.1×10⁻⁵), marginally better at 0.02 (+2.8%, p=0.049, borderline) and clearly better at 0.05 (+10.9%, p=1.3×10⁻¹¹, Fusang better in 99/130 seeds) — calculated as (FT2_nRF − Fusang_nRF) / FT2_nRF × 100%, so negative values denote a Fusang deficit. The crossover lies between indel rate 0.01 and 0.02. All four rows use 130/130 valid seeds (no outlier exclusions). An independent pipeline-level validation under a separate simulation protocol is reported below.
 
-The Fusang advantage increases with indel rate across the tested range (0.005–0.05). At indel=0.05, Fusang achieves a 13.2% relative advantage (nRF 0.066 vs 0.076), while at biologically typical rates (0.01–0.02) the advantage is modest (+4.5–5.9%). Real biological indel rates typically fall in the 0.01–0.05 range [27,28] — a regime where Fusang's robustness provides measurable benefit. The monotonic trend suggests Fusang's advantage may further increase at higher indel rates (>0.05), though phylogenetic signal eventually degrades for all methods.
+The Fusang advantage increases with indel rate across the tested range (0.005–0.05), changing sign between 0.01 and 0.02. At indel=0.05 Fusang achieves a 10.9% relative advantage (nRF 0.180 vs 0.202), whereas at 0.005 and 0.01 FastTree2 retains a significant advantage (8.9% and 5.1%). Real biological indel rates typically fall in the 0.01–0.05 range [27,28]; Fusang's advantage is therefore concentrated in the upper part of that range, and alignment-free inference should be preferred over MSA+ML only when indel density is high. The monotonic trend suggests Fusang's advantage may further increase at higher indel rates (>0.05), though phylogenetic signal eventually degrades for all methods.
 
 ### 130-seed benchmark validates indel robustness advantage
 
@@ -395,14 +397,14 @@ Systematic parameter scanning (k=3–8, gap=0–4, n=20–1000) revealed a robus
 
 | n | Adaptive (k,gap) | Fusang nRF (clean) | FT2 nRF (clean) | Notes |
 |---|:---:|------------|----------|-------|
-| 50 | 4,gap1 | 0.167 ± 0.046 | 0.167 ± 0.046 | Comparable (clean, p=0.935) § |
-| 100 | 5,gap2 | 0.147 ± 0.033 | 0.151 ± 0.032 | Comparable (clean, p=0.183) § |
-| 200 | 5,gap2 | 0.144 ± 0.025 | 0.146 ± 0.025 | Comparable (clean, p=0.242) |
-| 200 | 5,gap2 | **0.122 ± 0.024** | 0.134 ± 0.022 | Fusang better (indel, p=1.9×10⁻⁷) ‡ |
-| 500 | 5,gap2 | 0.147 ± 0.014 | **0.139 ± 0.011** | FT2 better (clean, p=0.004) |
-| 1000 | 5,gap2 | 0.147 ± 0.015 | **0.137 ± 0.013** | FT2 better (clean, p=3.2×10⁻⁴) |
+| 50 | 4,gap1 | 0.232 ± 0.072 | **0.210 ± 0.067** | FT2 better (clean, p=1.3×10⁻⁵) § |
+| 100 | 5,gap2 | 0.234 ± 0.045 | **0.209 ± 0.045** | FT2 better (clean, p=1.2×10⁻¹⁰) § |
+| 200 | 5,gap2 | 0.234 ± 0.035 | **0.210 ± 0.034** | FT2 better (clean, p=2.3×10⁻¹⁴) |
+| 200 | 5,gap2 | **0.199 ± 0.030** | 0.205 ± 0.030 | Fusang better (indel, p=0.049, borderline) ‡ |
+| 500 | 5,gap2 | 0.244 ± 0.019 | **0.213 ± 0.017** | FT2 better (clean, p=1.7×10⁻⁶) |
+| 1000 | 5,gap2 | 0.257 ± 0.019 | **0.212 ± 0.016** | FT2 better (clean, p=1.7×10⁻⁶) |
 
-**Notes**: For n<1000, Notes column indicates which method performs better and the p-value when significant. For n=1000, "Simplified" indicates that the simplified pipeline (k-mer→cosine→NJ plus BME-scored NNI refinement for n≥100) was used rather than DCM+EPA; the winner is still FastTree2 on clean data. See Supplementary Table S6 for complete n=1000 benchmark results (30 seeds, both clean and indel conditions). ‡ Row values are from the 130-seed benchmark (seeds 100–229; all seeds valid, no outlier exclusion), paired Wilcoxon p=1.9×10⁻⁷ (Table 3). § n=50 and n=100 rows: 130-seed INDELible clean benchmarks (seeds 100–229) measured at the benchmark configuration k=5,gap2 (the Adaptive column shows what the parameter selector would choose). At n=50, 3/130 seeds exceeded the symmetric nRF>0.3 outlier threshold (seeds 126, 175, 185) and were excluded (n=127; inclusion of all 130 seeds does not change the conclusion, p=0.947); n=100 had zero outliers (130/130 valid). Neither scale shows a significant difference (n=50: p=0.935; n=100: p=0.183).
+**Notes**: For n<1000, Notes column indicates which method performs better and the p-value when significant. For n=1000, "Simplified" indicates that the simplified pipeline (k-mer→cosine→NJ plus BME-scored NNI refinement for n≥100) was used rather than DCM+EPA; the winner is still FastTree2 on clean data. See Supplementary Table S6 for complete n=1000 benchmark results (30 seeds, both clean and indel conditions). ‡ Row values are from the 130-seed benchmark (seeds 100–229; all seeds valid, no outlier exclusion), paired Wilcoxon p=0.049 (Table 3). § n=50 and n=100 rows: 130-seed INDELible clean benchmarks (seeds 100–229) measured at the benchmark configuration k=5,gap2 (the Adaptive column shows what the parameter selector would choose). Values shown use all 130 seeds; applying the pre-specified symmetric nRF>0.3 exclusion removes 26/130 seeds at n=50 (Fusang 0.208 ± 0.057 vs FT2 0.189 ± 0.052, p=9.9×10⁻⁵) and 10/130 at n=100 (0.228 ± 0.041 vs 0.204 ± 0.041, p=8.1×10⁻¹⁰) without changing any conclusion. FastTree2 is significantly better at every clean-data scale tested.
 
 On indel-rich data (indel rate=0.02), the optimal gap shifts slightly: gap3 provides a modest 10.5% improvement over gap2 at n=200 (nRF=0.043 vs 0.048, Supplementary Table S2), attributed to wider spacing better tolerating indel-induced length variation. However, the absolute improvement is small, and k=5,gap2 remains a robust default within 10% of the empirical optimum across all tested conditions.
 
