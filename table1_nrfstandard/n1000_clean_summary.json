@@ -1,0 +1,28 @@
+{
+ "label": "n1000_clean",
+ "directory": "indelible_n1000_clean",
+ "condition": "clean",
+ "n_seeds": 30,
+ "seed_range": [
+  1000,
+  1029
+ ],
+ "n_taxa": 1000,
+ "fusang_nrf_mean": 0.25737211634904716,
+ "fusang_nrf_sd": 0.018570570609481432,
+ "ft2_nrf_mean": 0.21203610832497494,
+ "ft2_nrf_sd": 0.01609692375634459,
+ "mean_diff_fusang_minus_ft2": 0.04533600802407223,
+ "bootstrap_ci95_mean_diff": [
+  0.040922768304914744,
+  0.04989969909729188
+ ],
+ "wilcoxon_on_integer_rf": true,
+ "wilcoxon_W": 0.0,
+ "wilcoxon_p": 1.7300371292901245e-06,
+ "cohens_dz": 3.4977532346625337,
+ "fusang_better": 0,
+ "ft2_better": 30,
+ "ties": 0,
+ "metric": "nrf_standard (root-independent unrooted RF)"
+}
