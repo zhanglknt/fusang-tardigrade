@@ -81,7 +81,9 @@ where M = ½(P+Q) and D_KL is the Kullback-Leibler divergence. JSD is symmetric 
 
 Fusang implements two distinct tree-building strategies selected automatically based on dataset size:
 
-#### Simplified pipeline (n ≤ 1000, default)
+#### Simplified pipeline (default for n ≤ 500)
+
+The simplified pipeline is the default route for n ≤ 500; above that threshold Fusang switches to DCM+EPA automatically. It can be requested explicitly at larger n with `--auto_group_method simple`. (The `--simple` flag is intended to do the same, but in the version used for this work it is silently overridden for n > 500 by the `epa_method` branch in `fusang_v2.py`; see the note to Table 11.)
 
 For small-to-medium datasets, Fusang bypasses divide-and-conquer entirely:
 1. Extract spaced k-mer frequency vectors for all sequences
@@ -193,7 +195,7 @@ To test the indel-robustness claims on real data beyond simulations, we benchmar
 
 ### Cross-platform compatibility and deployment
 
-Fusang is implemented in Python 3.10+ with a modular architecture that supports both command-line and script-based workflows. Pre-compiled FastME binaries are provided for Windows (x86-64) and Linux (x86-64), ensuring consistent numerical results across platforms. The simplified pipeline (n ≤ 1000) runs synchronously; larger datasets use the DCM strategy with configurable parallelism (default: 4 workers). A containerized Docker image (python:3.10-slim base) is provided for reproducible deployment.
+Fusang is implemented in Python 3.10+ with a modular architecture that supports both command-line and script-based workflows. Pre-compiled FastME binaries are provided for Windows (x86-64) and Linux (x86-64), ensuring consistent numerical results across platforms. The simplified pipeline (default for n ≤ 500) runs synchronously; larger datasets use the DCM strategy with configurable parallelism (default: 4 workers). A containerized Docker image (python:3.10-slim base) is provided for reproducible deployment.
 
 ---
 
