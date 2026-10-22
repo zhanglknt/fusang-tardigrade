@@ -175,7 +175,7 @@ If the classifier reports your dataset as structured in a way consistent with re
 
 Fusang outputs a topology with branch lengths in cosine-distance units. To sanity-check:
 
-- Compare against a reference method on the same data (`calc_nrf_simple.py` computes normalized Robinson–Foulds distance between two Newick trees).
+- Compare against a reference method on the same data (`nrf_standard.py` computes the standard root-independent normalized Robinson–Foulds distance between two Newick trees; it replaces the withdrawn `calc_nrf_simple.py`, whose root-dependent "smaller child clade" rule under-counted splits — only 64 of 197 at n=200 — and systematically favoured Fusang).
 - For publication-grade support values, bootstrap by resampling columns is not meaningful for alignment-free input; instead, replicate over k and gap settings and check clade stability, or run the multi-k ensemble and compare with single-k results.
 - For downstream dating/ML refinement, import the Newick into standard tools.
 

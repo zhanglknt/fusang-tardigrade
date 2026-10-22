@@ -60,8 +60,10 @@ To see the saturation effect yourself, compare:
 ```bash
 python fusang_v2.py -i mito_genomes_25.fasta -o mito_single_k.nwk   # k=4,gap1 auto
 python fusang_v4_dahp_v1.py mito_genomes_25.fasta --v3 --output mito_multik.nwk
-python calc_nrf_simple.py mito_single_k.nwk mito_multik.nwk         # topological difference
+python nrf_standard.py mito_single_k.nwk mito_multik.nwk            # topological difference (standard unrooted nRF)
 ```
+
+> **Note:** `nrf_standard.py` computes the standard root-independent normalized Robinson–Foulds distance, nRF = RF/(2(n−3)), over non-trivial splits. The earlier `calc_nrf_simple.py` was withdrawn: it is root-dependent and its per-node "smaller child clade" rule under-counts splits (only 64 of 197 captured at n=200), which systematically biased tree comparisons in Fusang's favour. It is retained in the package only as `fusang/calc_nrf_simple_SUPERSEDED.py` for audit trail — do not use it for new comparisons.
 
 ---
 
