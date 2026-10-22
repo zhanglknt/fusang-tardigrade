@@ -108,8 +108,9 @@ def splits(nwk_or_tree) -> Set[FrozenSet[str]]:
         return acc
 
     walk(tree)
-    # drop trivial splits (size 1 and size n-1) and the full set
-    return {s for s in result if 1 < len(s) < len(all_leaves) - 0 and len(s) < len(all_leaves)}
+    # drop trivial splits: size 1, size n-1 (pendant edge, which surfaces when the
+    # Newick root has a leaf child, e.g. "(seq0,(...));") and the full set
+    return {s for s in result if 1 < len(s) < len(all_leaves) - 1}
 
 
 def _canon(side: Set[str], all_leaves, ref: str) -> FrozenSet[str]:
