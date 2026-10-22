@@ -1,0 +1,227 @@
+{
+  "scorer": "nrf_standard.py (root-independent unrooted RF, max_rf=2(n-3))",
+  "wilcoxon": "scipy.stats.wilcoxon on integer RF counts, zero_method='zsplit'",
+  "n_seeds": 30,
+  "mean_nrf_cosine": 0.19576988155668357,
+  "sd_nrf_cosine": 0.025803698591734904,
+  "mean_nrf_sqrtjsd": 0.2047377326565144,
+  "sd_nrf_sqrtjsd": 0.028725308633166722,
+  "cosine_better_seeds": 22,
+  "sqrtjsd_better_seeds": 7,
+  "tie_seeds": 1,
+  "wilcoxon_statistic": 109.5,
+  "wilcoxon_p": 0.011222979139826667,
+  "cohens_d_paired": 0.38351877547055757,
+  "per_seed": [
+    {
+      "seed": 100,
+      "rf_cosine": 108,
+      "rf_sqrtjsd": 106,
+      "nrf_cosine": 0.27411167512690354,
+      "nrf_sqrtjsd": 0.26903553299492383
+    },
+    {
+      "seed": 101,
+      "rf_cosine": 74,
+      "rf_sqrtjsd": 74,
+      "nrf_cosine": 0.18781725888324874,
+      "nrf_sqrtjsd": 0.18781725888324874
+    },
+    {
+      "seed": 102,
+      "rf_cosine": 82,
+      "rf_sqrtjsd": 72,
+      "nrf_cosine": 0.20812182741116753,
+      "nrf_sqrtjsd": 0.18274111675126903
+    },
+    {
+      "seed": 103,
+      "rf_cosine": 70,
+      "rf_sqrtjsd": 78,
+      "nrf_cosine": 0.17766497461928935,
+      "nrf_sqrtjsd": 0.19796954314720813
+    },
+    {
+      "seed": 104,
+      "rf_cosine": 82,
+      "rf_sqrtjsd": 86,
+      "nrf_cosine": 0.20812182741116753,
+      "nrf_sqrtjsd": 0.2182741116751269
+    },
+    {
+      "seed": 105,
+      "rf_cosine": 92,
+      "rf_sqrtjsd": 96,
+      "nrf_cosine": 0.233502538071066,
+      "nrf_sqrtjsd": 0.2436548223350254
+    },
+    {
+      "seed": 106,
+      "rf_cosine": 84,
+      "rf_sqrtjsd": 90,
+      "nrf_cosine": 0.2131979695431472,
+      "nrf_sqrtjsd": 0.22842639593908629
+    },
+    {
+      "seed": 107,
+      "rf_cosine": 68,
+      "rf_sqrtjsd": 50,
+      "nrf_cosine": 0.17258883248730963,
+      "nrf_sqrtjsd": 0.12690355329949238
+    },
+    {
+      "seed": 108,
+      "rf_cosine": 84,
+      "rf_sqrtjsd": 86,
+      "nrf_cosine": 0.2131979695431472,
+      "nrf_sqrtjsd": 0.2182741116751269
+    },
+    {
+      "seed": 109,
+      "rf_cosine": 86,
+      "rf_sqrtjsd": 92,
+      "nrf_cosine": 0.2182741116751269,
+      "nrf_sqrtjsd": 0.233502538071066
+    },
+    {
+      "seed": 110,
+      "rf_cosine": 90,
+      "rf_sqrtjsd": 66,
+      "nrf_cosine": 0.22842639593908629,
+      "nrf_sqrtjsd": 0.16751269035532995
+    },
+    {
+      "seed": 111,
+      "rf_cosine": 76,
+      "rf_sqrtjsd": 98,
+      "nrf_cosine": 0.19289340101522842,
+      "nrf_sqrtjsd": 0.24873096446700507
+    },
+    {
+      "seed": 112,
+      "rf_cosine": 82,
+      "rf_sqrtjsd": 76,
+      "nrf_cosine": 0.20812182741116753,
+      "nrf_sqrtjsd": 0.19289340101522842
+    },
+    {
+      "seed": 113,
+      "rf_cosine": 60,
+      "rf_sqrtjsd": 70,
+      "nrf_cosine": 0.15228426395939088,
+      "nrf_sqrtjsd": 0.17766497461928935
+    },
+    {
+      "seed": 114,
+      "rf_cosine": 68,
+      "rf_sqrtjsd": 80,
+      "nrf_cosine": 0.17258883248730963,
+      "nrf_sqrtjsd": 0.20304568527918782
+    },
+    {
+      "seed": 115,
+      "rf_cosine": 68,
+      "rf_sqrtjsd": 74,
+      "nrf_cosine": 0.17258883248730963,
+      "nrf_sqrtjsd": 0.18781725888324874
+    },
+    {
+      "seed": 116,
+      "rf_cosine": 82,
+      "rf_sqrtjsd": 92,
+      "nrf_cosine": 0.20812182741116753,
+      "nrf_sqrtjsd": 0.233502538071066
+    },
+    {
+      "seed": 117,
+      "rf_cosine": 64,
+      "rf_sqrtjsd": 66,
+      "nrf_cosine": 0.16243654822335024,
+      "nrf_sqrtjsd": 0.16751269035532995
+    },
+    {
+      "seed": 118,
+      "rf_cosine": 76,
+      "rf_sqrtjsd": 88,
+      "nrf_cosine": 0.19289340101522842,
+      "nrf_sqrtjsd": 0.2233502538071066
+    },
+    {
+      "seed": 119,
+      "rf_cosine": 72,
+      "rf_sqrtjsd": 78,
+      "nrf_cosine": 0.18274111675126903,
+      "nrf_sqrtjsd": 0.19796954314720813
+    },
+    {
+      "seed": 120,
+      "rf_cosine": 72,
+      "rf_sqrtjsd": 70,
+      "nrf_cosine": 0.18274111675126903,
+      "nrf_sqrtjsd": 0.17766497461928935
+    },
+    {
+      "seed": 121,
+      "rf_cosine": 84,
+      "rf_sqrtjsd": 90,
+      "nrf_cosine": 0.2131979695431472,
+      "nrf_sqrtjsd": 0.22842639593908629
+    },
+    {
+      "seed": 122,
+      "rf_cosine": 78,
+      "rf_sqrtjsd": 82,
+      "nrf_cosine": 0.19796954314720813,
+      "nrf_sqrtjsd": 0.20812182741116753
+    },
+    {
+      "seed": 123,
+      "rf_cosine": 76,
+      "rf_sqrtjsd": 80,
+      "nrf_cosine": 0.19289340101522842,
+      "nrf_sqrtjsd": 0.20304568527918782
+    },
+    {
+      "seed": 124,
+      "rf_cosine": 74,
+      "rf_sqrtjsd": 88,
+      "nrf_cosine": 0.18781725888324874,
+      "nrf_sqrtjsd": 0.2233502538071066
+    },
+    {
+      "seed": 125,
+      "rf_cosine": 64,
+      "rf_sqrtjsd": 72,
+      "nrf_cosine": 0.16243654822335024,
+      "nrf_sqrtjsd": 0.18274111675126903
+    },
+    {
+      "seed": 126,
+      "rf_cosine": 66,
+      "rf_sqrtjsd": 76,
+      "nrf_cosine": 0.16751269035532995,
+      "nrf_sqrtjsd": 0.19289340101522842
+    },
+    {
+      "seed": 127,
+      "rf_cosine": 76,
+      "rf_sqrtjsd": 84,
+      "nrf_cosine": 0.19289340101522842,
+      "nrf_sqrtjsd": 0.2131979695431472
+    },
+    {
+      "seed": 128,
+      "rf_cosine": 88,
+      "rf_sqrtjsd": 84,
+      "nrf_cosine": 0.2233502538071066,
+      "nrf_sqrtjsd": 0.2131979695431472
+    },
+    {
+      "seed": 129,
+      "rf_cosine": 68,
+      "rf_sqrtjsd": 76,
+      "nrf_cosine": 0.17258883248730963,
+      "nrf_sqrtjsd": 0.19289340101522842
+    }
+  ]
+}

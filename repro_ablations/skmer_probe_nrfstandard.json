@@ -1,0 +1,15 @@
+{
+  "scorer": "nrf_standard.py (root-independent unrooted RF, max_rf=2(n-3))",
+  "skmer_k31": {
+    "rf": 308,
+    "nrf": 0.7817258883248731
+  },
+  "skmer_k21": {
+    "rf": 242,
+    "nrf": 0.6142131979695431
+  },
+  "fusang_seed100": {
+    "rf": 108,
+    "nrf": 0.27411167512690354
+  }
+}
