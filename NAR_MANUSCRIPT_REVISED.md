@@ -475,7 +475,7 @@ Three findings emerge from the SwissTree benchmark:
 
 Fusang completes phylogenetic inference on 10,000 taxa in 69.8 seconds (Table 11, Figure 5). For comparison, RAxML-NG under GTR+Γ with 10 parsimony and 10 random starting trees required 244 s at n=200 (measured; `raxml_bench_results.csv`), against 2.3 s for the Fusang simplified pipeline at the same size. The divide-and-conquer strategy with FastME scales as O(n² log n), with optimizations including scipy-based clustering (52× faster than Python implementation) and an n≤2 fast path.
 
-**Table 11. Fusang scalability (L=500 bp, clean data; simplified pipeline for all n≤1000 timing runs, DCM at n=10,000). Tree builder: FastME BIONJ+BNNI.**
+**Table 11. Fusang scalability (L=500 bp, clean data; simplified pipeline for n≤500 timing runs; DCM+EPA at n=1,000 and n=10,000). Tree builder: FastME BIONJ+BNNI.**
 
 | n | Time (s) | Pipeline | FastME Speedup vs NJ |
 |---|:---:|----------|:---:|
@@ -484,10 +484,12 @@ Fusang completes phylogenetic inference on 10,000 taxa in 69.8 seconds (Table 11
 | 100 | 24.5 | Simplified | — |
 | 200 | 46.1 | Simplified (NJ) | 3.5× |
 | 500 | 3.8 | Simplified (FastME) | — |
-| 1000 | 5.2 | Simplified (FastME) | — |
+| 1000 | 5.2 | DCM+EPA ‡ | — |
 | 10000 | 69.8 | DCM | — |
 
 † This table mixes two measurement generations and should be read with care. The n=20–200 rows were timed with Neighbor-Joining (NJ) **before** the scipy-based clustering optimisation (reported: 4.9/13.9/24.5/46.1 s; the same NJ builder after optimisation: 1.8/2.0/2.2/2.3 s), whereas the n≥500 rows use FastME BIONJ+BNNI on the optimised code path (n=500/1000 also independently recorded as 3.59/5.08 s). The apparent non-monotonicity between n=200 (46.1 s) and n=500 (3.8 s) therefore reflects the change of tree builder and code version, not an algorithmic discontinuity; a uniform re-timing of the whole table on a single code version is in progress. All scalability claims in the main text use FastME BIONJ+BNNI as the default tree builder for n≥200 (3.5× faster than NJ at n=200).
+
+‡ The n=1,000 timing run was launched with `--simple`, but that flag is silently overridden for n > 500 because the `epa_method` branch resets `use_simple` to False; the recorded 5.2 s therefore reflects the DCM+EPA pipeline, not the simplified one. The same applies to any other run that relied on `--simple` above the `SIMPLE_THRESHOLD`.
 
 ### Real indel-rich genome benchmarks: AFproject community datasets
 
