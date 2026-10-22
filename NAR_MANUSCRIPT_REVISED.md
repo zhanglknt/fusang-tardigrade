@@ -231,12 +231,13 @@ On clean substitution-only data, Fusang's accuracy varies by dataset size (Table
 |---|-----------|-------------------|----------------------|--------|
 | 200 | Clean | 0.234 ± 0.035 (k=5,gap2) | **0.210 ± 0.034** | FT2 (p=2.07×10⁻¹⁴) |
 | 200 | Indel (0.02) | **0.199 ± 0.030** (k=5,gap2) | 0.205 ± 0.030 | Fusang (p=0.0507, borderline; n.s. at α=0.05) |
-| 500 | Clean | 0.244 ± 0.019 (k=5,gap2) | **0.213 ± 0.017** | FT2 (p=1.73×10⁻⁶) |
+| 500 | Clean | 0.244 ± 0.019 (k=5,gap2) | **0.213 ± 0.017** | FT2 (p=1.86×10⁻⁹) |
 | 500 | Indel (0.02) | 0.208 ± 0.019 (k=5,gap2) | 0.209 ± 0.017 | Tie (n.s., p=0.294) |
-| 1000 | Clean | 0.257 ± 0.019 (k=5,gap2) | **0.212 ± 0.016** | FT2 (p=1.73×10⁻⁶) |
+| 1000 | Clean | 0.257 ± 0.019 (k=5,gap2) | **0.212 ± 0.016** | FT2 (p=1.86×10⁻⁹) |
 | 1000 | Indel (0.02) | 0.226 ± 0.015 (k=5,gap2) | **0.212 ± 0.014** | FT2 (p=1.54×10⁻⁴) |
 
 nRF=0: perfect match. Best result in **bold**. Values are mean ± standard deviation, computed with the root-independent (unrooted) RF definition given in the Methods. Seed counts differ by condition: 130 seeds for n=200 (clean: seeds 100–229; indel: seeds 100–229), 30 seeds for n=500 and n=1000. All nRF values are TRUE-relative (vs the simulated ground-truth tree).
+‡ The n=500 and n=1000 clean rows carry the *same* p-value because the two comparisons are unanimous in the same way: in each, all 30 seeds favour FastTree2 (Fusang better in 0/30, no ties), so the signed-rank statistic sits at its floor (W=0) and, at equal seed count, the two rows share a single exact value. This is a property of a discrete test statistic, not a transcription error. Both rows are reported as **exact sign-flip permutation** p-values (2/2³⁰ = 1.86×10⁻⁹) rather than as normal-approximation values: at W=0 the large-sample approximation breaks down in the extreme tail and returns 1.73×10⁻⁶, which is conservative by nearly three orders of magnitude. All other p-values in this table come from comparisons whose statistic is away from the floor and are reported under the tie-corrected zero-split normal approximation described in the Methods.
 † After Bonferroni correction across the 6 ground-truth datasets (α≈0.008), the significant comparisons are reported in Supplementary Table S8. Note that under the root-independent RF definition used here, the direction of the clean-data comparisons is unchanged (FT2 better) while the n=200 indel comparison is borderline (p=0.0507 on integer RF counts with the zero-split convention; not significant at α=0.05); an earlier metric (`calc_nrf_simple.py`) biased comparisons in Fusang's favour and is no longer used (see Methods).
 
 Importantly, Fusang achieves this accuracy with **zero sequence alignment**, operating directly on raw FASTA sequences. The multi-k ensemble variant (see below) not only matches the best single-k configuration without manual k selection but is, on this benchmark, significantly more accurate than the default spaced+NNI pipeline (0.1940 vs 0.1990, p=0.0077; see the Multi-k section). On clean data at n≥500, MSA-based methods retain a clear advantage (p<0.001 after correction), indicating that full positional information from alignment benefits ML inference when indels are absent.
@@ -427,8 +428,8 @@ Systematic parameter scanning (k=3–8, gap=0–4, n=20–1000) revealed a robus
 | 100 | 5,gap2 | 0.234 ± 0.045 | **0.209 ± 0.045** | FT2 better (clean, p=1.2×10⁻¹⁰) § |
 | 200 | 5,gap2 | 0.234 ± 0.035 | **0.210 ± 0.034** | FT2 better (clean, p=2.07×10⁻¹⁴) |
 | 200 | 5,gap2 | **0.199 ± 0.030** | 0.205 ± 0.030 | Fusang better (indel, p=0.0507, borderline; n.s. at α=0.05) ‡ |
-| 500 | 5,gap2 | 0.244 ± 0.019 | **0.213 ± 0.017** | FT2 better (clean, p=1.73×10⁻⁶) |
-| 1000 | 5,gap2 | 0.257 ± 0.019 | **0.212 ± 0.016** | FT2 better (clean, p=1.73×10⁻⁶) |
+| 500 | 5,gap2 | 0.244 ± 0.019 | **0.213 ± 0.017** | FT2 better (clean, p=1.86×10⁻⁹) |
+| 1000 | 5,gap2 | 0.257 ± 0.019 | **0.212 ± 0.016** | FT2 better (clean, p=1.86×10⁻⁹) |
 
 **Notes**: For n<1000, Notes column indicates which method performs better and the p-value when significant. For n=1000 the Fusang trees were produced by the DCM+EPA pipeline: `run_bench_indelible.py` appends `--auto_group_method nj_centroid` whenever n > 500, and with `SIMPLE_THRESHOLD = 500` this routes n=1000 through DCM (see also the pipeline caveat in Discussion). The winner is still FastTree2 on clean data. See Supplementary Table S6 for complete n=1000 benchmark results (30 seeds, both clean and indel conditions). ‡ Row values are from the 130-seed benchmark (seeds 100–229; all seeds valid, no outlier exclusion), paired Wilcoxon p=0.0507 (Table 3; integer RF counts, zero-split convention; not significant at α=0.05). § n=50 and n=100 rows: 130-seed INDELible clean benchmarks (seeds 100–229) measured at the benchmark configuration k=5,gap2 (the Adaptive column shows what the parameter selector would choose). Values shown use all 130 seeds; applying the pre-specified symmetric nRF>0.3 exclusion removes 26/130 seeds at n=50 (Fusang 0.208 ± 0.057 vs FT2 0.189 ± 0.052, p=9.9×10⁻⁵) and 10/130 at n=100 (0.228 ± 0.041 vs 0.204 ± 0.041, p=8.1×10⁻¹⁰) without changing any conclusion. FastTree2 is significantly better at every clean-data scale tested.
 
