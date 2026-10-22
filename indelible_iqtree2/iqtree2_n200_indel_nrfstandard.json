@@ -1,0 +1,189 @@
+{
+  "generated": "2026-10-22T11:09:51",
+  "script": "rescore_iqtree2_nrfstandard.py",
+  "metric": {
+    "name": "standard root-independent (unrooted) Robinson-Foulds",
+    "module": "nrf_standard.py",
+    "definition": "RF = |S1-S2| + |S2-S1| over non-trivial splits; nRF = RF/(2*(n-3)); split canonicalised to the side not containing the lexicographically smallest leaf"
+  },
+  "legacy_metrics": {
+    "old": {
+      "module": "calc_nrf_simple.py",
+      "function": "calc_nrf",
+      "bias": "per-node 'smaller child clade' rule computed against the local subtree, so complements are wrong; under-counts"
+    },
+    "legacy_bp": {
+      "module": "batch_iqtree2_indelible.py",
+      "function": "compute_nrf",
+      "bias": "Biopython Phylo clade leaf-sets with no canonicalisation; rooting-dependent, over-counts"
+    }
+  },
+  "inputs": {
+    "true_trees": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_n200_indel\\seed{N}_indel_true.nwk",
+    "fusang_trees": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_n200_indel\\seed{N}_indel_fusang.nwk",
+    "iqtree2_trees": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\run",
+    "alt_iqtree2_trees": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\wsl_treefiles",
+    "reference_csv": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\iqtree2_n200_indel.csv",
+    "seed_range": [
+      100,
+      229
+    ],
+    "n_taxa": 200
+  },
+  "seed_audit": {
+    "n_seeds_requested": 130,
+    "n_seeds_used": 130,
+    "n_seeds_excluded": 0,
+    "excluded_seeds": [],
+    "leaf_set_check": "all usable seeds: 200 leaves, IQ-TREE2/Fusang leaf sets identical to true"
+  },
+  "primary_standard_metric": {
+    "n_seeds": 130,
+    "iqtree2": {
+      "mean": 0.2103865677469738,
+      "sd": 0.03070545803639286
+    },
+    "fusang": {
+      "mean": 0.19902381882077314,
+      "sd": 0.02960343817579009
+    },
+    "ratio_iqtree2_over_fusang": 1.0570924072984107,
+    "mean_paired_difference": 0.011362748926200705,
+    "wilcoxon": {
+      "zero_method_zsplit": {
+        "statistic": 2560.5,
+        "pvalue": 7.952707799434876e-05
+      },
+      "zero_method_wilcox": {
+        "statistic": 2224.5,
+        "pvalue": 6.011757611533938e-05
+      }
+    },
+    "cohens_d": {
+      "ddof1": 0.38496495158772387,
+      "ddof0": 0.38645418326693237
+    },
+    "counts": {
+      "n_iqtree2_worse": 77,
+      "n_iqtree2_better": 46,
+      "n_ties": 7
+    },
+    "iqtree2_tree_source": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\run"
+  },
+  "alt_treefiles_standard_metric": {
+    "n_seeds": 130,
+    "iqtree2": {
+      "mean": 0.21065989847715738,
+      "sd": 0.030700178342984257
+    },
+    "fusang": {
+      "mean": 0.19902381882077314,
+      "sd": 0.02960343817579009
+    },
+    "ratio_iqtree2_over_fusang": 1.058465764175005,
+    "mean_paired_difference": 0.011636079656384225,
+    "wilcoxon": {
+      "zero_method_zsplit": {
+        "statistic": 2517.5,
+        "pvalue": 5.2169270925253635e-05
+      },
+      "zero_method_wilcox": {
+        "statistic": 2202.5,
+        "pvalue": 4.746246648768867e-05
+      }
+    },
+    "cohens_d": {
+      "ddof1": 0.39727535794544894,
+      "ddof0": 0.39881221226421526
+    },
+    "counts": {
+      "n_iqtree2_worse": 80,
+      "n_iqtree2_better": 43,
+      "n_ties": 7
+    },
+    "iqtree2_tree_source": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\wsl_treefiles"
+  },
+  "legacy_metric_means": {
+    "calc_nrf_simple": {
+      "iqtree2_mean": 0.1360015618898868,
+      "iqtree2_sd": 0.022439649299222892,
+      "fusang_mean": 0.12163217493166732,
+      "fusang_sd": 0.02365269131447442
+    },
+    "legacy_biopython": {
+      "iqtree2_mean": 0.23123779773525965,
+      "iqtree2_sd": 0.031981610020154386,
+      "fusang_mean": 0.2013666536509176,
+      "fusang_sd": 0.029466095702565916
+    }
+  },
+  "provenance": {
+    "reference_csv": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\iqtree2_n200_indel.csv",
+    "calc_nrf_simple_vs_reference_csv": {
+      "n_compared": 130,
+      "max_abs_deviation": 0.16243654822335024,
+      "reproduced": false,
+      "note": "calc_nrf_simple.calc_nrf does NOT reproduce iqtree2_n200_indel.csv"
+    },
+    "legacy_biopython_vs_reference_csv": {
+      "implementation": "batch_iqtree2_indelible.py::compute_nrf (Biopython Phylo, non-canonicalised rooted clades)",
+      "primary_treefiles": {
+        "source": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\run",
+        "max_abs_deviation": 0.03045685279187821,
+        "n_exact": 36
+      },
+      "alt_treefiles": {
+        "source": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\wsl_treefiles",
+        "max_abs_deviation": 0.0,
+        "n_exact": 130
+      },
+      "conclusion": "reference CSV was produced from the alt treefiles with the Biopython legacy metric"
+    },
+    "iqtree2_treefile_provenance_discrepancy": {
+      "n_seeds_topologically_different": 128,
+      "mean_nrf_between_sources": 0.0470128855915658,
+      "max_nrf_between_sources": 0.116751269035533,
+      "warning": "the two IQ-TREE2 output directories hold DIFFERENT topologies; the manuscript's published 0.231 came from the alt treefiles"
+    },
+    "manuscript_figure_audit": {
+      "manuscript_figures": {
+        "iqtree2_mean": 0.231,
+        "iqtree2_sd": 0.032,
+        "fusang_mean": 0.122,
+        "fusang_sd": 0.024
+      },
+      "matches": {
+        "iqtree2": {
+          "mean": 0.23123779773525965,
+          "sd": 0.031981610020154386,
+          "abs_diff_vs_manuscript_mean": 0.00023779773525964276
+        },
+        "iqtree2_alt": {
+          "mean": 0.23147208121827412,
+          "sd": 0.031997460429940706,
+          "abs_diff_vs_manuscript_mean": 0.0004720812182741063
+        },
+        "fusang_old_metric": {
+          "mean": 0.12163217493166732,
+          "sd": 0.02365269131447442,
+          "abs_diff_vs_manuscript_mean": 0.00036782506833267503
+        },
+        "fusang_legacy_bp": {
+          "mean": 0.2013666536509176,
+          "sd": 0.029466095702565916,
+          "abs_diff_vs_manuscript_mean": 0.0793666536509176
+        },
+        "fusang_standard": {
+          "mean": 0.19902381882077314,
+          "sd": 0.02960343817579009,
+          "abs_diff_vs_manuscript_mean": 0.07702381882077314
+        }
+      },
+      "verdict": "the manuscript's 0.231 (IQ-TREE2) and 0.122 (Fusang) come from two different biased metrics; the 1.9x gap is a metric artefact, not a biological result"
+    }
+  },
+  "outputs": {
+    "csv": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\iqtree2_n200_indel_nrfstandard.csv",
+    "json": "D:\\\u7cfb\u7edf\u53d1\u80b2\u6811\u9879\u76ee\\Fusang\\Fusang-main\\indelible_iqtree2\\iqtree2_n200_indel_nrfstandard.json"
+  }
+}

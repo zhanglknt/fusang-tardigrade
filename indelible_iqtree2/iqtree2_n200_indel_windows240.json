@@ -1,0 +1,652 @@
+[
+  {
+    "seed": 100,
+    "nrf": 0.2817258883248731,
+    "status": "cached"
+  },
+  {
+    "seed": 101,
+    "nrf": 0.1751269035532995,
+    "status": "Success"
+  },
+  {
+    "seed": 102,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 103,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 104,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 105,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 106,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 107,
+    "nrf": 0.22081218274111675,
+    "status": "Success"
+  },
+  {
+    "seed": 108,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 109,
+    "nrf": 0.24619289340101522,
+    "status": "Success"
+  },
+  {
+    "seed": 110,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 111,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  },
+  {
+    "seed": 112,
+    "nrf": 0.21065989847715735,
+    "status": "Success"
+  },
+  {
+    "seed": 113,
+    "nrf": 0.22081218274111675,
+    "status": "Success"
+  },
+  {
+    "seed": 114,
+    "nrf": 0.19035532994923857,
+    "status": "Success"
+  },
+  {
+    "seed": 115,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 116,
+    "nrf": 0.1802030456852792,
+    "status": "Success"
+  },
+  {
+    "seed": 117,
+    "nrf": 0.19543147208121828,
+    "status": "Success"
+  },
+  {
+    "seed": 118,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 119,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  },
+  {
+    "seed": 120,
+    "nrf": 0.1802030456852792,
+    "status": "Success"
+  },
+  {
+    "seed": 121,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 122,
+    "nrf": 0.2766497461928934,
+    "status": "Success"
+  },
+  {
+    "seed": 123,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 124,
+    "nrf": 0.19035532994923857,
+    "status": "Success"
+  },
+  {
+    "seed": 125,
+    "nrf": 0.22081218274111675,
+    "status": "Success"
+  },
+  {
+    "seed": 126,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 127,
+    "nrf": 0.1700507614213198,
+    "status": "Success"
+  },
+  {
+    "seed": 128,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 129,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 130,
+    "nrf": 0.2868020304568528,
+    "status": "Success"
+  },
+  {
+    "seed": 131,
+    "nrf": 0.2817258883248731,
+    "status": "Success"
+  },
+  {
+    "seed": 132,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 133,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  },
+  {
+    "seed": 134,
+    "nrf": 0.2918781725888325,
+    "status": "Success"
+  },
+  {
+    "seed": 135,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 136,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 137,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 138,
+    "nrf": 0.2868020304568528,
+    "status": "Success"
+  },
+  {
+    "seed": 139,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 140,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 141,
+    "nrf": 0.2715736040609137,
+    "status": "Success"
+  },
+  {
+    "seed": 142,
+    "nrf": 0.20050761421319796,
+    "status": "Success"
+  },
+  {
+    "seed": 143,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 144,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 145,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 146,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 147,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 148,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 149,
+    "nrf": 0.20050761421319796,
+    "status": "Success"
+  },
+  {
+    "seed": 150,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 151,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 152,
+    "nrf": 0.19543147208121828,
+    "status": "Success"
+  },
+  {
+    "seed": 153,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 154,
+    "nrf": 0.20050761421319796,
+    "status": "Success"
+  },
+  {
+    "seed": 155,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 156,
+    "nrf": 0.20050761421319796,
+    "status": "Success"
+  },
+  {
+    "seed": 157,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  },
+  {
+    "seed": 158,
+    "nrf": 0.1598984771573604,
+    "status": "Success"
+  },
+  {
+    "seed": 159,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 160,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 161,
+    "nrf": 0.19035532994923857,
+    "status": "Success"
+  },
+  {
+    "seed": 162,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 163,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 164,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 165,
+    "nrf": 0.3020304568527919,
+    "status": "Success"
+  },
+  {
+    "seed": 166,
+    "nrf": 0.2868020304568528,
+    "status": "Success"
+  },
+  {
+    "seed": 167,
+    "nrf": 0.21065989847715735,
+    "status": "Success"
+  },
+  {
+    "seed": 168,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 169,
+    "nrf": 0.2868020304568528,
+    "status": "Success"
+  },
+  {
+    "seed": 170,
+    "nrf": 0.1446700507614213,
+    "status": "Success"
+  },
+  {
+    "seed": 171,
+    "nrf": 0.22081218274111675,
+    "status": "Success"
+  },
+  {
+    "seed": 172,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 173,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 174,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 175,
+    "nrf": 0.2868020304568528,
+    "status": "Success"
+  },
+  {
+    "seed": 176,
+    "nrf": 0.1700507614213198,
+    "status": "Success"
+  },
+  {
+    "seed": 177,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 178,
+    "nrf": 0.2969543147208122,
+    "status": "Success"
+  },
+  {
+    "seed": 179,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 180,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 181,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 182,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 183,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 184,
+    "nrf": 0.19035532994923857,
+    "status": "Success"
+  },
+  {
+    "seed": 185,
+    "nrf": 0.19543147208121828,
+    "status": "Success"
+  },
+  {
+    "seed": 186,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 187,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 188,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 189,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  },
+  {
+    "seed": 190,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 191,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 192,
+    "nrf": 0.1802030456852792,
+    "status": "Success"
+  },
+  {
+    "seed": 193,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 194,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 195,
+    "nrf": 0.24619289340101522,
+    "status": "Success"
+  },
+  {
+    "seed": 196,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 197,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 198,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 199,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 200,
+    "nrf": 0.1751269035532995,
+    "status": "Success"
+  },
+  {
+    "seed": 201,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 202,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 203,
+    "nrf": 0.2715736040609137,
+    "status": "Success"
+  },
+  {
+    "seed": 204,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 205,
+    "nrf": 0.2969543147208122,
+    "status": "Success"
+  },
+  {
+    "seed": 206,
+    "nrf": 0.2918781725888325,
+    "status": "Success"
+  },
+  {
+    "seed": 207,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 208,
+    "nrf": 0.1802030456852792,
+    "status": "Success"
+  },
+  {
+    "seed": 209,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 210,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 211,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 212,
+    "nrf": 0.2766497461928934,
+    "status": "Success"
+  },
+  {
+    "seed": 213,
+    "nrf": 0.20558375634517767,
+    "status": "Success"
+  },
+  {
+    "seed": 214,
+    "nrf": 0.22081218274111675,
+    "status": "Success"
+  },
+  {
+    "seed": 215,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 216,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 217,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 218,
+    "nrf": 0.24619289340101522,
+    "status": "Success"
+  },
+  {
+    "seed": 219,
+    "nrf": 0.23604060913705585,
+    "status": "Success"
+  },
+  {
+    "seed": 220,
+    "nrf": 0.2512690355329949,
+    "status": "Success"
+  },
+  {
+    "seed": 221,
+    "nrf": 0.18527918781725888,
+    "status": "Success"
+  },
+  {
+    "seed": 222,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 223,
+    "nrf": 0.2918781725888325,
+    "status": "Success"
+  },
+  {
+    "seed": 224,
+    "nrf": 0.21573604060913706,
+    "status": "Success"
+  },
+  {
+    "seed": 225,
+    "nrf": 0.2614213197969543,
+    "status": "Success"
+  },
+  {
+    "seed": 226,
+    "nrf": 0.22588832487309646,
+    "status": "Success"
+  },
+  {
+    "seed": 227,
+    "nrf": 0.23096446700507614,
+    "status": "Success"
+  },
+  {
+    "seed": 228,
+    "nrf": 0.24111675126903553,
+    "status": "Success"
+  },
+  {
+    "seed": 229,
+    "nrf": 0.2563451776649746,
+    "status": "Success"
+  }
+]
