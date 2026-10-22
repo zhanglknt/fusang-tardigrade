@@ -32,7 +32,7 @@ SRC = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(SRC, "cover_letter_v3.1.docx")
 
 FONT = "Times New Roman"
-PT = 10.0  # sized so the letter fits on one page
+PT = 9.5   # sized so the letter fits on one page
 
 # ---------------------------------------------------------------------------
 # PROVENANCE — every figure below, with the place it occurs in
@@ -62,6 +62,20 @@ PROVENANCE = [
     ("GitHub / Zenodo 10.5281/zenodo.20746742", "Data Availability"),
     ("NSFC 32370682; 2026ZD01910500", "FUNDING"),
     ("corresponding author Li Zhang, knightz@pumc.edu.cn", "L20, CORRESPONDING AUTHOR"),
+]
+
+
+# Reproduced verbatim from NAR_Submission_v3.0/cover_letter.docx. Do not edit:
+# names, affiliations and the short descriptions are carried over unchanged.
+REVIEWERS = [
+    "Dr. Bernard Haubold (Max Planck Institute for Chemical Ecology) — developer of "
+    "andi, a suffix array-based alignment-free method.",
+    "Dr. Olga Vekshina (University of Texas) — expert in alignment-free phylogenetics "
+    "and spaced seed design.",
+    "Dr. Daniel Huson (University of Tübingen) — developer of SplitsTree and "
+    "contributor to disk-covering methods.",
+    "Dr. Rob Knight (University of California, San Diego) — expert in microbiome "
+    "phylogenetic analysis and alignment-free methods.",
 ]
 
 
@@ -107,10 +121,10 @@ def today():
 def build():
     doc = Document()
     sec = doc.sections[0]
-    sec.top_margin = Cm(1.6)
-    sec.bottom_margin = Cm(1.6)
-    sec.left_margin = Cm(2.0)
-    sec.right_margin = Cm(2.0)
+    sec.top_margin = Cm(1.4)
+    sec.bottom_margin = Cm(1.4)
+    sec.left_margin = Cm(1.8)
+    sec.right_margin = Cm(1.8)
 
     normal = doc.styles["Normal"]
     normal.font.name = FONT
@@ -198,7 +212,17 @@ def build():
          "withdrawn or reversed. All accuracy figures use the standard "
          "root-independent unrooted RF (RF/2(n−3)), with Wilcoxon signed-rank tests "
          "on integer RF counts.",
-         space_after=6)
+         space_after=5)
+
+    # ---- recommended reviewers (verbatim from the v3.0 cover letter) -------
+    para(doc, "Recommended Reviewers", bold=True, space_after=1)
+    para(doc,
+         "We suggest the following researchers as potential reviewers (please note "
+         "that we have avoided suggesting direct collaborators):",
+         space_after=1)
+    for line in REVIEWERS:
+        para(doc, line, space_after=0)
+    doc.paragraphs[-1].paragraph_format.space_after = Pt(5)
 
     # ---- availability -----------------------------------------------------
     para(doc, "Software and data availability.", bold=True, space_after=2)
@@ -211,8 +235,9 @@ def build():
          "30-seed Linux MAFFT+FastTree2 comparison, the Mash, kmacs and Skmer runs, "
          "the AFproject real-genome benchmarks, the 150-scenario classifier "
          "validation, the 73-taxon 16S rRNA dataset and the BAliBASE v3.0 results — "
-         "are in the repository and as Supplementary Data. Inference on 10,000 taxa "
-         "completes in 69.8 s with peak memory below 1 GB.",
+         "are in the repository and as Supplementary Data (Supplementary Tables "
+         "S1–S17). Inference on 10,000 taxa completes in 69.8 s with peak memory "
+         "below 1 GB.",
          space_after=6)
 
     para(doc, "No competing interests are declared. Support: National Natural Science "
