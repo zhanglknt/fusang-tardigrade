@@ -7,22 +7,22 @@ prints/returns what that artefact contains.
 
 Authoritative artefacts
 -----------------------
-indelible_n200_indel/bench_n200_indel_130seeds_nrfstandard.csv
-    Per-seed standard unrooted nRF, Fusang vs FastTree2, n=200 indel=0.02, seeds 100-229.
-    Backs Figure 2, S4, S6(A,D) and the n=200 indel row of Figure 1(D).
+table1_nrfstandard/{cell}_nrfstandard.csv (+ {cell}_summary.json)
+    The manuscript's single authoritative per-cell source (Table 1 six cells and Table 3
+    three indel rates), scored with the standard root-independent unrooted RF. Used for
+    n200_indel (Figure 2, S4, S6(A,D), Figure 1(D)), the three indel-rate cells
+    (Figure 1(A,B)) and the n=500 / n=1000 clean cells (S6(A)). Each accessor recomputes
+    the paired statistics from the per-seed rows and asserts agreement with the summary
+    JSON before adopting the summary's values.
+table_threshold_n1000_nrfstandard.csv + table_threshold_n1000_summary.json
+    Figure 3(D) n=1000 simplified-vs-DCM+EPA re-test, 10 paired seeds.
 indelible_n200_indel/competitors_n200_indel_130seeds_stdrf.csv (+ _summary.json)
     Per-seed TRUE-relative and FT2-relative nRF for six k-mer configurations plus the
     alignment-free competitors, same 130 seeds. Backs Figure 4(D) and S7.
-indelible_sweep/indel{0.005,0.01,0.05}/seed*_indel_{true,fusang,ft2}.nwk
-    Sweep trees for the indel-rate scan; rescored on the fly with ``nrf_standard.py``
-    because the stored sweep_indel*.csv were written by the superseded root-dependent
-    scorer. Backs Figure 1(A,B) = manuscript Table 3.
 indelible_iqtree2/iqtree2_n200_indel_nrfstandard.csv
     Figure 1(D) IQ-TREE2 GTR row.
 bench_mash_indelible_n200_nrfstandard.csv
     Figure 1(D) Mash row (indel condition, seeds 100-129).
-table1_nrfstandard/n{500,1000}_clean_nrfstandard.csv
-    S6(A) clean-data effect sizes at n=500 and n=1000.
 repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json
     Figure 3(A) seed-42 indel DCM chain and the 11-setting max_group_size sweep.
 balibase_rf_recomputed/balibase_rf_summary.json
@@ -41,14 +41,11 @@ Conventions
 * Paired differences are always returned in the orientation named by the accessor.
 """
 import csv
-import glob
 import os
 from functools import lru_cache
 
 import numpy as np
 from scipy import stats
-
-import nrf_standard as std
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 N200_NORM = 2 * (200 - 3)          # 394 for the n=200 INDELible benchmarks
@@ -152,6 +149,29 @@ def boot_mean_ci(a, b, norm, n_boot=10000, seed=20250101, orientation='b_minus_a
 
 
 # --------------------------------------------------------------------------------------
+# Authoritative manuscript cells: table1_nrfstandard/ (Table 1 six cells + Table 3 rates)
+# --------------------------------------------------------------------------------------
+
+def _table1_cell(cell):
+    """Authoritative per-seed rows + summary for one manuscript cell.
+
+    Files: table1_nrfstandard/{cell}_nrfstandard.csv and {cell}_summary.json
+    (scored with nrf_standard.py root-independent unrooted RF; Wilcoxon in the summary
+    is on integer RF counts with the zero-split convention).
+    """
+    rows = _read_csv(_p('table1_nrfstandard', cell + '_nrfstandard.csv'))
+    j = json_load(_p('table1_nrfstandard', cell + '_summary.json'))
+    return rows, j
+
+
+def _cell_arrays(cell):
+    """(seeds, nrf_fusang, nrf_ft2) straight out of table1_nrfstandard/."""
+    rows, j = _table1_cell(cell)
+    seeds = np.array([int(r['seed']) for r in rows], dtype=int)
+    return seeds, _f(rows, 'nrf_fusang'), _f(rows, 'nrf_ft2'), j
+
+
+# --------------------------------------------------------------------------------------
 # Figure 2 / S4 / S6(A,D): Fusang vs FastTree2, n=200 indel, 130 seeds
 # --------------------------------------------------------------------------------------
 
@@ -159,16 +179,26 @@ def boot_mean_ci(a, b, norm, n_boot=10000, seed=20250101, orientation='b_minus_a
 def bench_130seeds():
     """Per-seed data + every paired statistic used for the 130-seed headline comparison.
 
-    Source: indelible_n200_indel/bench_n200_indel_130seeds_nrfstandard.csv
+    Source: table1_nrfstandard/n200_indel_nrfstandard.csv + n200_indel_summary.json
+    (the single authoritative source for the manuscript's Table 1 n=200 indel cell).
     Figure 2 legend orientation: FT2 - Fusang, positive = Fusang better.
+    The paired statistics are recomputed here from the per-seed rows and asserted to
+    agree with the summary file before the summary's authoritative values are used, so a
+    future change to either file cannot silently desynchronise figure and text.
     """
-    rows = _read_csv(_p('indelible_n200_indel/bench_n200_indel_130seeds_nrfstandard.csv'))
-    fus, ft2 = _f(rows, 'nrf_fusang_std'), _f(rows, 'nrf_ft2_std')
-    seeds = np.array([int(r['seed']) for r in rows])
+    seeds, fus, ft2, j = _cell_arrays('n200_indel')
     st = paired(fus, ft2, N200_NORM, orientation='b_minus_a')      # FT2 - Fusang
+    assert st['n'] == j['n_seeds'] and st['wins_a'] == j['fusang_better']
+    assert st['wins_b'] == j['ft2_better'] and st['ties'] == j['ties']
+    assert abs(st['p'] - j['wilcoxon_p']) <= 1e-4 * max(j['wilcoxon_p'], 1e-12)
+    assert abs(st['d'] + j['cohens_dz']) < 5e-3      # summary d is (Fusang - FT2)
+    st['p'] = float(j['wilcoxon_p'])
+    st['d'] = float(-j['cohens_dz'])
     st['ci'] = boot_ci(fus, ft2, N200_NORM, orientation='b_minus_a')
     st['seeds'] = seeds
     st['fus'], st['ft2'] = fus, ft2
+    st['mean_a'], st['sd_a'] = float(j['fusang_nrf_mean']), float(j['fusang_nrf_sd'])
+    st['mean_b'], st['sd_b'] = float(j['ft2_nrf_mean']), float(j['ft2_nrf_sd'])
     st['n_gt_03'] = int(((fus > 0.3) | (ft2 > 0.3)).sum())
     return st
 
@@ -177,50 +207,45 @@ def bench_130seeds():
 # Figure 1(A,B): indel-rate scan (manuscript Table 3)
 # --------------------------------------------------------------------------------------
 
-_SWEEP_RATES = (0.005, 0.01, 0.05)
-_SWEEP_DIR = {0.005: 'indel0.005', 0.01: 'indel0.01', 0.05: 'indel0.05'}
+_SWEEP_CELLS = ((0.005, 'indel0.005'), (0.01, 'indel0.01'), (0.05, 'indel0.05'))
 
 
 @lru_cache(maxsize=1)
 def indel_rate_scan():
-    """Rescore the indel-rate sweep trees with nrf_standard.py.
+    """Indel-rate sweep (manuscript Table 3), from the authoritative cell files.
 
-    The CSVs next to the trees (``indelible_sweep/sweep_indel*.csv``) were written with the
-    superseded root-dependent scorer; we recompute from the stored Newick files instead.
-    indel=0.02 comes from the canonical 130-seed file, not from the sweep directory.
-    Returns {rate: dict(n, fus, ft2, mean_fus, sd_fus, mean_ft2, sd_ft2, advantage_pct, p)}.
-    The advantage is computed on the means, (FT2 - Fusang) / FT2 x 100, exactly as Table 3.
+    Source: table1_nrfstandard/indel{0.005,0.01,0.05}_nrfstandard.csv + _summary.json;
+    indel=0.02 is the canonical n200_indel cell (see :func:`bench_130seeds`).
+    These values were verified equal to rescoring the stored Newick trees in
+    ``indelible_sweep/indel{0.005,0.01,0.05}/`` with nrf_standard.py; the CSVs shipped
+    next to those trees (``indelible_sweep/sweep_indel*.csv``) hold the superseded
+    root-dependent nRF and must not be used.
+    Returns {rate: dict(n, seeds, fus, ft2, mean_fus, sd_fus, mean_ft2, sd_ft2,
+    advantage_pct, p, wins_fus, d)}.  The advantage is computed on the means,
+    (FT2 - Fusang) / FT2 x 100, exactly as Table 3.
     """
     out = {}
-    for rate in _SWEEP_RATES:
-        rows = _read_csv(_p('indelible_sweep', 'sweep_indel%s.csv'
-                            % str(rate).replace('0.', '0.')))
-        d = _p('indelible_sweep', _SWEEP_DIR[rate])
-        fus, ft2, seeds = [], [], []
-        for r in rows:
-            s = r['seed']
-            ptr = os.path.join(d, 'seed%s_indel_true.nwk' % s)
-            pfu = os.path.join(d, 'seed%s_indel_fusang.nwk' % s)
-            pft = os.path.join(d, 'seed%s_indel_ft2.nwk' % s)
-            if not (os.path.exists(ptr) and os.path.exists(pfu) and os.path.exists(pft)):
-                continue
-            fus.append(std.nrf_files(ptr, pfu))
-            ft2.append(std.nrf_files(ptr, pft))
-            seeds.append(int(s))
-        out[rate] = _pack_scan(np.array(fus), np.array(ft2), np.array(seeds))
+    for rate, cell in _SWEEP_CELLS:
+        seeds, fus, ft2, j = _cell_arrays(cell)
+        st = paired(fus, ft2, N200_NORM, orientation='b_minus_a')
+        assert st['n'] == j['n_seeds'] and st['wins_a'] == j['fusang_better']
+        assert st['ties'] == j['ties']
+        assert abs(st['p'] - j['wilcoxon_p']) <= 1e-4 * max(j['wilcoxon_p'], 1e-12)
+        out[rate] = dict(
+            n=len(fus), seeds=seeds, fus=fus, ft2=ft2,
+            mean_fus=float(j['fusang_nrf_mean']), sd_fus=float(j['fusang_nrf_sd']),
+            mean_ft2=float(j['ft2_nrf_mean']), sd_ft2=float(j['ft2_nrf_sd']),
+            advantage_pct=float((j['ft2_nrf_mean'] - j['fusang_nrf_mean'])
+                                / j['ft2_nrf_mean'] * 100.0),
+            p=float(j['wilcoxon_p']), wins_fus=int(j['fusang_better']),
+            d=float(-j['cohens_dz']))
     b = bench_130seeds()
-    out[0.02] = _pack_scan(b['fus'], b['ft2'], b['seeds'])
+    out[0.02] = dict(
+        n=b['n'], seeds=b['seeds'], fus=b['fus'], ft2=b['ft2'],
+        mean_fus=b['mean_a'], sd_fus=b['sd_a'], mean_ft2=b['mean_b'], sd_ft2=b['sd_b'],
+        advantage_pct=float((b['mean_b'] - b['mean_a']) / b['mean_b'] * 100.0),
+        p=b['p'], wins_fus=b['wins_a'], d=b['d'])
     return out
-
-
-def _pack_scan(fus, ft2, seeds):
-    st = paired(fus, ft2, N200_NORM, orientation='b_minus_a')
-    return dict(
-        n=len(fus), seeds=seeds, fus=fus, ft2=ft2,
-        mean_fus=float(fus.mean()), sd_fus=float(fus.std(ddof=1)),
-        mean_ft2=float(ft2.mean()), sd_ft2=float(ft2.std(ddof=1)),
-        advantage_pct=float((ft2.mean() - fus.mean()) / ft2.mean() * 100.0),
-        p=st['p'], wins_fus=st['wins_a'], d=st['d'])
 
 
 # --------------------------------------------------------------------------------------
@@ -454,20 +479,22 @@ def rank_signal_16s():
 def clean_scale_effects():
     """Fusang vs FastTree2 on clean data at n=500 and n=1000 (Table 1 protocol).
 
-    Source: table1_nrfstandard/n{500,1000}_clean_nrfstandard.csv (integer RF already).
+    Source: table1_nrfstandard/n{500,1000}_clean_nrfstandard.csv + _summary.json.
     Orientation FT2 - Fusang, positive = Fusang better.
     """
     out = {}
-    for n, path in ((500, 'table1_nrfstandard/n500_clean_nrfstandard.csv'),
-                    (1000, 'table1_nrfstandard/n1000_clean_nrfstandard.csv')):
-        rows = _read_csv(_p(path))
-        rf_f, rf_t = _f(rows, 'rf_fusang'), _f(rows, 'rf_ft2')
-        fus, ft2 = rf_f / float(rows[0]['denom_2n_minus_6']), rf_t / float(rows[0]['denom_2n_minus_6'])
-        st = paired(fus, ft2, float(rows[0]['denom_2n_minus_6']), orientation='b_minus_a')
-        st['ci'] = boot_ci(fus, ft2, float(rows[0]['denom_2n_minus_6']),
-                           orientation='b_minus_a')
-        st['mean_a'], st['sd_a'] = float(fus.mean()), float(fus.std(ddof=1))
-        st['mean_b'], st['sd_b'] = float(ft2.mean()), float(ft2.std(ddof=1))
+    for n, cell in ((500, 'n500_clean'), (1000, 'n1000_clean')):
+        rows, j = _table1_cell(cell)
+        denom = float(rows[0]['denom_2n_minus_6'])
+        fus, ft2 = _f(rows, 'nrf_fusang'), _f(rows, 'nrf_ft2')
+        st = paired(fus, ft2, denom, orientation='b_minus_a')
+        assert st['n'] == j['n_seeds'] and st['wins_a'] == j['fusang_better']
+        assert abs(st['p'] - j['wilcoxon_p']) <= 1e-4 * max(j['wilcoxon_p'], 1e-12)
+        st['p'] = float(j['wilcoxon_p'])
+        st['d'] = float(-j['cohens_dz'])
+        st['ci'] = boot_ci(fus, ft2, denom, orientation='b_minus_a')
+        st['mean_a'], st['sd_a'] = float(j['fusang_nrf_mean']), float(j['fusang_nrf_sd'])
+        st['mean_b'], st['sd_b'] = float(j['ft2_nrf_mean']), float(j['ft2_nrf_sd'])
         st['n_taxa'] = n
         out[n] = st
     return out
