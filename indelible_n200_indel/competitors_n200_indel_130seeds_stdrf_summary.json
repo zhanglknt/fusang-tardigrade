@@ -14,7 +14,7 @@
     "nj_implementation": "BioPython DistanceTreeConstructor().nj (fusang_v4_dahp_v1.build_nj) for every distance-matrix method; fusang_spaced_k5 additionally uses the official CLI (fusang_v2.py --tree_method nj --kmer_k 5 --kmer_gap gap2), which applies a BME/NNI refinement pass that competitor methods do not receive",
     "fusang_config": "k=5, gap2 (position mask 1110011 = positions 0,1,2,5,6)",
     "trees_dir": "indelible_n200_indel/trees_stdrf",
-    "wilcoxon": "scipy.stats.wilcoxon(a, b, zero_method='zsplit')"
+    "wilcoxon": "scipy.stats.wilcoxon(a, b, zero_method='zsplit') on exact integer RF counts (nRF x 394); float nRF differences carry ~1e-17 noise that breaks Wilcoxon ties and biases p"
   },
   "split_resolution_diagnostics": {
     "cophylog_k19": {
@@ -119,7 +119,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.4054002151630176e-23,
+        "wilcoxon_p_zsplit": 4.378570938327204e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 14.487182005358685
       }
     },
@@ -139,7 +140,8 @@
         "wins_vs_fusang": 64,
         "losses_vs_fusang": 56,
         "ties": 10,
-        "wilcoxon_p_zsplit": 0.47824559046421766,
+        "wilcoxon_p_zsplit": 0.5504169514651451,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.02456863782181054
       }
     },
@@ -159,7 +161,8 @@
         "wins_vs_fusang": 81,
         "losses_vs_fusang": 41,
         "ties": 8,
-        "wilcoxon_p_zsplit": 3.4502121432800466e-06,
+        "wilcoxon_p_zsplit": 4.503372926806115e-06,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.4207833373617571
       }
     },
@@ -179,7 +182,8 @@
         "wins_vs_fusang": 56,
         "losses_vs_fusang": 60,
         "ties": 14,
-        "wilcoxon_p_zsplit": 0.7402618269031256,
+        "wilcoxon_p_zsplit": 0.7486581970118542,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 0.02811657893326917
       }
     },
@@ -199,7 +203,8 @@
         "wins_vs_fusang": 79,
         "losses_vs_fusang": 40,
         "ties": 11,
-        "wilcoxon_p_zsplit": 0.0001000881768180828,
+        "wilcoxon_p_zsplit": 0.00012436305226382405,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.3129430642319217
       }
     },
@@ -219,7 +224,8 @@
         "wins_vs_fusang": 65,
         "losses_vs_fusang": 46,
         "ties": 19,
-        "wilcoxon_p_zsplit": 0.02895259522066321,
+        "wilcoxon_p_zsplit": 0.03469296740368757,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.20144411819303623
       }
     },
@@ -239,7 +245,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.426327201376978e-23,
+        "wilcoxon_p_zsplit": 4.3344931310909257e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 4.373413253036947
       }
     },
@@ -259,7 +266,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.409666305288717e-23,
+        "wilcoxon_p_zsplit": 4.3060640719781835e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 5.591490519299085
       }
     },
@@ -279,7 +287,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.4276567697712604e-23,
+        "wilcoxon_p_zsplit": 4.3597528051359245e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 6.008145729131429
       }
     },
@@ -311,7 +320,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.393798880262611e-23,
+        "wilcoxon_p_zsplit": 4.345218537959524e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 15.40337474294365
       }
     },
@@ -331,7 +341,8 @@
         "wins_vs_fusang": 39,
         "losses_vs_fusang": 80,
         "ties": 11,
-        "wilcoxon_p_zsplit": 4.939534087712772e-05,
+        "wilcoxon_p_zsplit": 4.959162948770712e-05,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 0.38493786199159397
       }
     },
@@ -351,7 +362,8 @@
         "wins_vs_fusang": 76,
         "losses_vs_fusang": 42,
         "ties": 12,
-        "wilcoxon_p_zsplit": 0.004657896574446502,
+        "wilcoxon_p_zsplit": 0.003909605007733638,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.25155874198139455
       }
     },
@@ -371,7 +383,8 @@
         "wins_vs_fusang": 52,
         "losses_vs_fusang": 61,
         "ties": 17,
-        "wilcoxon_p_zsplit": 0.37670247354558417,
+        "wilcoxon_p_zsplit": 0.37555846014626726,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 0.07407246058592695
       }
     },
@@ -391,7 +404,8 @@
         "wins_vs_fusang": 72,
         "losses_vs_fusang": 46,
         "ties": 12,
-        "wilcoxon_p_zsplit": 0.008102243989041382,
+        "wilcoxon_p_zsplit": 0.007657400446387244,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": -0.24553292531731824
       }
     },
@@ -411,7 +425,8 @@
         "wins_vs_fusang": 50,
         "losses_vs_fusang": 54,
         "ties": 26,
-        "wilcoxon_p_zsplit": 0.31992120633447463,
+        "wilcoxon_p_zsplit": 0.3402001866967316,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 0.09216765110713333
       }
     },
@@ -431,7 +446,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.429873568899567e-23,
+        "wilcoxon_p_zsplit": 4.3424622894618055e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 4.837967289183401
       }
     },
@@ -451,7 +467,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.418062937019201e-23,
+        "wilcoxon_p_zsplit": 4.3145595322145943e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 5.843563700355724
       }
     },
@@ -471,7 +488,8 @@
         "wins_vs_fusang": 0,
         "losses_vs_fusang": 130,
         "ties": 0,
-        "wilcoxon_p_zsplit": 4.3853001164810616e-23,
+        "wilcoxon_p_zsplit": 4.328417045744489e-23,
+        "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
         "cohens_d_paired": 6.567472232369641
       }
     },

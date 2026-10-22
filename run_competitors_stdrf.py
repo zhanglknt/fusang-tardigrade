@@ -263,6 +263,18 @@ def parse_seed_spec(spec):
 # --------------------------------------------------------------------------
 # summary statistics
 # --------------------------------------------------------------------------
+# All nRF values on the n=200 data live on the exact grid k/394 (k = integer RF).
+# Floating-point subtraction of k/394 values breaks ties between nominally equal
+# differences (~1e-17 noise), which silently corrupts Wilcoxon midrank
+# assignment.  All rank-based statistics are therefore computed on the integer
+# RF counts (v * 394, rounded); means/SDs are unaffected either way.
+NRF_DENOM = 394  # 2 * (n - 3), n = 200
+
+
+def _to_rf(arr):
+    return np.round(np.asarray(arr, dtype=np.float64) * NRF_DENOM).astype(np.int64)
+
+
 def summarize(rows, frame):
     """frame in {'ft2','true'}; per-method stats + paired comparison vs Fusang CLI."""
     from scipy import stats
@@ -307,14 +319,17 @@ def summarize(rows, frame):
             continue
         pairs = [(base[s], x) for s, x in zip(seeds, arr) if s in base]
         if len(pairs) >= 5:
-            a = np.array([p[0] for p in pairs], dtype=np.float64)   # Fusang CLI
-            b = np.array([p[1] for p in pairs], dtype=np.float64)   # method
+            # exact integer RF counts -> tie structure is exact
+            a_rf = _to_rf([p[0] for p in pairs])   # Fusang CLI
+            b_rf = _to_rf([p[1] for p in pairs])   # method
+            a = np.array([p[0] for p in pairs], dtype=np.float64)
+            b = np.array([p[1] for p in pairs], dtype=np.float64)
             diff = b - a
-            wins = int(np.sum(b < a))
-            losses = int(np.sum(b > a))
-            ties = int(np.sum(b == a))
+            wins = int(np.sum(b_rf < a_rf))
+            losses = int(np.sum(b_rf > a_rf))
+            ties = int(np.sum(b_rf == a_rf))
             try:
-                _, p = stats.wilcoxon(a, b, zero_method="zsplit")
+                _, p = stats.wilcoxon(a_rf, b_rf, zero_method="zsplit")
                 p = float(p)
             except Exception:
                 p = None
@@ -329,6 +344,7 @@ def summarize(rows, frame):
                 "losses_vs_fusang": losses,
                 "ties": ties,
                 "wilcoxon_p_zsplit": p,
+                "wilcoxon_input": "integer RF counts (nRF x 394) to preserve exact ties",
                 "cohens_d_paired": d,
             }
         summary[m] = entry
@@ -535,7 +551,9 @@ def main():
                                   "methods do not receive"),
             "fusang_config": "k=5, gap2 (position mask 1110011 = positions 0,1,2,5,6)",
             "trees_dir": os.path.relpath(trees_dir, HERE),
-            "wilcoxon": "scipy.stats.wilcoxon(a, b, zero_method='zsplit')",
+            "wilcoxon": ("scipy.stats.wilcoxon(a, b, zero_method='zsplit') on exact "
+                         "integer RF counts (nRF x 394); float nRF differences carry "
+                         "~1e-17 noise that breaks Wilcoxon ties and biases p"),
         },
         "split_resolution_diagnostics": diag,
         "vs_ft2": summarize(rows, "ft2"),
