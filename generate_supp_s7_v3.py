@@ -39,8 +39,7 @@ def panel_label(ax, s):
             fontweight='bold', color=INK, va='top')
 
 def fmt_p(p):
-    if p < 1e-3:
-        return '%.2g' % p
+    # three significant figures, matching how the manuscript prints these p-values
     return '%.3g' % p
 
 # ---------- A: scatter, NJ-only spaced vs ensemble ----------

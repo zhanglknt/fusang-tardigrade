@@ -121,10 +121,7 @@ names = [e[c]['label'] for c in order]
 n_seeds = len(e['multik_ensemble']['true'])
 
 def _fmt_p(p):
-    if p < 1e-3:
-        ex = int(np.floor(np.log10(p)))
-        mant = p / 10 ** ex
-        return 'p=%.2g' % p
+    # three significant figures, matching how the manuscript prints these p-values
     return 'p=%.3g' % p
 
 bar_cols = []
@@ -138,10 +135,15 @@ for i, c in enumerate(order):
             fontsize=8.2, fontweight='bold', color=INK)
     if c != 'multik_ensemble':
         v = pw[c]
-        note = f'{_fmt_p(v["p"])}\n{v["ensemble_wins"]}/130'
-        ax.text(i, 0.010, note, ha='center', va='bottom', fontsize=7.0, color='white')
+        # in-bar label: p (prefix stripped so the string fits inside the narrow bar)
+        # over ensemble wins / 130
+        note = f'{_fmt_p(v["p"])[2:]}\n{v["ensemble_wins"]}/130'
+        ax.text(i, 0.010, note, ha='center', va='bottom', fontsize=6.8, color='white')
 ax.text(order.index('multik_ensemble'), 0.010, 'reference\nmethod', ha='center',
         va='bottom', fontsize=7.0, color='white', style='italic')
+ax.text(0.015, 0.985, 'labels in bars: Wilcoxon p (integer RF, zsplit)\n'
+                      'over ensemble wins / 130 seeds',
+        transform=ax.transAxes, fontsize=6.4, color=GREY, style='italic', va='top')
 ax.set_xticks(range(len(order)))
 ax.set_xticklabels(names, fontsize=7.4, rotation=24, ha='right')
 ax.set_ylabel('nRF vs true tree (mean ± SD)', fontsize=9.5, color=INK)

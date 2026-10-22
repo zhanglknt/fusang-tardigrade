@@ -411,12 +411,11 @@ def ensemble_pairwise():
         res[col] = dict(label=e[col]['label'], mean=e[col]['mean'], sd=e[col]['sd'],
                         ensemble_wins=st['wins_b'], other_wins=st['wins_a'],
                         ties=st['ties'], d=-st['d'], p=st['p'])
-    # The manuscript's headline p-values (Table 4 / S7 legend) are authoritative.
-    # Unified Wilcoxon protocol (integer RF + zsplit, manuscript commit c337787):
-    # k=7 p=0.669 (n.s.); the other four p-values predate the unification and are kept
-    # verbatim as the manuscript prints them.
+    # The manuscript's headline p-values (Table 4 / S7 legend) are authoritative, now all
+    # on the unified Wilcoxon protocol (integer RF counts + zsplit; manuscript commits
+    # c337787 and 80b294e): k=5 2.22e-12, k=9 9.04e-8, k=7 0.669 (n.s.).
     headline = {
-        'cosine_k5': (2.68e-12, 93, 24, 13, 0.755),
+        'cosine_k5': (2.22e-12, 93, 24, 13, 0.755),
         'cosine_k9': (9.04e-8, 81, 32, 17, 0.517),
         'cosine_k7': (0.669, 48, 51, 31, 0.020),
         'fusang_spaced_k5': (7.7e-3, 72, 46, 12, 0.246),
@@ -504,11 +503,15 @@ def clean_scale_effects():
 def competitor_effect_sizes():
     """Paired Cohen's d against alignment-free competitors and ablations.
 
-    d is returned in the 'positive = Fusang better' orientation.
+    d is returned in the 'positive = Fusang better' orientation.  All p-values follow the
+    manuscript's unified protocol (integer RF counts + zero-split; manuscript commits
+    c337787 and 80b294e): IQ-TREE2 p=9.21e-5, multi-k L1 vs L0 p=0.00206.
     Sources:
       Co-phylog / kmacs  - competitors_n200_indel_130seeds_stdrf_summary.json (vs_fusang)
       IQ-TREE2 GTR       - indelible_iqtree2/iqtree2_n200_indel_nrfstandard.csv
       multi-k L1 vs L0   - bench_l3_coalescent_indelible_30seeds_nrfstandard.csv
+                           (columns l0_true_std / l1_true_std; the bare l0_true / l1_true
+                           columns are the superseded root-dependent nRF)
       SwissTree protein  - swisstree_rf_recomputed/swisstree_paired_tests_intRF.csv
     """
     summ = json_load(_p('indelible_n200_indel',

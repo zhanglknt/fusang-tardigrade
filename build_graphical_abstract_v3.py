@@ -89,7 +89,19 @@ for s in ["top", "right", "bottom"]: axbar.spines[s].set_visible(False)
 axbar.spines["left"].set_color("#cbd5e1")
 axbar.set_xticks([])
 txt(x1 + ew/2, ey + 5.6, "marginally better than FastTree2 (p=0.0507, borderline n.s.)", 8.5, INK)
-txt(x1 + ew/2, ey + 3.2, "5% more accurate than IQ-TREE2 GTR (p=7.9\u00d710\u207b\u2075)", 8.5, INK, "bold")
+# IQ-TREE2 p-value from figure_data (integer RF + zsplit), same convention as the manuscript
+def _sci_sup(expo):
+    if expo.startswith('-'):
+        expo = '-' + expo[1:].lstrip('0')
+    else:
+        expo = expo.lstrip('0') or '0'
+    return ''.join('\u207b' if c == '-' else chr(0x2070 + int(c)) for c in expo)
+
+_iq_p = [c for c in FD.competitor_effect_sizes() if c[0].startswith('IQ-TREE2')][0][2]
+_iq_mant, _iq_expo = f'{_iq_p:.2e}'.split('e')
+txt(x1 + ew/2, ey + 3.2,
+    f"5% more accurate than IQ-TREE2 GTR (p={_iq_mant}\u00d710{_sci_sup(_iq_expo)})",
+    8.5, INK, "bold")
 
 # (ii) real data
 x2 = 2*gap + ew
