@@ -1,6 +1,8 @@
 """Supplementary Figure S3 (v3): DCM degradation — 4 panels.
-A: single-seed pipeline stage trace (seed=42, n=200, clean)
-B: simplified pipeline multi-seed validation vs full DCM
+A: single-seed pipeline stage trace (seed=42, n=200, indel rate=0.02;
+   machine-readable artefact: repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json)
+B: DCM max_group_size sweep on the same seed (11 settings) vs simplified pipeline
+   and MAFFT+FastTree2 reference lines (same JSON artefact)
 C: DCM pipeline schematic with EPA grafting failure point
 D: nRF stability across scales incl. DCM regime (scalability_results.json, 5 seeds)
 """
@@ -24,52 +26,53 @@ def panel_label(ax, s):
             fontweight='bold', color=INK, va='top')
 
 # ---------- A: single-seed stage trace ----------
-# Standard root-independent unrooted RF, n=200 seed 42 clean. Values are those printed in
-# the Supplementary Figure S3 legend of NAR_MANUSCRIPT_REVISED.md
-# (0.000 / 0.030 / 0.000 / 0.010 / 0.457); no machine-readable standard-RF artefact for
-# this clean chain is retained (the superseded calc_nrf_simple trace lives in
-# repro_ablations/diag_dcm_loss_n200_s42.json), so they are transcribed from the legend.
+# Standard root-independent unrooted RF, n=200 indel rate=0.02 seed 42. All values are
+# read directly from the machine-readable artefact
+# repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json (no transcription).
+ABL = json.load(open('repro_ablations/ablation_dcm_seed42_indel_nrfstandard.json'))
 ax = axes[0][0]
-stages = ['Simplified\npipeline', 'TF-IDF\nweighting', 'DCM+NJ\nrecovery', 'DCM+FastME\nrecovery', 'DCM+EPA\ngrafting']
-vals = [0.000, 0.030, 0.000, 0.010, 0.457]
-cols = [GREEN, AMBER, GREEN, GREEN, RED]
+stages = ['Simplified\npipeline (NJ)', 'Simplified\n(FastME)', 'distances.py\nmatrix (NJ)',
+          'TF-IDF\n(diagnostic)', 'DCM+EPA\ngrafting']
+vals = [ABL['step1_simplified_nj']['nrf'], ABL['step2_fastme']['nrf'],
+        ABL['step3_v2_distmat_nj']['nrf'], ABL['step4_tfidf_nj']['nrf'],
+        ABL['step5_dcm_sweep_nj_default']['mg10_nj_default']['nrf']]
+cols = [GREEN, GREEN, GREEN, AMBER, RED]
 bars = ax.bar(stages, vals, color=cols, width=0.6)
 for b, v in zip(bars, vals):
     ax.text(b.get_x() + b.get_width()/2, v + 0.012, f'{v:.3f}', ha='center',
             fontsize=9, fontweight='bold', color=INK)
 ax.set_ylabel('nRF distance', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.55)
-ax.set_title('Stage-by-stage trace (n=200, seed=42, clean;\nstandard root-independent unrooted RF)',
+ax.set_ylim(0, 0.62)
+ax.set_title('Stage-by-stage trace (n=200, indel 0.02, seed=42;\nstandard root-independent unrooted RF)',
              fontsize=9.8, color=INK, pad=6)
 ax.tick_params(axis='x', labelsize=7.5)
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'A')
 
-# ---------- B: simplified multi-seed vs DCM ----------
+# ---------- B: DCM max_group_size sweep on the same seed ----------
+# All values from the same JSON artefact (step5_dcm_sweep_nj_default, 11 settings,
+# NJ subtrees); reference lines: simplified pipeline and MAFFT+FastTree2 on this seed.
 ax = axes[0][1]
-# Single-seed values are the standard-RF clean seed-42 chain of panel A (0.000 / 0.457).
-# The 10-seed mean (0.014±0.003, seeds 42-51) was produced by the superseded
-# root-dependent nRF implementation and is retained for shape only (S3 legend).
-names = ['Simplified\nsingle seed\n(standard RF)', 'Simplified\n10-seed mean\n(superseded impl.)', 'Full DCM+EPA\nsingle seed\n(standard RF)']
-v = [0.000, 0.014, 0.457]
-e = [0, 0.003, 0]
-cols = [GREEN, TEAL, RED]
-bars = ax.bar(names, v, yerr=e, capsize=5, color=cols, width=0.52,
-              error_kw=dict(lw=1.2, ecolor=INK))
-for b, vv in zip(bars, v):
-    ax.text(b.get_x() + b.get_width()/2, vv + 0.014, f'{vv:.3f}', ha='center',
-            fontsize=9.5, fontweight='bold', color=INK)
+sweep = ABL['step5_dcm_sweep_nj_default']
+mg_labels = ['10', '20', '25', '30', '40', '50', '60', '80', '100', '120', '150']
+mg_vals = [sweep[f'mg{m}_nj_default']['nrf'] for m in mg_labels]
+cols = [RED if i == 0 else AMBER for i in range(len(mg_vals))]
+bars = ax.bar(mg_labels, mg_vals, color=cols, width=0.62)
+for b, vv in zip(bars, mg_vals):
+    ax.text(b.get_x() + b.get_width()/2, vv + 0.010, f'{vv:.2f}', ha='center',
+            fontsize=7.6, fontweight='bold', color=INK)
+ax.axhline(ABL['step1_simplified_nj']['nrf'], color=GREEN, ls='--', lw=1.6,
+           label='simplified pipeline (0.081)')
+ax.axhline(ABL['fasttree2_mafft']['nrf'], color=BLUE, ls=':', lw=1.6,
+           label='MAFFT+FastTree2 (0.096)')
+ax.legend(loc='upper right', fontsize=7.2, frameon=False, handlelength=2.2)
+ax.set_xlabel('max_group_size (NJ subtrees)', fontsize=9, color=INK)
 ax.set_ylabel('nRF distance', fontsize=9.5, color=INK)
-ax.set_ylim(0, 0.55)
-ax.set_title('Simplified pipeline: multi-seed validation\n(seeds 42-51, n=200, clean)', fontsize=10, color=INK, pad=6)
-ax.tick_params(axis='x', labelsize=7.2)
-ax.text(0.02, 0.97, 'step-5 DCM uses max_group_size=10\n(chosen for continuity with the withdrawn\n'
-                    'old-scorer trace; all 11 settings exceed\nsimplified — see Results)',
-        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic', va='top')
-ax.text(0.5, -0.30, 'middle bar: superseded root-dependent nRF implementation,\n'
-                    'retained for shape only (not a validated accuracy value)',
-        transform=ax.transAxes, fontsize=6.6, color=GREY, style='italic', ha='center')
+ax.set_ylim(0, 0.62)
+ax.set_title('DCM max_group_size sweep (same seed, 11 settings):\nevery setting loses to the simplified pipeline',
+             fontsize=9.4, color=INK, pad=6)
+ax.tick_params(axis='x', labelsize=8)
 ax.grid(alpha=0.25, axis='y')
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 panel_label(ax, 'B')
@@ -95,7 +98,7 @@ for i, (t, c) in enumerate(steps):
         ax.annotate('', xy=(x + 1.22, 6.6), xytext=(x + 0.80, 6.6),
                     arrowprops=dict(arrowstyle='-|>', color=INK, lw=1.4))
     x += 2.0
-ax.text(9.0, 5.1, '\u2717 primary error source: grafting\nsubtrees with internal structure\n(nRF 0.000 \u2192 0.457)',
+ax.text(9.0, 5.1, '\u2717 primary error source: grafting\nsubtrees with internal structure\n(nRF 0.081 \u2192 0.523)',
         fontsize=7.5, color=RED, ha='center', va='top', fontweight='bold')
 # recovery path
 ax.annotate('', xy=(5.0, 3.1), xytext=(8.6, 5.7),

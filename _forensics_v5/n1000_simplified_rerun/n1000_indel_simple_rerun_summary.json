@@ -1,0 +1,36 @@
+{
+  "n_valid": 30,
+  "seed_range": [
+    100,
+    129
+  ],
+  "simple_mean": 0.22019391507856906,
+  "simple_sd": 0.015231288977119655,
+  "dcm_mean": 0.2262788365095286,
+  "dcm_sd": 0.015084512506792356,
+  "ft2_mean": 0.21166833834837845,
+  "ft2_sd": 0.014389219219055477,
+  "simple_vs_dcm": {
+    "p": 0.000129327444484731,
+    "dz": -0.8670124830456796,
+    "a_better": 25,
+    "b_better": 4,
+    "ties": 1
+  },
+  "simple_vs_ft2": {
+    "p": 0.003975482615222628,
+    "dz": 0.5806271749853399,
+    "a_better": 7,
+    "b_better": 23,
+    "ties": 0
+  },
+  "dcm_vs_ft2": {
+    "p": 0.00015390987699978722,
+    "dz": 0.9830968479829911,
+    "a_better": 4,
+    "b_better": 25,
+    "ties": 1
+  },
+  "metric": "nrf_standard.py, denom=2(n-3)=1994",
+  "runner": "fusang_v2.py --simple --tree_method fastme --threads 4 (nj fallback), Windows venv python"
+}
