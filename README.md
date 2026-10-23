@@ -4,7 +4,7 @@
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20746742.svg)](https://doi.org/10.5281/zenodo.20746742)
 
-**Alignment-free phylogenetic inference from unaligned FASTA in seconds — robust where insertions and deletions break alignment-based pipelines.**
+**Alignment-free phylogenetic inference from unaligned FASTA in seconds — k-mer frequency vector cosine distances that retain accuracy under indel-rich sequence evolution.**
 
 Fusang reconstructs phylogenetic trees directly from unaligned sequences: spaced k-mer frequency vectors → cosine distance → Neighbor-Joining / FastME. No multiple sequence alignment, no model selection, no manual parameter tuning — adaptive defaults pick k-mer size and gap pattern from your dataset size, and a multi-k ensemble removes the need to choose k at all.
 
@@ -19,9 +19,9 @@ Fusang reconstructs phylogenetic trees directly from unaligned sequences: spaced
 | Adaptive parameters | k and gap auto-selected from n (n≤100 → k=4,gap1; n>100 → k=5,gap2) |
 | Multi-k ensemble (`--v3`) | Averages distances over k=5,7,9 — no manual k selection; auto-rescues k=5 saturation at genomic scale |
 | Two-scale pipeline | Simplified direct pipeline for n≤500; DCM decomposition + EPA grafting for n>500 |
-| Boundary classifier | Random-forest model (`boundary_rf.pkl`) flags homogeneous vs. structured datasets and routes them appropriately |
+| Boundary classifier (research) | Random-forest model (`boundary_rf.pkl`) flags homogeneous vs. structured datasets — part of the `fusang_mhl_main.py` research framework, not of the shipped `fusang_v2.py` inference pipeline |
 | FastME backend | BIONJ + balanced NNI; bundled native Windows (`fastme_bin/fastme.exe`) and Linux binaries — no WSL or manual install needed |
-| Scalable | 10,000 taxa in ~54 s on a 4-core workstation |
+| Scalable | 10,000 taxa in ~70 s on a 4-core workstation |
 
 ## 30-second quick start
 
@@ -99,11 +99,12 @@ If you are unsure, run the MHL entry point: the boundary classifier will tell yo
 
 | n taxa | Time | Notes |
 |---|---|---|
-| 200 | 1.3 s (NJ) / 0.4 s (FastME) | single gene, 4 cores |
-| 1,000 | ~8 s | simplified pipeline |
-| 10,000 | ~54 s | DCM pipeline, 4-core workstation, ~0.6 GB RAM |
+| 200 | 2.3 s (NJ, optimised) | single gene, 4-core workstation |
+| 500 | 3.8 s | simplified pipeline, FastME BIONJ+BNNI |
+| 1,000 | 5.2 s | DCM+EPA pipeline (default routing for n>500), FastME |
+| 10,000 | 69.8 s | DCM pipeline, 4-core workstation, ~0.6 GB RAM |
 
-Accuracy (nRF vs. true tree, indel-rich simulations, n=200; lower is better): Fusang multi-k (0.105) ties FastTree2-with-MAFFT (0.084–0.105 range across settings) and significantly outperforms IQ-TREE2 on indel-rich data, at <3 s vs. minutes — see the manuscript and `repro_package/` for full benchmark tables.
+Accuracy (TRUE-relative nRF vs. simulated ground truth, indel rate=0.02, n=200, L=500 bp, 130 seeds; lower is better): Fusang 0.199 ± 0.030 vs FastTree2 (MAFFT+ML) 0.205 ± 0.030 — numerically better but borderline (paired Wilcoxon p=0.0507, not significant at α=0.05); IQ-TREE2 GTR 0.210 ± 0.031 (significantly worse than Fusang, p=9.2×10⁻⁵). The multi-k ensemble (k=5,7,9) improves on the default pipeline (0.194 vs 0.199, p=7.7×10⁻³). Note the direction reverses at scale: at n=1000 indel FastTree2 is significantly better (0.212 vs 0.226, p=1.5×10⁻⁴). See the manuscript and `repro_package/` for full benchmark tables.
 
 ## Documentation
 
@@ -125,7 +126,7 @@ If you use Fusang, please cite the archived software and the manuscript:
 }
 ```
 
-Manuscript (under review at *Nucleic Acids Research*): "Fusang: Tardigrade Edition — Spaced k-mer Alignment-Free Phylogenetic Inference Resilient to Indel-Rich Sequence Evolution".
+Manuscript (under review at *Nucleic Acids Research*): "Fusang: Tardigrade Edition — K-mer Frequency Vector Alignment-Free Phylogenetic Inference under Indel-Rich Sequence Evolution".
 
 ## License
 
